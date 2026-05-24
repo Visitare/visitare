@@ -187,7 +187,7 @@ ranking é um requisito (não opcional). Detalhes em
 
 ## Demo video
 
-🚧 _60s de demo gravados antes da entrega aos juízes._
+**[Assistir no Google Drive](https://drive.google.com/file/d/1-GGOJNMB0wRv3bVE9JJEJ8ZuEJsQX9lj/view?usp=sharing)**
 
 ---
 
