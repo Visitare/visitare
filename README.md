@@ -26,25 +26,24 @@ Comunitários de Saúde (ACS) da Atenção Primária do Rio de Janeiro.
 
 ## Solution summary
 
-**Claudia** é ACS há 8 anos no Rio. Responsável por ~750 pessoas. Toda segunda de manhã ela decide quem visitar de cabeça, com caderno e WhatsApp. Não sabe se a Dona Maria — diabética, sumida do posto há 3 meses — está bem. No fim do dia gasta ~1h transcrevendo em papel para o sistema. Todo dia.
+**Claudia** é ACS há 8 anos no Rio. Todo fim de dia ela volta à UBS, abre o computador e passa ~1h transcrevendo para o sistema o que anotou em papel durante as visitas. Dado que ela já coletou, digitado de novo. Todo dia. São 6.200 ACS na cidade — **~6.200h desperdiçadas por dia.**
 
-O problema não é dedicação. É falta de informação organizada na hora certa.
+**A principal entrega do ACS Digital é eliminar essa hora.** Claudia preenche a ficha diretamente no celular, na casa do paciente, durante a visita. O app funciona sem internet e sincroniza quando ela volta à cobertura. Acabou a transcrição.
 
-**ACS Digital** entrega a Claudia:
+Além disso, o app entrega dois insumos para ela operar melhor:
 
-1. **Lista priorizada da semana** — quem visitar, por quê, com que cadência. A lista reage em tempo real: ao registrar uma visita, o ranking se reordena sozinho.
-2. **Briefing antes de bater na porta** — condições crônicas, última visita, alertas clínicos do Vitacare + o que ela mesma anotou em campo.
-3. **Formulário contextual durante a visita** — adaptado ao perfil do paciente, funciona offline, sincroniza quando volta à cobertura.
+1. **Lista priorizada da semana** — quem visitar, por quê, com que cadência. Ela decide a ordem final; o app dá o contexto. A lista reage em tempo real: cada visita registrada reordena o ranking automaticamente.
+2. **Briefing antes de bater na porta** — condições crônicas, última visita e alertas clínicos do Vitacare + o que ela mesma já registrou em campo.
 
-Claudia não perde mais 1h transcrevendo. E a Dona Maria não cai no esquecimento.
+Claudia não perde mais 1h transcrevendo. E a Dona Maria — diabética, sumida do posto há 3 meses — não cai no esquecimento.
 
 > *"um sistema nunca vai dar a lista que eu realmente vou fazer"* — ACS entrevistada no desenvolvimento. O ACS Digital é **insumo para a decisão da Claudia, nunca substituto.**
 
 ### Impacto esperado
 
 - **~1h/dia recuperada por ACS** — 6.200 ACS no Rio: ~6.200h/dia devolvidas ao cuidado.
+- **Dados coletados no ponto de cuidado**, não reconstruídos horas depois de memória.
 - **Famílias de alto risco alcançadas em dias, não semanas.**
-- **Cuidado preventivo, não reativo** — o motor prioriza quem está no limiar, não só quem já está em crise.
 - **Equidade e gestão** — supervisores enxergam lacunas de cobertura por equipe e AP.
 
 ---
