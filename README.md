@@ -14,10 +14,11 @@ Comunitários de Saúde (ACS) da Atenção Primária do Rio de Janeiro.
 
 **Integrantes:**
 
-- Vinicius Saraiva Andrade
-- Rafael Bressan — [@rafaelbressan](https://github.com/rafaelbressan)
-- Daniel Seraphim — [@danielseraphim](https://github.com/danielseraphim)
 - Laura Soares Anderaus
+- Vinicius Saraiva Andrade
+- Rafael Bressan
+- Daniel Seraphim
+- Leonardo Santos
 
 **Tema:** Saúde
 
@@ -33,13 +34,17 @@ que anotou em campo.
 
 **ACS Digital** é um web app mobile-first que entrega ao ACS:
 
-1. **Lista priorizada da semana**, agrupada por motivo (gestante sem visita,
-   pós-urgência sem follow-up, hipertenso fora da cadência do manual, etc.).
-2. **Briefing por paciente** com o porquê da prioridade — sempre como insumo,
+1. **Lista priorizada da semana**, com motivo e cadência do manual SUS por
+   paciente. A lista reage **em tempo real**: quando o ACS termina uma
+   visita, o ranking se reordena sozinho via Supabase Realtime.
+2. **Briefing por paciente** — score 0–100 (4 componentes interpretáveis)
+   + linha de cuidado + motivo curto, sempre como **insumo de decisão**,
    nunca como comando.
-3. **Form contextual** durante a visita, gerado dinamicamente a partir do
-   perfil clínico do paciente, usando os blocos do **e-SUS AB** e dos
-   manuais do MS/SUS.
+3. **Form contextual** durante a visita, adaptado ao perfil clínico do
+   paciente. Salva offline (IndexedDB) e sincroniza com o Supabase quando
+   há rede.
+4. **Ficha estendida do paciente** que combina o cadastro do Vitacare com
+   tudo que o ACS observou em campo — sem alterar a tabela base.
 
 O sistema é **insumo para a decisão da ACS**, não substituto. Esse princípio
 veio direto da entrevista com agentes em campo: *"um sistema nunca vai dar
@@ -58,51 +63,108 @@ a lista que eu realmente vou fazer"*.
 ## Architecture / approach
 
 ```
-┌───────────────────────────────────────────────────────────────────────┐
-│  PWA mobile (Next.js App Router) — Vercel, região São Paulo           │
-│  · lista priorizada · briefing · form contextual · modo offline (PWA) │
-└──────────────────────────────┬────────────────────────────────────────┘
-                               │  supabase-js (anon key + JWT do ACS)
+┌──────────────────────────────────────────────────────────────────────┐
+│  PWA mobile (Vite + React 19, mobile-first, IndexedDB offline)       │
+│  Deploy: Vercel sa-east-1 (São Paulo)                                │
+│  · /selecionar-acs · lista priorizada · ficha · form · supervisor    │
+└──────────────────────────────┬───────────────────────────────────────┘
+                               │  supabase-js (anon key + JWT no piloto)
+                               │  Realtime via WebSocket
                                ▼
-┌───────────────────────────────────────────────────────────────────────┐
-│  Supabase Postgres (sa-east-1 · São Paulo)                            │
-│  · pacientes · equipes · eventos · visitas · visitas_capturadas       │
-│  · índices por equipe/paciente/data · RLS [roadmap]                   │
-└───────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│  Supabase Postgres 17 — sa-east-1 (São Paulo, residência BR)         │
+│                                                                      │
+│  Tabelas: pacientes · equipes · eventos · visitas · visitas_capturadas
+│                                                                      │
+│  VIEW pacientes_ficha_extendida = pacientes (Vitacare)               │
+│                               + LATERAL JOIN última captura do ACS   │
+│                                                                      │
+│  RPCs (PRIO-ACS — heurística determinística, sem LLM):               │
+│  · priorizacao_pacientes(equipe, ref_date)                           │
+│  · paciente_detalhe(paciente_id, ref_date)                           │
+│  · dashboard_equipe(equipe, ref_date)                                │
+│  · equipe_do_profissional(profissional_id)                           │
+│  · acs_demo_options()                                                │
+│                                                                      │
+│  Realtime ligado em: visitas_capturadas, eventos, visitas            │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-### Motor de priorização — heurística determinística
+### Motor de priorização — heurística determinística (PRIO-ACS)
 
-O score por paciente combina, no SQL/server, sinais cuja **regra está nos
-manuais oficiais do MS/SUS** (não em pesos aprendidos):
+Score 0–100 por paciente, 4 componentes aditivos baseados em fontes
+oficiais (Portaria SAS/MS 221/2008, manuais ACS-MS, fichas SMS-Rio):
 
-- **Cadência mínima do manual** (criança 0–6 → 7–8 visitas/ano; gestante →
-  mensal; hipertenso/diabético → 60–90 dias; idoso → trimestral).
-- **Gap desde a última visita** vs. cadência esperada.
-- **Eventos clínicos recentes** (urgência sobe; agendamento próximo sobe).
-- **Vulnerabilidade social** (peso adicional).
-- **Distância à unidade** (entra na roteirização, não no triagem clínica).
+```
+ICSAP proxy (35)        +  Vulnerable life-stage (25)
+  +15 hipertenso             25 gestação
+  +15 diabético              20 0-6 anos
+  +15 gestação               15 idoso crônico
 
-Optamos por **heurística sobre LLM em runtime** porque decisões de saúde
-precisam ser auditáveis (critério de Engenharia do desafio) e os manuais já
-codificam o conhecimento clínico necessário.
+Care gap / urgency (25) +  Social vulnerability (15)
+  +15 evento não-eletivo     15 vulnerabilidade social
+       60d (Vitacare OU
+       sinal do ACS no
+       form)
+  +10 gap > cadência         = score 0–100
+       manual                = tier alto (≥61) /
+                              medio (31–60) /
+                              habitual (≤30)
+```
+
+**Por que heurística (não LLM em runtime):** decisões de saúde precisam ser
+**auditáveis** (critério de Engenharia do desafio). Os manuais SUS já
+codificam o conhecimento. LLM em decisão clínica é risco regulatório sem
+ganho. O motor é SQL puro — qualquer um pode inspecionar a regra.
+
+### Loop fechado de tempo real
+
+```
+ACS termina visita no app
+  ↓
+INSERT em visitas_capturadas (jsonb com 60+ campos do form)
+  ↓
+Supabase Realtime emite postgres_changes
+  ↓
+Todos os clients refazem priorizacao_pacientes
+  ↓
+Motor recalcula:
+  - ultima_visita = MAX(visitas, capturado_em)  ← gap zera
+  - se ACS reportou UPA no form: evento_recente_60d = TRUE
+  - motivo_curto cita "Visitada hoje pelo ACS."
+  ↓
+Lista se reordena sozinha
+```
+
+### Identidade do ACS → equipe
+
+Cada ACS pertence a uma equipe. Cada equipe tem ~2 000 pacientes
+amostrados. O flow:
+
+1. ACS faz login (MVP: picker mostra 10 ACSs reais do dataset; piloto:
+   ConecteSUS Profissional via OIDC).
+2. `equipe_do_profissional(profissional_id)` resolve a equipe.
+3. `priorizacao_pacientes(equipe_id)` retorna só os pacientes daquela
+   equipe — **identity-bound queries** server-side.
+4. Trocar de ACS no app muda toda a lista; multi-tenant nativo.
 
 ### Claude's role
 
 Claude entrou no **desenvolvimento**, não na inferência clínica em produção:
 
-- **Claude Code (CLI)** como copiloto durante o hackathon — exploração de
-  dados (DuckDB sobre os parquets anonimizados), scaffolding do app,
-  modelagem do schema Postgres, redação do PRD/arquitetura e do README do
-  desafio.
-- **Princípio de produto** validado em conversa — "briefing, não comando" —
-  veio da entrevista com ACS e foi consolidado iterativamente com Claude.
+- **Claude Code (CLI da Anthropic)** atuou como copiloto durante as ~7h
+  do hackathon — exploração de dados (DuckDB sobre os parquets
+  anonimizados), modelagem do schema Postgres, codificação das funções
+  SQL do motor PRIO-ACS, scaffolding dos hooks e páginas do app,
+  redação do PRD, da arquitetura técnica e do README.
+- **Princípio de produto** "briefing, não comando" — validado em
+  conversa, vindo da entrevista com ACS e consolidado iterativamente
+  com Claude.
 
 A escolha de **não** usar LLM em runtime é deliberada: clínica é domínio
 regulado, os manuais SUS são a fonte de verdade, e a auditabilidade do
-ranking é um requisito.
-
-📄 Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+ranking é um requisito (não opcional). Detalhes em
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ---
 
@@ -112,42 +174,71 @@ ranking é um requisito.
 
 ## Demo video
 
-🚧 _60s de demo gravados antes da entrega ao judges._
+🚧 _60s de demo gravados antes da entrega aos juízes._
 
 ---
 
-## Repositórios relacionados
+## Como rodar localmente
 
-- **Este repo** (`acs-digital`): documentação consolidada para os juízes.
-- [`impact-lab-saude-app`](https://github.com/vinicius-saraiva/impact-lab-saude-app)
-  — código do app (Next.js) em desenvolvimento.
-- [`impact-lab-saude-17`](https://github.com/vinicius-saraiva/impact-lab-saude-17)
-  — exploração de dados (marimo + DuckDB) e notas do desafio.
-- [`prefeitura-rio/claude-impact-lab-saude`](https://github.com/prefeitura-rio/claude-impact-lab-saude)
-  — dataset oficial anonimizado da Prefeitura.
+```bash
+# 1. backend (Supabase já está no ar — sa-east-1)
+#    URL: https://gyutcqmrbbtftrowcyhv.supabase.co
+#    schema + dados aplicados via db/migrations/ + scripts/setup_supabase.py
 
-> Tudo será **consolidado neste repositório** antes do final do hackathon.
+# 2. frontend
+cd frontend
+cp .env.example .env.local
+# preencher VITE_SUPABASE_ANON_KEY (Dashboard Supabase → Settings → API → anon public)
+npm install
+npm run dev
+# → http://localhost:5173
+```
+
+Detalhes de integração e schema: [`docs/SUPABASE.md`](docs/SUPABASE.md).
 
 ---
 
 ## Documentação
 
-- 📋 [`docs/PRD.md`](docs/PRD.md) — Product Requirements Document.
+- 📋 [`docs/PRD.md`](docs/PRD.md) — produto, princípios e perguntas em aberto.
 - 🏗️ [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arquitetura técnica
-  com foco em segurança e LGPD.
-- 🗄️ [`docs/SUPABASE.md`](docs/SUPABASE.md) — schema do banco e exemplos de
-  uso para o frontend.
+  completa, com foco em segurança e LGPD.
+- 🗄️ [`docs/SUPABASE.md`](docs/SUPABASE.md) — schema do banco, todas as
+  RPCs, padrão de Realtime e exemplos de uso com `supabase-js`.
+- 📂 [`db/migrations/`](db/migrations/) — 5 migrations versionadas
+  (schema → motor → Realtime → ficha estendida → picker).
+- 📂 [`FICHAS/`](FICHAS/) — fichas oficiais SMS-Rio (Ficha A, Crônico,
+  Gestante, Primeira Infância, Tuberculose) em PDF + JSON estruturado.
+- 📂 [`manuais/`](manuais/) — manuais oficiais do Ministério da Saúde
+  consultados na construção das regras.
+
+---
+
+## Stack técnica
+
+| Camada | Tecnologia | Por quê |
+|---|---|---|
+| Frontend | **Vite + React 19**, Tailwind v4, react-router, **Dexie (IndexedDB)** | Mobile-first, offline-first, deploy 1-clique no Vercel |
+| Mapa | **Leaflet + react-leaflet** | OpenStreetMap, sem chave de API |
+| Realtime | **Supabase Realtime (WebSocket)** | Loop fechado captura → score |
+| Backend | **Supabase Postgres 17** (sa-east-1) | RLS pronto, REST/RPC auto-gerado, Realtime nativo |
+| Motor | **SQL puro** com `STABLE` functions | Auditável, determinístico, sem dependência de LLM |
+| Dataset | **4 parquets anonimizados** (Prefeitura do Rio) | k-anon ≥ 5, date-shifted, ruído geo 100m |
 
 ---
 
 ## Status — hackathon `2026-05-24`
 
 - [x] Exploração e perfilamento do dataset
-- [x] Modelagem do schema Postgres + carga no Supabase
-- [x] PRD e arquitetura técnica (incl. segurança/LGPD)
-- [ ] Motor de priorização — implementação server-side
-- [ ] Web app mobile-first
-- [ ] Form contextual com blocos do e-SUS AB
-- [ ] Deploy + demo
+- [x] Schema Postgres + carga dos 4 parquets no Supabase
+- [x] Motor PRIO-ACS server-side (5 migrations aplicadas)
+- [x] Ficha estendida (view + signals do form alimentam o motor)
+- [x] Realtime: lista reage à captura em campo
+- [x] Multi-ACS via picker + `equipe_do_profissional`
+- [x] Web app mobile-first (lista · paciente · visita · supervisor)
+- [x] Form contextual com perguntas oficiais e-SUS AB / SMS-Rio
+- [x] PRD + arquitetura técnica + segurança/LGPD documentados
+- [ ] Deploy preview público no Vercel
+- [ ] Vídeo demo 60s
 
 Critério do desafio: **primeiro commit após 09:30 de 24/05** ✅
