@@ -15,18 +15,21 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'ACS Visitas',
-        short_name: 'ACS',
-        description: 'Registro de visitas domiciliares para Agentes Comunitários de Saúde',
+        name: 'ACS Digital',
+        short_name: 'ACS Digital',
+        description: 'Inteligência no território para o Agente Comunitário de Saúde do Rio de Janeiro',
         theme_color: '#1d4ed8',
-        background_color: '#f8fafc',
+        background_color: '#1d4ed8',
         display: 'standalone',
         orientation: 'portrait',
+        start_url: '/',
+        scope: '/',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
