@@ -1,0 +1,111 @@
+{
+  "ficha_id": "FICHA_B_CRONICO",
+  "codigo_oficial": "SMSRIO019_FICHA_B",
+  "nome": "Ficha B — Acompanhamento de Doença Crônica",
+  "versao_oficial": "1.0",
+  "ano": 2022,
+  "publico_alvo": "Paciente com HAS, DM, Asma, DPOC, ou Idoso vulnerável",
+  "linha_de_cuidado": "Doenças Crônicas / Idoso vulnerável",
+  "frequencia_aplicacao": "Mensal (descompensado: quinzenal). 12 colunas de visita = ~1 ano de acompanhamento.",
+  "descricao": "Acompanhamento periódico de paciente crônico. 14 perguntas por visita, algumas exclusivas para subgrupos.",
+
+  "secoes": [
+    {
+      "id": "cabecalho",
+      "label": "Cabeçalho",
+      "ordem": 1,
+      "shared_ref": "_shared.cabecalho_comum"
+    },
+
+    {
+      "id": "identificacao_paciente",
+      "label": "Identificação do Paciente",
+      "ordem": 2,
+      "campos": [
+        { "id": "nome", "label": "Nome", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "nome_social", "label": "Nome Social", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "data_nascimento", "label": "Data de Nascimento", "tipo": "date", "obrigatorio": true },
+        { "id": "cpf", "label": "CPF", "tipo": "cpf", "obrigatorio": true },
+        { "id": "cns", "label": "Nº CNS", "tipo": "string", "obrigatorio": false, "max_length": 15 },
+        { "id": "nis", "label": "NIS", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+        { "id": "possui_auxilio_brasil", "label": "Possui Auxílio Brasil?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "beneficiario_bpc", "label": "Beneficiário BPC?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "pertence_territorio_social", "label": "Pertence ao Território Social", "tipo": "boolean", "obrigatorio": false },
+        { "id": "sexo", "label": "Sexo", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.sexo_biologico" },
+        { "id": "orientacao_sexual", "label": "Orientação Sexual", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.orientacao_sexual" },
+        { "id": "identidade_genero", "label": "Identidade de Gênero", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.identidade_genero" },
+        { "id": "deficiencia", "label": "Deficiência", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.deficiencia" },
+        { "id": "telefones", "label": "Telefone(s)", "tipo": "array", "obrigatorio": false, "item_schema": { "tipo": "phone" } },
+        { "id": "email_rede_social", "label": "E-mail ou rede social", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "religiao", "label": "Religião", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.religiao" },
+        { "id": "perfil_clinico", "label": "Perfil clínico (subgrupos elegíveis)", "tipo": "multi_enum", "obrigatorio": true, "enum_values": [
+          { "codigo": "HAS", "label": "Hipertensão" },
+          { "codigo": "DM", "label": "Diabetes" },
+          { "codigo": "ASMA", "label": "Asma" },
+          { "codigo": "DPOC", "label": "DPOC" },
+          { "codigo": "IDOSO_VULNERAVEL", "label": "Idoso vulnerável" }
+        ], "descricao": "Determina visibilidade das perguntas exclusivas (P7, P8, P9-P14)" }
+      ]
+    },
+
+    {
+      "id": "visitas",
+      "label": "Visitas (até 12 colunas)",
+      "ordem": 3,
+      "tipo": "array",
+      "min_items": 0,
+      "max_items": 12,
+      "item_schema": {
+        "campos": [
+          { "id": "data_visita", "label": "Data da Visita", "tipo": "date", "obrigatorio": true },
+          { "id": "p1_esqueceu_medicacao_2sem", "label": "1) Nas duas últimas semanas você esqueceu alguma dose da medicação?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p2_dificuldade_lembrar_remedio", "label": "2) Com que frequência você sente que é difícil lembrar de tomar o remédio?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.frequencia_5pt" },
+          { "id": "p3_desconforto_medicacao", "label": "3) Você sente algum desconforto causado pela medicação?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p4_duvida_tratamento", "label": "4) Você tem alguma dificuldade ou dúvida em relação ao tratamento?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p5_mudanca_estilo_vida", "label": "5) Você está passando por alguma mudança de estilo de vida?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.mudanca_estilo_vida" },
+          { "id": "p6_atendido_upa_emergencia", "label": "6) Você precisou ser atendido em UPA ou Emergência?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao", "descricao": "ESCALONAMENTO: SIM dispara alerta + bundle de visita imediata (NHS Virtual Wards pattern)" },
+
+          { "id": "p7_machucado_pe", "label": "7) Você está com algum machucado no pé? (exclusivo DM)", "tipo": "enum", "obrigatorio_condicional": "perfil_clinico inclui 'DM'", "enum_ref": "_shared.enums.sim_nao", "visivel_se": "perfil_clinico inclui 'DM'" },
+          { "id": "p8_tosse_piorou", "label": "8) Nas últimas semanas você percebeu que sua tosse piorou? (exclusivo Asma/DPOC)", "tipo": "enum", "obrigatorio_condicional": "perfil_clinico inclui 'ASMA' OU 'DPOC'", "enum_ref": "_shared.enums.sim_nao", "visivel_se": "perfil_clinico inclui 'ASMA' OU 'DPOC'" },
+
+          { "id": "p9_necessita_cuidador", "label": "9) Necessita de cuidador? (exclusivo idoso vulnerável)", "tipo": "enum", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL'", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p10_cuidador_estava_residencia", "label": "10) O cuidador estava na residência? (idoso vulnerável)", "tipo": "enum", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL' E p9_necessita_cuidador == 'S'", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p11_paciente_responde", "label": "11) O paciente consegue responder às perguntas? (idoso vulnerável)", "tipo": "enum", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL'", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p12_deixou_tomar_dose_2sem", "label": "12) Nas duas últimas semanas você deixou de tomar alguma dose da medicação? (idoso vulnerável)", "tipo": "enum", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL'", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p13_refeicoes_dia", "label": "13) Quantas refeições você tem feito por dia? (idoso vulnerável)", "tipo": "integer", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL'", "min": 0, "max": 6, "descricao": "Sinalize com 1, 2, 3 ou 4+" },
+          { "id": "p14_alguma_ferida", "label": "14) Você está com alguma ferida? (idoso vulnerável)", "tipo": "enum", "visivel_se": "perfil_clinico inclui 'IDOSO_VULNERAVEL'", "enum_ref": "_shared.enums.sim_nao" },
+
+          { "id": "informacoes", "label": "Informações / observações da visita", "tipo": "text", "obrigatorio": false, "max_length": 1000 }
+        ]
+      }
+    },
+
+    {
+      "id": "informacoes_adicionais",
+      "label": "Informações Adicionais",
+      "ordem": 4,
+      "campos": [
+        { "id": "informacoes_adicionais", "label": "Informações Adicionais (livre)", "tipo": "text", "obrigatorio": false, "max_length": 4000 }
+      ]
+    }
+  ],
+
+  "regras_negocio": [
+    { "id": "RN001", "descricao": "Pergunta 7 só aparece se paciente tem DM", "tipo": "conditional_visibility" },
+    { "id": "RN002", "descricao": "Pergunta 8 só aparece se paciente tem Asma OU DPOC", "tipo": "conditional_visibility" },
+    { "id": "RN003", "descricao": "Perguntas 9-14 só aparecem para idoso vulnerável", "tipo": "conditional_visibility" },
+    { "id": "RN004", "descricao": "P6 == 'S' (UPA/Emergência) dispara escalonamento — visita prioritária + alerta supervisor", "tipo": "downstream" },
+    { "id": "RN005", "descricao": "P1 == 'S' OU P12 == 'S' (esqueceu dose) por 2+ visitas consecutivas → bundle de adesão", "tipo": "downstream" },
+    { "id": "RN006", "descricao": "P7 == 'S' (machucado pé em DM) → encaminhamento prioritário + foto se possível", "tipo": "downstream" },
+    { "id": "RN007", "descricao": "Cadência padrão = mensal. Se 2+ alertas seguidos (P6 SIM ou P1 SIM) → quinzenal", "tipo": "cadencia" }
+  ],
+
+  "indicadores_gerados": [
+    "Adesão medicamentosa (P1, P2, P12) — pode alimentar Previne Brasil HAS/DM",
+    "Taxa de descompensação (P6 — UPA/Emergência)",
+    "Detecção precoce de pé diabético (P7)",
+    "Detecção de exacerbação respiratória (P8)",
+    "Segurança alimentar idoso (P13)",
+    "Cobertura de cuidador para idoso vulnerável (P9, P10)"
+  ]
+}

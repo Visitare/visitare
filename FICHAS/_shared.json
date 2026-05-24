@@ -1,0 +1,415 @@
+{
+  "$schema_version": "1.0",
+  "descricao": "Enumerações e blocos reusáveis entre as 5 fichas SMS-Rio/SUBPAV 2022",
+
+  "cabecalho_comum": {
+    "descricao": "Cabeçalho presente em TODAS as fichas (A, B Crônico, B Gestante, C, B TB)",
+    "campos": [
+      { "id": "ap", "label": "AP (Área Programática)", "tipo": "string", "obrigatorio": false, "max_length": 3, "exemplo": "10" },
+      { "id": "cnes", "label": "CNES", "tipo": "string", "obrigatorio": false, "max_length": 10, "descricao": "Cadastro Nacional de Estabelecimento de Saúde" },
+      { "id": "unidade_saude", "label": "Unidade de Saúde", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+      { "id": "equipe_id", "label": "Equipe", "tipo": "string", "obrigatorio": true, "max_length": 80 },
+      { "id": "codigo_equipe", "label": "Cód. Equipe", "tipo": "string", "obrigatorio": true, "max_length": 12 },
+      { "id": "microarea", "label": "Microárea", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+      { "id": "nome_agente_saude", "label": "Nome do Agente de Saúde", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+      { "id": "data_abertura_ficha", "label": "Data da abertura da ficha", "tipo": "date", "obrigatorio": true }
+    ]
+  },
+
+  "enums": {
+    "sexo_biologico": {
+      "descricao": "Sexo biológico (1 - Sexo Biológico)",
+      "valores": [
+        { "codigo": "F", "label": "Feminino" },
+        { "codigo": "M", "label": "Masculino" }
+      ]
+    },
+    "raca_cor": {
+      "descricao": "Raça/Cor declarada (2 - Raça/Cor)",
+      "valores": [
+        { "codigo": "1", "label": "Branca" },
+        { "codigo": "2", "label": "Preta" },
+        { "codigo": "3", "label": "Amarela" },
+        { "codigo": "4", "label": "Parda" },
+        { "codigo": "5", "label": "Indígena" }
+      ]
+    },
+    "situacao_familiar": {
+      "descricao": "Situação familiar (3)",
+      "valores": [
+        { "codigo": "1", "label": "Vive com companheira(o) e filho(s)" },
+        { "codigo": "2", "label": "Convive com companheira(o) com laços conjugais e sem filho(s)" },
+        { "codigo": "3", "label": "Convive com companheira(o) com filho(s) e/ou outro(s) familiares" },
+        { "codigo": "4", "label": "Convive com familiar(es), sem companheira(o)" },
+        { "codigo": "5", "label": "Convive com outras pessoas sem laços consanguíneos e ou conjugais" },
+        { "codigo": "6", "label": "Vive só" }
+      ]
+    },
+    "frequenta_escola": {
+      "valores": [
+        { "codigo": "S", "label": "Sim" },
+        { "codigo": "N", "label": "Não" }
+      ]
+    },
+    "natureza_escola": {
+      "valores": [
+        { "codigo": "P", "label": "Particular" },
+        { "codigo": "M", "label": "Municipal" },
+        { "codigo": "E", "label": "Estadual" },
+        { "codigo": "F", "label": "Federal" }
+      ]
+    },
+    "escolaridade": {
+      "descricao": "Escolaridade (6 - ESC)",
+      "valores": [
+        { "codigo": "01", "label": "Não sabe ler/escrever" },
+        { "codigo": "02", "label": "Alfabetizado" },
+        { "codigo": "03", "label": "Fundamental Incompleto" },
+        { "codigo": "04", "label": "Fundamental Completo" },
+        { "codigo": "05", "label": "Médio Incompleto" },
+        { "codigo": "06", "label": "Médio Completo" },
+        { "codigo": "07", "label": "Superior Incompleto" },
+        { "codigo": "08", "label": "Superior Completo" },
+        { "codigo": "09", "label": "Espec./Residência" },
+        { "codigo": "10", "label": "Mestrado" },
+        { "codigo": "11", "label": "Doutorado" }
+      ]
+    },
+    "situacao_profissional": {
+      "descricao": "Situação Profissional (16 - SP)",
+      "valores": [
+        { "codigo": "1", "label": "Emprego Formal" },
+        { "codigo": "2", "label": "Emprego Informal" },
+        { "codigo": "3", "label": "Desempregado" },
+        { "codigo": "4", "label": "Autônomo" },
+        { "codigo": "5", "label": "Pensionista/Aposentado" },
+        { "codigo": "6", "label": "Empregador" }
+      ]
+    },
+    "deficiencia": {
+      "descricao": "Deficiência (múltipla escolha)",
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "AUDITIVA", "label": "Auditiva" },
+        { "codigo": "FISICA", "label": "Física" },
+        { "codigo": "INTELECTUAL", "label": "Intelectual" },
+        { "codigo": "VISUAL", "label": "Visual" },
+        { "codigo": "TEA", "label": "Transtorno do Espectro Autista" },
+        { "codigo": "NA", "label": "N/A" }
+      ]
+    },
+    "identidade_genero": {
+      "valores": [
+        { "codigo": "HOMEM_TRANS", "label": "Homem Transexual" },
+        { "codigo": "MULHER_TRANS", "label": "Mulher Transexual" },
+        { "codigo": "TRAVESTI", "label": "Travesti" },
+        { "codigo": "CIS", "label": "Cis" },
+        { "codigo": "OUTRO", "label": "Outro" }
+      ]
+    },
+    "orientacao_sexual": {
+      "valores": [
+        { "codigo": "HETERO", "label": "Heterossexual" },
+        { "codigo": "HOMO", "label": "Homossexual/Gay/Lésbica" },
+        { "codigo": "BI", "label": "Bissexual" },
+        { "codigo": "OUTRO", "label": "Outro" }
+      ]
+    },
+    "religiao": {
+      "valores": [
+        { "codigo": "SEM_RELIGIAO", "label": "Sem religião" },
+        { "codigo": "BUDISMO", "label": "Budismo" },
+        { "codigo": "CANDOMBLE", "label": "Candomblé" },
+        { "codigo": "CATOLICA", "label": "Católica" },
+        { "codigo": "ESPIRITA", "label": "Espírita" },
+        { "codigo": "EVANGELICA", "label": "Evangélica" },
+        { "codigo": "ISLAMISMO", "label": "Islamismo" },
+        { "codigo": "JUDAISMO", "label": "Judaísmo" },
+        { "codigo": "OUTRA", "label": "Outra" }
+      ]
+    },
+    "grupos_saude": {
+      "descricao": "Grupos de Saúde (14)",
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "01", "label": "Hipertensão" },
+        { "codigo": "02", "label": "Pré-Natal" },
+        { "codigo": "03", "label": "Diabetes" },
+        { "codigo": "04", "label": "Hanseníase" },
+        { "codigo": "05", "label": "Tuberculose" },
+        { "codigo": "06", "label": "Idoso" },
+        { "codigo": "07", "label": "Aleitamento" },
+        { "codigo": "08", "label": "Desnutrição" },
+        { "codigo": "09", "label": "Obesos" },
+        { "codigo": "10", "label": "AIDS" },
+        { "codigo": "11", "label": "Acomp. Cresc. e Desenv. da Criança" },
+        { "codigo": "99", "label": "Outros (Indicar na OBS)" }
+      ]
+    },
+    "doencas_condicoes_referidas": {
+      "descricao": "Doenças ou Condições Referidas (15)",
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "01", "label": "Alcoolismo" },
+        { "codigo": "02", "label": "AIDS" },
+        { "codigo": "03", "label": "Câncer" },
+        { "codigo": "04", "label": "Chagas" },
+        { "codigo": "05", "label": "Def. Física" },
+        { "codigo": "06", "label": "Def. Mental" },
+        { "codigo": "07", "label": "Def. Visual" },
+        { "codigo": "08", "label": "Def. Auditiva" },
+        { "codigo": "09", "label": "Diabetes" },
+        { "codigo": "10", "label": "Transtorno Mental" },
+        { "codigo": "11", "label": "Epilepsia" },
+        { "codigo": "12", "label": "Gestante" },
+        { "codigo": "13", "label": "Hipertensão Arterial" },
+        { "codigo": "14", "label": "Hanseníase" },
+        { "codigo": "15", "label": "Malária" },
+        { "codigo": "16", "label": "Tuberculose" },
+        { "codigo": "17", "label": "Violência Doméstica" },
+        { "codigo": "18", "label": "Tentativa de suicídio" },
+        { "codigo": "19", "label": "Usuário de Drogas Ilícitas" },
+        { "codigo": "20", "label": "Usuário de Psicofármacos" },
+        { "codigo": "21", "label": "Intern. Psiq. Ult. 12 Meses" },
+        { "codigo": "22", "label": "Asma" },
+        { "codigo": "23", "label": "Sintomático Respiratório" },
+        { "codigo": "24", "label": "Sintomático Dermatológico" },
+        { "codigo": "99", "label": "Outros (Informar na OBS)" }
+      ]
+    },
+    "situacao_moradia": {
+      "valores": [
+        { "codigo": "PROPRIO", "label": "Próprio" },
+        { "codigo": "FINANCIADO", "label": "Financiado" },
+        { "codigo": "ALUGADO", "label": "Alugado" },
+        { "codigo": "CEDIDO", "label": "Cedido" },
+        { "codigo": "OCUPACAO", "label": "Ocupação" },
+        { "codigo": "SITUACAO_DE_RUA", "label": "Situação de Rua" },
+        { "codigo": "INST_PERMANENCIA_PUBLICA", "label": "Inst. de Permanência Pública" },
+        { "codigo": "INST_PERMANENCIA_PRIVADA", "label": "Inst. de Permanência Privada" },
+        { "codigo": "PROFISSIONAIS_SAUDE_EM_QUADRO", "label": "Com profissionais de saúde em quadro" },
+        { "codigo": "SEM_PROFISSIONAIS_SAUDE_EM_QUADRO", "label": "Sem profissionais de saúde em quadro" },
+        { "codigo": "ILPI", "label": "Instituição de Longa Permanência para Idosos" },
+        { "codigo": "UNIDADE_SOCIOEDUCATIVA", "label": "Unidade Socioeducativa para Adolescentes em Conflito com a Lei" },
+        { "codigo": "ACOLHIMENTO_SOCIAL", "label": "Acolhimento social" },
+        { "codigo": "UNIDADE_PRISIONAL", "label": "Unidade Prisional" }
+      ]
+    },
+    "tipo_domicilio": {
+      "valores": [
+        { "codigo": "CASA", "label": "Casa" },
+        { "codigo": "APARTAMENTO", "label": "Apartamento" },
+        { "codigo": "COMODO", "label": "Cômodo" },
+        { "codigo": "OUTRO", "label": "Outro" }
+      ]
+    },
+    "tipo_acesso_domicilio": {
+      "valores": [
+        { "codigo": "PAVIMENTO", "label": "Pavimento" },
+        { "codigo": "CHAO_BATIDO", "label": "Chão Batido" },
+        { "codigo": "FLUVIAL", "label": "Fluvial" },
+        { "codigo": "OUTRO", "label": "Outro" }
+      ]
+    },
+    "horario_visita": {
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "MANHA", "label": "Manhã" },
+        { "codigo": "TARDE", "label": "Tarde" },
+        { "codigo": "NOITE", "label": "Noite" },
+        { "codigo": "SABADO", "label": "Sábado" },
+        { "codigo": "DOMINGO", "label": "Domingo" }
+      ]
+    },
+    "material_paredes": {
+      "valores": [
+        { "codigo": "ALVENARIA", "label": "Alvenaria/Tijolo" },
+        { "codigo": "TAIPA_REVESTIDA", "label": "Taipa Revestida" },
+        { "codigo": "TAIPA_NAO_REVESTIDA", "label": "Taipa Não Revestida" },
+        { "codigo": "MADEIRA", "label": "Madeira" },
+        { "codigo": "MATERIAL_APROVEITADO", "label": "Material Aproveitado" },
+        { "codigo": "ADOBE", "label": "Adobe" },
+        { "codigo": "OUTROS", "label": "Outros" }
+      ]
+    },
+    "tratamento_agua": {
+      "valores": [
+        { "codigo": "FILTRACAO", "label": "Filtração" },
+        { "codigo": "CLORACAO", "label": "Cloração" },
+        { "codigo": "FERVURA", "label": "Fervura" },
+        { "codigo": "MINERAL", "label": "Mineral" },
+        { "codigo": "SEM_TRATAMENTO", "label": "Sem Tratamento" }
+      ]
+    },
+    "abastecimento_agua": {
+      "valores": [
+        { "codigo": "REDE_PUBLICA", "label": "Rede Pública" },
+        { "codigo": "POCO_NASCENTE", "label": "Poço ou Nascente" },
+        { "codigo": "CISTERNA", "label": "Cisterna" },
+        { "codigo": "CARRO_PIPA", "label": "Carro Pipa" },
+        { "codigo": "OUTROS", "label": "Outros" }
+      ]
+    },
+    "escoamento_sanitario": {
+      "valores": [
+        { "codigo": "REDE", "label": "Sistema de Esgoto (Rede)" },
+        { "codigo": "FOSSA", "label": "Fossa" },
+        { "codigo": "DIRETO_RIO_MAR", "label": "Direto para Rio/Lago/Mar" },
+        { "codigo": "CEU_ABERTO", "label": "Céu Aberto" },
+        { "codigo": "OUTRA_FORMA", "label": "Outra Forma" }
+      ]
+    },
+    "destino_lixo": {
+      "valores": [
+        { "codigo": "COLETADO", "label": "Coletado" },
+        { "codigo": "QUEIMADO_ENTERRADO", "label": "Queimado/Enterrado" },
+        { "codigo": "CEU_ABERTO", "label": "Céu Aberto" },
+        { "codigo": "OUTRO", "label": "Outro" }
+      ]
+    },
+    "renda_familiar_faixa": {
+      "valores": [
+        { "codigo": "ATE_MEIO_SM", "label": "Até ½ Salário Mínimo" },
+        { "codigo": "MEIO_A_UM_SM", "label": "Mais de ½ até 1 Salário Mínimo" },
+        { "codigo": "UM_A_DOIS_SM", "label": "Mais de 1 até 2 Salários Mínimos" },
+        { "codigo": "DOIS_A_CINCO_SM", "label": "Mais de 2 até 5 Salários Mínimos" },
+        { "codigo": "ACIMA_CINCO_SM", "label": "Mais de 5 Salários Mínimos" },
+        { "codigo": "DOACOES", "label": "Doações" },
+        { "codigo": "IGNORADA", "label": "Ignorada" },
+        { "codigo": "NAO_RESPONDEU", "label": "Não Respondeu" }
+      ]
+    },
+    "procura_em_caso_doenca": {
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "AUXILIO_ESPIRITUAL", "label": "Auxílio Espiritual" },
+        { "codigo": "FARMACIA", "label": "Farmácia" },
+        { "codigo": "HOSPITAL_PUBLICO", "label": "Hospital Público" },
+        { "codigo": "REDE_PRIVADA", "label": "Rede Privada" },
+        { "codigo": "UNIDADE_DE_SAUDE", "label": "Unidade de Saúde" },
+        { "codigo": "OUTROS", "label": "Outros" }
+      ]
+    },
+    "sim_nao": {
+      "valores": [
+        { "codigo": "S", "label": "Sim" },
+        { "codigo": "N", "label": "Não" }
+      ]
+    },
+    "frequencia_5pt": {
+      "descricao": "Escala Pergunta 2 (Crônico)",
+      "valores": [
+        { "codigo": "1", "label": "Sempre" },
+        { "codigo": "2", "label": "Quase sempre" },
+        { "codigo": "3", "label": "Às vezes" },
+        { "codigo": "4", "label": "Quase nunca" },
+        { "codigo": "5", "label": "Nunca" }
+      ]
+    },
+    "mudanca_estilo_vida": {
+      "descricao": "Escala Pergunta 5 (Crônico)",
+      "valores": [
+        { "codigo": "N", "label": "Não" },
+        { "codigo": "1", "label": "Cessando tabagismo" },
+        { "codigo": "2", "label": "Iniciando atividade física" },
+        { "codigo": "3", "label": "Mudando a alimentação" }
+      ]
+    },
+    "ganho_peso_gestante": {
+      "descricao": "Pergunta 7 (Gestante)",
+      "valores": [
+        { "codigo": "1", "label": "Adequado" },
+        { "codigo": "2", "label": "Muito peso" },
+        { "codigo": "3", "label": "Pouco peso" }
+      ]
+    },
+    "motivo_encerramento_tb": {
+      "valores": [
+        { "codigo": "TRANSFERENCIA", "label": "Transferência" },
+        { "codigo": "OBITO", "label": "Óbito" },
+        { "codigo": "ABANDONO", "label": "Abandono" },
+        { "codigo": "CURA", "label": "Cura" },
+        { "codigo": "FALENCIA", "label": "Falência" },
+        { "codigo": "MUDANCA_DIAGNOSTICO", "label": "Mudança de diagnóstico" }
+      ]
+    },
+    "desconforto_medicacao_tb": {
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "1", "label": "Náuseas" },
+        { "codigo": "2", "label": "Urina escura" },
+        { "codigo": "3", "label": "Vômitos" },
+        { "codigo": "4", "label": "Febre acima de 38ºC" },
+        { "codigo": "5", "label": "Perda de apetite" },
+        { "codigo": "6", "label": "Pele amarelada" },
+        { "codigo": "7", "label": "Diarreia" },
+        { "codigo": "9", "label": "Nenhum" }
+      ]
+    },
+    "tdo_status_dose": {
+      "descricao": "Status da dose no TDO (Tratamento Diretamente Observado)",
+      "valores": [
+        { "codigo": "O", "label": "Observada (por profissional de saúde)" },
+        { "codigo": "A", "label": "Autoadministrada" }
+      ]
+    },
+    "alimentacao_crianca": {
+      "descricao": "Como está a alimentação da criança (5)",
+      "valores": [
+        { "codigo": "1", "label": "LM Exclusivo" },
+        { "codigo": "2", "label": "LM + água + chá ou suco" },
+        { "codigo": "3", "label": "LM + outro leite" },
+        { "codigo": "4", "label": "Outro leite" },
+        { "codigo": "5", "label": "LM + outros alimentos" },
+        { "codigo": "6", "label": "LM + outro leite + outros alimentos" },
+        { "codigo": "7", "label": "Outro leite + outros alimentos" },
+        { "codigo": "8", "label": "Outros alimentos" }
+      ]
+    },
+    "sinais_risco_crianca": {
+      "descricao": "Sinais de risco (6)",
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "1", "label": "Cansaço" },
+        { "codigo": "2", "label": "Febre" },
+        { "codigo": "3", "label": "Irritabilidade" },
+        { "codigo": "4", "label": "Tosse" },
+        { "codigo": "5", "label": "Diarreia" },
+        { "codigo": "6", "label": "Gemido" },
+        { "codigo": "7", "label": "Não suga/engole" },
+        { "codigo": "8", "label": "Vômitos" },
+        { "codigo": "9", "label": "Outros" },
+        { "codigo": "10", "label": "Cansaço ao respirar" },
+        { "codigo": "11", "label": "Lesões de pele" },
+        { "codigo": "12", "label": "Internação" }
+      ]
+    },
+    "onde_dorme_crianca": {
+      "valores": [
+        { "codigo": "1", "label": "Berço" },
+        { "codigo": "2", "label": "Chão" },
+        { "codigo": "3", "label": "Cama com outras pessoas" },
+        { "codigo": "4", "label": "Sofá/Cama/Rede" }
+      ]
+    },
+    "fatores_risco_gestacao": {
+      "tipo": "multi_select",
+      "valores": [
+        { "codigo": "PRESSAO_ALTA", "label": "Pressão alta" },
+        { "codigo": "DIABETES", "label": "Diabetes" },
+        { "codigo": "40_OU_MAIS", "label": "40 anos ou mais" },
+        { "codigo": "MENOS_15", "label": "Menos de 15 anos" },
+        { "codigo": "6_OU_MAIS_GESTACOES", "label": "6 ou mais gestações" },
+        { "codigo": "TENTATIVA_ABORTO", "label": "Tentativa de aborto nesta gestação" },
+        { "codigo": "PARTO_PREMATURO_ABORTO", "label": "Parto prematuro / Aborto" }
+      ]
+    },
+    "resultado_gestacao": {
+      "valores": [
+        { "codigo": "NASCIDO_VIVO", "label": "Nascido vivo" },
+        { "codigo": "NASCIDO_MORTO", "label": "Nascido morto" },
+        { "codigo": "ABORTO", "label": "Aborto" }
+      ]
+    }
+  }
+}

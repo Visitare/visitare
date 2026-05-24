@@ -1,0 +1,7 @@
+nome,tipo,cnes,endereco,bairro,lat,lon,observacao
+Clínica da Família Rinaldo de Lamare,Clínica da Família,5634694,Estrada da Gávea 551,Rocinha,-22.9869,-43.2448,Única CF dentro da Rocinha; referência APS da comunidade
+CAPS Maria do Socorro Santos,CAPS II,7077093,Rua Nova Aliança 11,Rocinha,-22.9881,-43.2431,1098 pacientes cadastrados; saúde mental
+UPA 24h Botafogo,UPA,-43.184580,Rua Jardim Botânico 195,Botafogo,-22.9499,-43.1846,UPA estadual mais próxima da Rocinha (~4km)
+Hospital Copa D'Or,Hospital,0000000,Rua Figueiredo Magalhães 875,Copacabana,-22.9677,-43.1844,Hospital privado referência trauma
+Hospital Universitário Clementino Fraga Filho,Hospital Federal,,Rua Prof. Rodolpho Paulo Rocco 255,Cidade Universitária,-22.9063,-43.1784,Referência terciária federal
+Policlínica Piedade,Policlínica,,Rua Moncorvo Filho 90,Centro,-22.9103,-43.1775,Referência secundária

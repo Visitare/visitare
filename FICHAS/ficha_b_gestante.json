@@ -1,0 +1,166 @@
+{
+  "ficha_id": "FICHA_B_GESTANTE",
+  "codigo_oficial": "SMSRIO013_FICHA_B",
+  "nome": "Ficha B — Acompanhamento de Gestantes",
+  "versao_oficial": "1.0",
+  "ano": 2022,
+  "publico_alvo": "Mulher gestante (cadastrada como linha de cuidado materno-infantil)",
+  "linha_de_cuidado": "Pré-natal / Puerpério",
+  "frequencia_aplicacao": "Mensal (risco habitual) · Semanal (alto risco) — até 48 visitas",
+  "descricao": "Acompanhamento periódico da gestante pelo ACS, com perguntas indexadas por semana de gestação. Conecta com Monitor da Gestante (em rollout) e Previne Brasil indicadores pré-natal.",
+
+  "contexto_clinico": {
+    "duracao_gestacao_semanas": 41,
+    "marco_dum": "DUM (Data da Última Menstruação) define o eixo temporal",
+    "marco_dpp": "Data Provável do Parto = DUM + 280 dias",
+    "alto_risco_criterios": ["pressao_alta", "diabetes", "40_ou_mais", "menos_15", "6_ou_mais_gestacoes", "tentativa_aborto", "parto_prematuro_aborto_previo"]
+  },
+
+  "secoes": [
+    {
+      "id": "cabecalho",
+      "label": "Cabeçalho",
+      "ordem": 1,
+      "shared_ref": "_shared.cabecalho_comum"
+    },
+
+    {
+      "id": "identificacao_gestante",
+      "label": "Identificação da Gestante",
+      "ordem": 2,
+      "campos": [
+        { "id": "nome", "label": "Nome ou nome social", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "idade", "label": "Idade", "tipo": "integer", "obrigatorio": true, "min": 9, "max": 60 },
+        { "id": "data_nascimento", "label": "Data de Nascimento", "tipo": "date", "obrigatorio": false },
+        { "id": "cpf", "label": "CPF", "tipo": "cpf", "obrigatorio": true },
+        { "id": "cadunico_status", "label": "CadÚnico", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "AGUARDANDO", "label": "Aguardando" },
+          { "codigo": "SEM_INDICACAO", "label": "Sem indicação" },
+          { "codigo": "ATIVO", "label": "Ativo" }
+        ]},
+        { "id": "nis", "label": "NIS", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+        { "id": "identidade_genero", "label": "Identidade de Gênero", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.identidade_genero" },
+        { "id": "deficiencia", "label": "Deficiência", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.deficiencia" },
+        { "id": "endereco", "label": "Endereço", "tipo": "string", "obrigatorio": true, "max_length": 200 },
+        { "id": "numero", "label": "Número", "tipo": "string", "obrigatorio": true, "max_length": 10 },
+        { "id": "complemento", "label": "Complemento", "tipo": "string", "obrigatorio": false, "max_length": 60 },
+        { "id": "bairro", "label": "Bairro", "tipo": "string", "obrigatorio": true, "max_length": 80 },
+        { "id": "cep", "label": "CEP", "tipo": "cep", "obrigatorio": false },
+        { "id": "telefones", "label": "Telefone(s)", "tipo": "array", "obrigatorio": true, "min_items": 1, "item_schema": { "tipo": "phone" } },
+        { "id": "email_rede_social", "label": "E-mail ou rede social", "tipo": "string", "obrigatorio": false, "max_length": 120 }
+      ]
+    },
+
+    {
+      "id": "marcos_gestacionais",
+      "label": "Marcos Gestacionais",
+      "ordem": 3,
+      "campos": [
+        { "id": "dum", "label": "DUM (Data da Última Menstruação)", "tipo": "date", "obrigatorio": true, "descricao": "Eixo temporal do acompanhamento" },
+        { "id": "dpp", "label": "Data Provável do Parto", "tipo": "date", "obrigatorio": true, "calculo_sugerido": "dum + 280 dias" }
+      ]
+    },
+
+    {
+      "id": "visitas",
+      "label": "Visitas (até 48 — uma por semana possível)",
+      "ordem": 4,
+      "tipo": "array",
+      "min_items": 0,
+      "max_items": 48,
+      "item_schema": {
+        "campos": [
+          { "id": "data_visita", "label": "Data da Visita", "tipo": "date", "obrigatorio": true },
+          { "id": "semana_gestacao", "label": "Semana de gestação", "tipo": "integer", "obrigatorio": true, "min": 0, "max": 42, "calculo_sugerido": "(data_visita - dum).days / 7" },
+
+          { "id": "p1_mediu_pressao", "label": "1) Você mediu a pressão? (0-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p2_atendida_upa_maternidade", "label": "2) Você precisou ser atendida em UPA ou maternidade neste mês? (0-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao", "descricao": "INDICAÇÃO DE GRAVIDEZ DE RISCO se SIM" },
+          { "id": "p3_realizou_exames", "label": "3) Você realizou os exames solicitados pela equipe? (0-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao" },
+
+          { "id": "p4_enjoando", "label": "4) Você está enjoando? (0-12 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 12", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p5_sangramento", "label": "5) Você teve algum sangramento? (0-12 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 12", "enum_ref": "_shared.enums.sim_nao", "descricao": "INDICAÇÃO DE GRAVIDEZ DE RISCO se SIM" },
+
+          { "id": "p6_ardencia_urinar", "label": "6) Você teve alguma ardência ao urinar desde a última visita? (0-24 sem)", "tipo": "enum", "visivel_se": "semana_gestacao <= 24", "enum_ref": "_shared.enums.sim_nao", "descricao": "Triagem ITU — INDICAÇÃO DE GRAVIDEZ DE RISCO se SIM" },
+
+          { "id": "p7_ganho_peso", "label": "7) Como você avalia seu ganho de peso? (13-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao >= 13 E semana_gestacao <= 41", "enum_ref": "_shared.enums.ganho_peso_gestante", "descricao": "Pouco peso ou Muito peso = atenção" },
+          { "id": "p8_inchaco_pernas", "label": "8) Você tem inchaço nas pernas? (13-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao >= 13 E semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao", "descricao": "Triagem pré-eclâmpsia se SIM" },
+
+          { "id": "p9_sentiu_bebe_mexer", "label": "9) Você sentiu o bebê mexer nas últimas 24 horas? (25-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao >= 25 E semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao", "descricao": "URGÊNCIA: NÃO sentir movimentação fetal > 24h → encaminhamento imediato" },
+          { "id": "p10_visitou_maternidade", "label": "10) Você visitou a maternidade de referência? (25-41 sem)", "tipo": "enum", "visivel_se": "semana_gestacao >= 25 E semana_gestacao <= 41", "enum_ref": "_shared.enums.sim_nao" },
+
+          { "id": "pa_sistolica", "label": "Pressão arterial sistólica (mmHg)", "tipo": "integer", "obrigatorio": false, "min": 60, "max": 250 },
+          { "id": "pa_diastolica", "label": "Pressão arterial diastólica (mmHg)", "tipo": "integer", "obrigatorio": false, "min": 40, "max": 160 },
+          { "id": "pa_data_aferida", "label": "Data em que a PA foi aferida (informada pela gestante)", "tipo": "date", "obrigatorio": false },
+
+          { "id": "observacoes", "label": "Outras informações", "tipo": "text", "obrigatorio": false, "max_length": 1000 }
+        ]
+      }
+    },
+
+    {
+      "id": "informacoes_gestacao",
+      "label": "Informações Sobre a Gestação",
+      "ordem": 5,
+      "campos": [
+        { "id": "fatores_risco", "label": "Fatores de Risco", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.fatores_risco_gestacao", "descricao": "Qualquer fator marcado classifica como alto risco → cadência SEMANAL" }
+      ]
+    },
+
+    {
+      "id": "vacinas",
+      "label": "Vacinas em dia",
+      "ordem": 6,
+      "campos": [
+        { "id": "dupla_adulto_dt", "label": "Dupla Adulto (DT) — em dia", "tipo": "boolean", "obrigatorio": false },
+        { "id": "dt_1a_dose", "label": "DT 1ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "dt_2a_dose", "label": "DT 2ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "dt_3a_dose", "label": "DT 3ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "dt_reforco", "label": "DT Reforço", "tipo": "date", "obrigatorio": false },
+        { "id": "dtpa", "label": "dTPa (data)", "tipo": "date", "obrigatorio": false, "descricao": "Recomendado entre 20-36 semanas" },
+        { "id": "hepatite_b", "label": "Hepatite B — em dia", "tipo": "boolean", "obrigatorio": false },
+        { "id": "hep_b_1a", "label": "Hep B 1ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "hep_b_2a", "label": "Hep B 2ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "hep_b_3a", "label": "Hep B 3ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "influenza", "label": "Influenza (data)", "tipo": "date", "obrigatorio": false },
+        { "id": "covid_19_1a_ou_du", "label": "Covid-19 1ª ou Dose Única", "tipo": "date", "obrigatorio": false },
+        { "id": "covid_19_2a", "label": "Covid-19 2ª dose", "tipo": "date", "obrigatorio": false },
+        { "id": "covid_19_1o_reforco", "label": "Covid-19 1º Reforço", "tipo": "date", "obrigatorio": false },
+        { "id": "covid_19_2o_reforco", "label": "Covid-19 2º Reforço", "tipo": "date", "obrigatorio": false }
+      ]
+    },
+
+    {
+      "id": "resultado_gestacao",
+      "label": "Resultado da Gestação Atual",
+      "ordem": 7,
+      "descricao": "Preenchido após o parto/encerramento",
+      "campos": [
+        { "id": "data_encerramento", "label": "Data do encerramento da gestação", "tipo": "date", "obrigatorio": false },
+        { "id": "resultado", "label": "Resultado", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.resultado_gestacao" },
+        { "id": "peso_nascer_g", "label": "Peso (g) ao nascer", "tipo": "integer", "obrigatorio_condicional": "resultado == 'NASCIDO_VIVO' OU resultado == 'NASCIDO_MORTO'", "min": 200, "max": 6000 }
+      ]
+    }
+  ],
+
+  "regras_negocio": [
+    { "id": "RN001", "descricao": "Qualquer fator de risco marcado classifica gestação como alto risco → cadência semanal", "tipo": "cadencia" },
+    { "id": "RN002", "descricao": "P2 == 'S' (UPA/maternidade) → escalonamento + visita imediata", "tipo": "downstream" },
+    { "id": "RN003", "descricao": "P5 == 'S' (sangramento) em < 12 semanas → URGÊNCIA — risco de aborto", "tipo": "downstream" },
+    { "id": "RN004", "descricao": "P6 == 'S' (ardência ao urinar) → triagem ITU, encaminhamento médico", "tipo": "downstream" },
+    { "id": "RN005", "descricao": "P8 == 'S' + PA elevada → triagem pré-eclâmpsia, URGÊNCIA", "tipo": "downstream" },
+    { "id": "RN006", "descricao": "P9 == 'N' (não sentiu bebê mexer) em > 25 semanas → URGÊNCIA — encaminhamento imediato à maternidade", "tipo": "downstream" },
+    { "id": "RN007", "descricao": "Visibilidade das perguntas P4–P10 muda conforme semana_gestacao", "tipo": "conditional_visibility" },
+    { "id": "RN008", "descricao": "PA sistólica ≥ 140 OU diastólica ≥ 90 → alerta pressão alta", "tipo": "downstream" },
+    { "id": "RN009", "descricao": "Cadência: gestante de risco habitual = mensal. Alto risco = semanal. (DOCX SMS-Rio)", "tipo": "cadencia" }
+  ],
+
+  "indicadores_gerados": [
+    "Cobertura de pré-natal — % gestantes com cadência respeitada",
+    "Cobertura vacinal de gestantes (DT, dTPa, Hep B, Influenza, Covid-19)",
+    "Taxa de gestantes de alto risco identificadas",
+    "Taxa de atendimento em UPA/maternidade (proxy de risco gestacional)",
+    "Resultado final da gestação (vivo / morto / aborto / peso ao nascer)",
+    "Alimenta indicadores Previne Brasil pré-natal (6+ consultas, sífilis, HIV)",
+    "Alimenta Monitor da Gestante SMS-Rio"
+  ]
+}

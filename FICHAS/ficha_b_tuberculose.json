@@ -1,0 +1,150 @@
+{
+  "ficha_id": "FICHA_B_TB",
+  "codigo_oficial": "SMSRIO015_FICHA_B",
+  "nome": "Ficha B — Acompanhamento de Tuberculose",
+  "versao_oficial": "1.0",
+  "ano": 2022,
+  "publico_alvo": "Paciente com tuberculose em tratamento",
+  "linha_de_cuidado": "Tuberculose / TDO (Tratamento Diretamente Observado)",
+  "frequencia_aplicacao": "DIÁRIO (TDO) — pelo prazo de tratamento (até 180 doses)",
+  "descricao": "Acompanhamento diário com TDO. Cadência mais rigorosa de todas as fichas. Inclui 24 visitas formais + 180 doses do TDO.",
+
+  "contexto_clinico": {
+    "duracao_tratamento_padrao_meses": 6,
+    "fases": [
+      { "fase": "Ataque", "duracao_meses": 2, "frequencia": "Diário" },
+      { "fase": "Manutenção", "duracao_meses": 4, "frequencia": "Diário" }
+    ],
+    "doses_totais_aproximadas": 180,
+    "escarro_controle_meses": [1, 2, 3, 4, 5, 6]
+  },
+
+  "secoes": [
+    {
+      "id": "cabecalho",
+      "label": "Cabeçalho",
+      "ordem": 1,
+      "shared_ref": "_shared.cabecalho_comum"
+    },
+
+    {
+      "id": "identificacao_paciente",
+      "label": "Identificação do Paciente",
+      "ordem": 2,
+      "campos": [
+        { "id": "nome", "label": "Nome", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "nome_social", "label": "Nome Social", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "data_nascimento", "label": "Data de Nascimento", "tipo": "date", "obrigatorio": true },
+        { "id": "cpf", "label": "CPF", "tipo": "cpf", "obrigatorio": true },
+        { "id": "cns", "label": "Nº CNS", "tipo": "string", "obrigatorio": false, "max_length": 15 },
+        { "id": "nis", "label": "NIS", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+        { "id": "possui_auxilio_brasil", "label": "Possui Auxílio Brasil?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "beneficiario_bpc", "label": "Beneficiário BPC?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "pertence_territorio_social", "label": "Pertence ao Território Social", "tipo": "boolean", "obrigatorio": false },
+        { "id": "sexo", "label": "Sexo", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.sexo_biologico" },
+        { "id": "orientacao_sexual", "label": "Orientação Sexual", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.orientacao_sexual" },
+        { "id": "identidade_genero", "label": "Identidade de Gênero", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.identidade_genero" },
+        { "id": "deficiencia", "label": "Deficiência", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.deficiencia" },
+        { "id": "telefones", "label": "Telefone(s)", "tipo": "array", "obrigatorio": true, "min_items": 1, "item_schema": { "tipo": "phone" } },
+        { "id": "populacao_de_rua", "label": "População de Rua?", "tipo": "boolean", "obrigatorio": false, "descricao": "Marcador de alta vulnerabilidade — TDO requer estratégia diferente" },
+        { "id": "onde_fica_maior_parte_tempo", "label": "Onde fica maior parte do tempo?", "tipo": "string", "obrigatorio_condicional": "populacao_de_rua == true", "max_length": 200 },
+        { "id": "religiao", "label": "Religião", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.religiao" },
+        { "id": "recebe_auxilio_tb", "label": "Recebe Auxílio TB?", "tipo": "boolean", "obrigatorio": false, "descricao": "Benefício específico para pessoas em tratamento de tuberculose" }
+      ]
+    },
+
+    {
+      "id": "dados_tratamento",
+      "label": "Dados do Tratamento",
+      "ordem": 3,
+      "campos": [
+        { "id": "quantos_contatos", "label": "Quantos contatos?", "tipo": "integer", "obrigatorio": true, "min": 0, "descricao": "Pessoas de convívio próximo que devem ser examinadas" },
+        { "id": "data_inicio_tratamento", "label": "Início do tratamento", "tipo": "date", "obrigatorio": true },
+        { "id": "data_encerramento_tratamento", "label": "Encerramento do tratamento", "tipo": "date", "obrigatorio": false, "descricao": "Preenchido ao final" },
+        { "id": "motivo_encerramento", "label": "Motivo do encerramento", "tipo": "enum", "obrigatorio_condicional": "data_encerramento_tratamento preenchida", "enum_ref": "_shared.enums.motivo_encerramento_tb" }
+      ]
+    },
+
+    {
+      "id": "visitas_periodicas",
+      "label": "Visitas Periódicas (24 colunas)",
+      "ordem": 4,
+      "descricao": "Diferente da TDO diária — são consultas estruturadas de acompanhamento",
+      "tipo": "array",
+      "min_items": 0,
+      "max_items": 24,
+      "item_schema": {
+        "campos": [
+          { "id": "data_visita", "label": "Data da Visita", "tipo": "date", "obrigatorio": true },
+          { "id": "p1_tossindo", "label": "1) Você está tossindo?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p2_desconforto_medicacao", "label": "2) A medicação tem causado algum desconforto? Especifique.", "tipo": "multi_enum", "obrigatorio": true, "enum_ref": "_shared.enums.desconforto_medicacao_tb" },
+          { "id": "p3_resistencia_remedio", "label": "3) Apresenta alguma resistência para tomar o remédio?", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p4_contatos_nao_examinados", "label": "4) Das pessoas de contato, quantas NÃO foram examinadas após o diagnóstico?", "tipo": "integer", "obrigatorio": true, "min": 0 }
+        ]
+      }
+    },
+
+    {
+      "id": "controle_escarro_mensal",
+      "label": "Controle de Escarro Mensal (6 meses)",
+      "ordem": 5,
+      "campos": [
+        { "id": "escarro_1m", "label": "Escarro 1º mês", "tipo": "date", "obrigatorio": false },
+        { "id": "escarro_2m", "label": "Escarro 2º mês", "tipo": "date", "obrigatorio": false },
+        { "id": "escarro_3m", "label": "Escarro 3º mês", "tipo": "date", "obrigatorio": false },
+        { "id": "escarro_4m", "label": "Escarro 4º mês", "tipo": "date", "obrigatorio": false },
+        { "id": "escarro_5m", "label": "Escarro 5º mês", "tipo": "date", "obrigatorio": false },
+        { "id": "escarro_6m", "label": "Escarro 6º mês", "tipo": "date", "obrigatorio": false }
+      ]
+    },
+
+    {
+      "id": "tdo_doses",
+      "label": "Tratamento Diretamente Observado (até 180 doses)",
+      "ordem": 6,
+      "descricao": "Cada dose: data + status (Observada por profissional / Autoadministrada)",
+      "tipo": "array",
+      "min_items": 0,
+      "max_items": 180,
+      "item_schema": {
+        "campos": [
+          { "id": "numero_dose", "label": "Número da dose", "tipo": "integer", "obrigatorio": true, "min": 1, "max": 180 },
+          { "id": "data_dose", "label": "Data da dose", "tipo": "date", "obrigatorio": true },
+          { "id": "status_dose", "label": "Status da dose (Observada / Autoadministrada)", "tipo": "enum", "obrigatorio": true, "enum_ref": "_shared.enums.tdo_status_dose" }
+        ]
+      }
+    },
+
+    {
+      "id": "informacoes",
+      "label": "Informações",
+      "ordem": 7,
+      "campos": [
+        { "id": "informacoes", "label": "Informações livres", "tipo": "text", "obrigatorio": false, "max_length": 4000 }
+      ]
+    }
+  ],
+
+  "regras_negocio": [
+    { "id": "RN001", "descricao": "TDO = visita diária obrigatória durante todo o período de tratamento (regra DOCX SMS-Rio)", "tipo": "cadencia" },
+    { "id": "RN002", "descricao": "Falha consecutiva > 2 dias em registrar dose → ALERTA — risco de abandono", "tipo": "downstream" },
+    { "id": "RN003", "descricao": "P1 == 'S' (continua tossindo) após 2º mês → encaminhamento médico — possível resistência", "tipo": "downstream" },
+    { "id": "RN004", "descricao": "P2 inclui sinais hepatotóxicos (urina escura, pele amarelada) → URGÊNCIA — possível hepatite medicamentosa", "tipo": "downstream" },
+    { "id": "RN005", "descricao": "P3 == 'S' (resistência a tomar remédio) → bundle de adesão + envolver família", "tipo": "downstream" },
+    { "id": "RN006", "descricao": "P4 > 0 (contatos não examinados) → busca ativa imediata dos contatos", "tipo": "downstream" },
+    { "id": "RN007", "descricao": "Escarro mensal NÃO realizado nos meses 2 e 5 → encaminhamento prioritário (controle obrigatório)", "tipo": "downstream" },
+    { "id": "RN008", "descricao": "Após 2 meses de TDO sem nova baciloscopia → flag de risco", "tipo": "downstream" },
+    { "id": "RN009", "descricao": "Paciente em população de rua → estratégia TDO diferenciada (busca ativa em pontos)", "tipo": "downstream" },
+    { "id": "RN010", "descricao": "Status final pode ser: Cura, Abandono, Óbito, Transferência, Falência, Mudança de diagnóstico", "tipo": "structural" }
+  ],
+
+  "indicadores_gerados": [
+    "Taxa de adesão ao TDO (% doses observadas vs autoadministradas)",
+    "Taxa de cura ao final do tratamento",
+    "Taxa de abandono",
+    "Cobertura de exame de contatos",
+    "Cobertura de baciloscopia de controle",
+    "Detecção de hepatotoxicidade medicamentosa",
+    "Alimenta Previne Brasil + SINAN TB"
+  ]
+}

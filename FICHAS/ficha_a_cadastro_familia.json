@@ -1,0 +1,174 @@
+{
+  "ficha_id": "FICHA_A",
+  "codigo_oficial": "SMSDC008_SIAB",
+  "nome": "Ficha de Cadastro de Família e do Cidadão para ACS",
+  "versao_oficial": "1.0",
+  "ano": 2022,
+  "publico_alvo": "Família + até 6 cidadãos por ficha",
+  "linha_de_cuidado": "Base — Cadastramento",
+  "frequencia_aplicacao": "Pontual — cadastro inicial + atualizações em mudanças significativas",
+  "descricao": "Cadastro completo da família e dos cidadãos pelo ACS. Base SIAB. Quem não está aqui não está acompanhado.",
+
+  "secoes": [
+    {
+      "id": "cabecalho",
+      "label": "Cabeçalho",
+      "ordem": 1,
+      "shared_ref": "_shared.cabecalho_comum",
+      "campos_adicionais": [
+        { "id": "comunidade", "label": "Comunidade", "tipo": "string", "obrigatorio": false, "max_length": 80 },
+        { "id": "data_cadastro", "label": "Data", "tipo": "date", "obrigatorio": true, "descricao": "Data do cadastramento" }
+      ]
+    },
+
+    {
+      "id": "registro_familia",
+      "label": "Domicílio e família",
+      "ordem": 2,
+      "campos": [
+        { "id": "registro_familia", "label": "Registro da Família", "tipo": "string", "obrigatorio": true, "max_length": 20 },
+        { "id": "familia_numero", "label": "Família Número", "tipo": "integer", "obrigatorio": true, "min": 1 },
+        { "id": "endereco", "label": "Endereço", "tipo": "string", "obrigatorio": true, "max_length": 200 },
+        { "id": "numero", "label": "Número", "tipo": "string", "obrigatorio": true, "max_length": 10 },
+        { "id": "complemento", "label": "Complemento", "tipo": "string", "obrigatorio": false, "max_length": 60 },
+        { "id": "bairro", "label": "Bairro", "tipo": "string", "obrigatorio": true, "max_length": 80 },
+        { "id": "cep", "label": "CEP", "tipo": "cep", "obrigatorio": true },
+        { "id": "telefones", "label": "Telefone(s)", "tipo": "array", "obrigatorio": true, "min_items": 1, "item_schema": { "tipo": "phone" } },
+        { "id": "situacao_moradia", "label": "Situação de Moradia", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.situacao_moradia" },
+        { "id": "qual_outra_situacao", "label": "Qual? (se Outra situação)", "tipo": "string", "obrigatorio": false, "obrigatorio_condicional": "situacao_moradia inclui 'OUTRO'" },
+        { "id": "tempo_moradia", "label": "Tempo de Moradia", "tipo": "string", "obrigatorio": false, "max_length": 40, "descricao": "Ex.: '10 anos', '6 meses'" }
+      ]
+    },
+
+    {
+      "id": "cidadaos",
+      "label": "Identificação da Família (até 6 cidadãos)",
+      "ordem": 3,
+      "tipo": "array",
+      "min_items": 1,
+      "max_items": 6,
+      "campos_por_cidadao": [
+        { "id": "nome", "label": "Nome do Cidadão", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "nome_social", "label": "Nome Social", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "data_nascimento", "label": "Data de Nascimento", "tipo": "date", "obrigatorio": true },
+        { "id": "cpf", "label": "CPF", "tipo": "cpf", "obrigatorio": false, "obrigatorio_condicional": "idade >= 16 anos OU ('idade <= 16' E 'numero_dnv vazio')", "descricao": "Campo obrigatório para maiores de 16 anos e preferencial para aqueles com até 16 anos" },
+        { "id": "numero_dnv", "label": "Nº da Dec. de Nascido Vivo (DNV)", "tipo": "string", "obrigatorio": false, "obrigatorio_condicional": "idade <= 16 anos E cpf vazio", "descricao": "Campo obrigatório para aqueles com até 16 anos se CPF não preenchido", "max_length": 32 },
+        { "id": "sexo_biologico", "label": "Sexo", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.sexo_biologico" },
+        { "id": "raca_cor", "label": "Raça/Cor", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.raca_cor" },
+        { "id": "situacao_familiar", "label": "Situação Familiar", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.situacao_familiar" },
+        { "id": "frequenta_escola", "label": "Frequenta Escola?", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.frequenta_escola" },
+        { "id": "natureza_escola", "label": "Natureza da Escola", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.natureza_escola", "obrigatorio_condicional": "frequenta_escola == 'S'" },
+        { "id": "escolaridade", "label": "Escolaridade", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.escolaridade" },
+        { "id": "possui_plano_saude", "label": "Possui Plano de Saúde", "tipo": "boolean", "obrigatorio": false },
+        { "id": "fuma", "label": "Fuma", "tipo": "boolean", "obrigatorio": false },
+        { "id": "presente_durante_visita", "label": "Presente Durante Visita (PDV)", "tipo": "boolean", "obrigatorio": false },
+        { "id": "csb_dor", "label": "C.S.B. — Dor", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "1", "label": "Sem dor" },
+          { "codigo": "2", "label": "Espontânea" },
+          { "codigo": "3", "label": "Provocada" }
+        ]},
+        { "id": "csb_mucosa", "label": "C.S.B. — Mucosa", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "1", "label": "Normal" },
+          { "codigo": "2", "label": "Lesão não cicatrizada a mais de 15 dias" },
+          { "codigo": "3", "label": "Presença de fenda Lábio-Palatal" }
+        ]},
+        { "id": "csb_interferencia", "label": "C.S.B. — Interferência", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.sim_nao" },
+        { "id": "csb_necessidade_protese", "label": "C.S.B. — Necessidade de Prótese", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "1", "label": "Sem Necessidade" },
+          { "codigo": "2", "label": "Uma Prótese Total" },
+          { "codigo": "3", "label": "Duas Próteses Totais" },
+          { "codigo": "4", "label": "Uma Prótese Parcial" },
+          { "codigo": "5", "label": "Duas Próteses Parciais" },
+          { "codigo": "6", "label": "Combinação de Total Com Parcial" }
+        ]},
+        { "id": "grupos_saude", "label": "Grupos de Saúde", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.grupos_saude" },
+        { "id": "doencas_condicoes_referidas", "label": "Doenças ou Condições Referidas", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.doencas_condicoes_referidas" },
+        { "id": "situacao_profissional", "label": "Situação Profissional", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.situacao_profissional" },
+        { "id": "ocupacao", "label": "Ocupação", "tipo": "string", "obrigatorio": false, "max_length": 80, "descricao": "Texto livre — pode evoluir para CBO no futuro" },
+
+        { "id": "mae_pai", "label": "Mãe/Pai", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "pai_mae", "label": "Pai/Mãe", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "municipio_nascimento", "label": "Município de Nascimento", "tipo": "string", "obrigatorio": false, "max_length": 80 },
+        { "id": "uf_nascimento", "label": "UF", "tipo": "string", "obrigatorio": false, "max_length": 2 },
+        { "id": "nacionalidade", "label": "Nacionalidade", "tipo": "string", "obrigatorio": false, "max_length": 60 },
+        { "id": "cartao_familia_carioca", "label": "Cartão Família Carioca?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "pertence_territorio_social", "label": "Pertence ao Território Social", "tipo": "boolean", "obrigatorio": false },
+        { "id": "cns", "label": "Nº CNS (Cartão Nacional de Saúde)", "tipo": "string", "obrigatorio": false, "max_length": 15 },
+        { "id": "nis", "label": "NIS", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+        { "id": "possui_auxilio_brasil", "label": "Possui Auxílio Brasil?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "beneficiario_bpc", "label": "Beneficiário BPC?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "deficiencia", "label": "Deficiência", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.deficiencia" },
+        { "id": "identidade_genero", "label": "Identidade de Gênero", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.identidade_genero" },
+        { "id": "orientacao_sexual", "label": "Orientação Sexual", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.orientacao_sexual" },
+        { "id": "telefones", "label": "Telefone(s)", "tipo": "array", "obrigatorio": false, "item_schema": { "tipo": "phone" } },
+        { "id": "email_rede_social", "label": "E-mail ou rede social", "tipo": "string", "obrigatorio": false, "max_length": 120 },
+        { "id": "religiao", "label": "Religião", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.religiao" },
+        { "id": "religiao_outra", "label": "Outra religião (especificar)", "tipo": "string", "obrigatorio_condicional": "religiao == 'OUTRA'" }
+      ]
+    },
+
+    {
+      "id": "moradia_detalhes",
+      "label": "Documentos · Situação e Moradia",
+      "ordem": 4,
+      "campos": [
+        { "id": "tipo_domicilio", "label": "Tipo de Domicílio", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.tipo_domicilio" },
+        { "id": "tipo_acesso_domicilio", "label": "Tipo de Acesso ao Domicílio", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.tipo_acesso_domicilio" },
+        { "id": "comodos", "label": "Cômodos", "tipo": "integer", "obrigatorio": false, "min": 1 },
+        { "id": "energia_eletrica", "label": "Energia Elétrica", "tipo": "boolean", "obrigatorio": false },
+        { "id": "melhor_horario_visita", "label": "Melhor Horário / Dia Para Visitas", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.horario_visita", "descricao": "CRÍTICO: usar para roteirização e captura de pacientes 'invisíveis' (Camila)" },
+        { "id": "material_paredes", "label": "Material Predominante das Paredes Externas", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.material_paredes" },
+        { "id": "material_paredes_outro", "label": "Material — Outros (especificar)", "tipo": "string", "obrigatorio_condicional": "material_paredes == 'OUTROS'" },
+        { "id": "possui_filtro_agua", "label": "Possui Filtro de Água", "tipo": "boolean", "obrigatorio": false },
+        { "id": "tratamento_agua", "label": "Tratamento da Água", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.tratamento_agua" },
+        { "id": "abastecimento_agua", "label": "Abastecimento de Água", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.abastecimento_agua" },
+        { "id": "ponto_abastecimento_agua", "label": "Ponto de Abastecimento de Água", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "NO_DOMICILIO", "label": "No Domicílio" },
+          { "codigo": "NO_TERRENO", "label": "No Terreno" },
+          { "codigo": "FORA_DO_TERRENO", "label": "Fora do Terreno" }
+        ]},
+        { "id": "escoamento_sanitario", "label": "Forma de Escoamento do Banheiro/Sanitário", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.escoamento_sanitario" },
+        { "id": "destino_lixo", "label": "Destino do Lixo", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.destino_lixo" },
+        { "id": "plantas_medicinais_cultiva", "label": "Plantas Medicinais — Cultiva?", "tipo": "boolean", "obrigatorio": false },
+        { "id": "plantas_medicinais_utiliza", "label": "Plantas Medicinais — Utiliza?", "tipo": "boolean", "obrigatorio": false }
+      ]
+    },
+
+    {
+      "id": "informacoes_complementares",
+      "label": "Informações Complementares",
+      "ordem": 5,
+      "campos": [
+        { "id": "data_kit_odonto", "label": "Data Kit Odonto", "tipo": "date", "obrigatorio": false },
+        { "id": "renda_familiar", "label": "Renda Familiar", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.renda_familiar_faixa", "descricao": "Soma de todos os ganhos dos membros (em reais)" },
+        { "id": "procura_em_caso_doenca", "label": "Em caso de doença, procura", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.procura_em_caso_doenca" },
+        { "id": "procura_outros_especificar", "label": "Outros (especificar)", "tipo": "string", "obrigatorio_condicional": "procura_em_caso_doenca inclui 'OUTROS'" }
+      ]
+    },
+
+    {
+      "id": "anotacoes",
+      "label": "Anotações",
+      "ordem": 6,
+      "campos": [
+        { "id": "anotacoes", "label": "Anotações livres", "tipo": "text", "obrigatorio": false, "max_length": 4000 }
+      ]
+    }
+  ],
+
+  "regras_negocio": [
+    { "id": "RN001", "descricao": "Pelo menos um cidadão é obrigatório", "tipo": "structural" },
+    { "id": "RN002", "descricao": "Se idade do cidadão ≥ 16 → CPF obrigatório", "tipo": "conditional_required" },
+    { "id": "RN003", "descricao": "Se idade do cidadão < 16 E CPF vazio → DNV obrigatório", "tipo": "conditional_required" },
+    { "id": "RN004", "descricao": "Atualizar Ficha A pelo menos 1x/ano, ou em qualquer mudança de moradia/composição familiar", "tipo": "cadencia" },
+    { "id": "RN005", "descricao": "Melhor horário de visita deve ser usado pelo gerador de lista do dia para resolver gap de pacientes invisíveis", "tipo": "downstream" }
+  ],
+
+  "indicadores_gerados": [
+    "Cobertura de cadastros por microárea",
+    "Distribuição de vulnerabilidade social no território",
+    "Proporção de domicílios em situação de risco habitacional (acesso a água, esgoto, energia)",
+    "Mapa de Auxílio Brasil / BPC no território",
+    "Base para Escala de Risco Familiar (Ficha A SIAB/SISAB)"
+  ]
+}

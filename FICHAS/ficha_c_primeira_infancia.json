@@ -1,0 +1,168 @@
+{
+  "ficha_id": "FICHA_C_PRIMEIRA_INFANCIA",
+  "codigo_oficial": "SMSRIO001_FICHA_C",
+  "nome": "Ficha C — Acompanhamento da Criança na Primeira Infância",
+  "versao_oficial": "1.0",
+  "ano": 2022,
+  "publico_alvo": "Criança de 0 a 6 anos",
+  "linha_de_cuidado": "Primeira Infância (Puericultura)",
+  "frequencia_aplicacao": "Mensal (mínimo). Até 30 colunas de visita.",
+  "descricao": "Acompanhamento periódico de criança 0-6 anos pelo ACS. Perguntas indexadas por faixa etária. Inclui calendário vacinal completo.",
+
+  "secoes": [
+    {
+      "id": "cabecalho",
+      "label": "Cabeçalho",
+      "ordem": 1,
+      "shared_ref": "_shared.cabecalho_comum",
+      "campos_adicionais": [
+        { "id": "familia_id", "label": "Família (ID)", "tipo": "string", "obrigatorio": true, "max_length": 20 },
+        { "id": "principal_cuidador", "label": "Principal cuidador", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "parentesco_cuidador", "label": "Parentesco do cuidador", "tipo": "string", "obrigatorio": true, "max_length": 40 }
+      ]
+    },
+
+    {
+      "id": "identificacao_crianca",
+      "label": "Identificação da Criança",
+      "ordem": 2,
+      "campos": [
+        { "id": "nome", "label": "Nome da criança", "tipo": "string", "obrigatorio": true, "max_length": 120 },
+        { "id": "idade", "label": "Idade", "tipo": "string", "obrigatorio": true, "max_length": 20, "descricao": "Ex.: '2 anos 3 meses', '5 meses'" },
+        { "id": "data_nascimento", "label": "Data de Nascimento", "tipo": "date", "obrigatorio": true },
+        { "id": "cpf_ou_dnv", "label": "CPF / DNV", "tipo": "string", "obrigatorio": true, "max_length": 32, "descricao": "CPF se já emitido, ou número da Declaração de Nascido Vivo" },
+        { "id": "cadunico_status", "label": "CadÚnico", "tipo": "enum", "obrigatorio": false, "enum_values": [
+          { "codigo": "AGUARDANDO", "label": "Aguardando" },
+          { "codigo": "SEM_INDICACAO", "label": "Sem indicação" },
+          { "codigo": "ATIVO", "label": "Ativo" }
+        ]},
+        { "id": "nis", "label": "NIS", "tipo": "string", "obrigatorio": false, "max_length": 12 },
+        { "id": "sexo", "label": "Sexo", "tipo": "enum", "obrigatorio": false, "enum_ref": "_shared.enums.sexo_biologico" },
+        { "id": "certidao_nascimento_emitida", "label": "Certidão de nascimento", "tipo": "boolean", "obrigatorio": false },
+        { "id": "certidao_data_emissao", "label": "Certidão emitida em", "tipo": "date", "obrigatorio_condicional": "certidao_nascimento_emitida == true" },
+        { "id": "deficiencia", "label": "Deficiência", "tipo": "multi_enum", "obrigatorio": false, "enum_ref": "_shared.enums.deficiencia" },
+        { "id": "endereco", "label": "Endereço", "tipo": "string", "obrigatorio": true, "max_length": 200 },
+        { "id": "numero", "label": "Número", "tipo": "string", "obrigatorio": true, "max_length": 10 },
+        { "id": "complemento", "label": "Complemento", "tipo": "string", "obrigatorio": false, "max_length": 60 },
+        { "id": "bairro", "label": "Bairro", "tipo": "string", "obrigatorio": true, "max_length": 80 },
+        { "id": "cep", "label": "CEP", "tipo": "cep", "obrigatorio": false },
+        { "id": "telefones", "label": "Telefone(s) do cuidador", "tipo": "array", "obrigatorio": true, "min_items": 1, "item_schema": { "tipo": "phone" } },
+        { "id": "email_rede_social", "label": "E-mail ou rede social", "tipo": "string", "obrigatorio": false, "max_length": 120 }
+      ]
+    },
+
+    {
+      "id": "visitas",
+      "label": "Visitas (até 30 colunas)",
+      "ordem": 3,
+      "tipo": "array",
+      "min_items": 0,
+      "max_items": 30,
+      "item_schema": {
+        "campos": [
+          { "id": "data_visita", "label": "Data da Visita", "tipo": "date", "obrigatorio": true },
+          { "id": "idade_meses", "label": "Idade da criança em meses no momento da visita", "tipo": "integer", "obrigatorio": false, "min": 0, "max": 72, "calculo_sugerido": "(data_visita - data_nascimento).months" },
+
+          { "id": "p1_primeira_consulta_7d", "label": "1) Realizou a primeira consulta em até 7 dias? (0-28 dias)", "tipo": "enum", "visivel_se": "idade_meses == 0 OU (idade em dias <= 28)", "enum_ref": "_shared.enums.sim_nao", "descricao": "Indicador Previne Brasil crítico" },
+          { "id": "p2_onde_dorme", "label": "2) Onde dorme a criança? (0-5 meses)", "tipo": "enum", "visivel_se": "idade_meses <= 5", "enum_ref": "_shared.enums.onde_dorme_crianca", "descricao": "Triagem segurança do sono — risco SMSL" },
+
+          { "id": "p3_comparecendo_consultas", "label": "3) A criança está comparecendo às consultas? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p3_justifica_nao", "label": "3) Se NÃO, justifique", "tipo": "text", "obrigatorio_condicional": "p3_comparecendo_consultas == 'N'", "max_length": 500 },
+          { "id": "p4_vacinacao_em_dia", "label": "4) Vacinação em dia? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p5_alimentacao", "label": "5) Como está a alimentação da criança? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.alimentacao_crianca" },
+          { "id": "p6_sinais_risco", "label": "6) Sinais de risco? (0-6 anos)", "tipo": "multi_enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sinais_risco_crianca" },
+          { "id": "p7_alteracao_desenvolvimento", "label": "7) A mãe percebeu algum problema/alteração no desenvolvimento? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p8_perfil_bpc_nao_recebendo", "label": "8) Criança com perfil de BPC, mas ainda não está recebendo? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao", "descricao": "Encaminhar para assistente social se SIM" },
+          { "id": "p9_comida_acabou", "label": "9) No último mês, a comida acabou antes que tivesse dinheiro? (0-6 anos)", "tipo": "enum", "visivel_se": "idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao", "descricao": "Triagem segurança alimentar" },
+
+          { "id": "p10_creche_pre_escola", "label": "10) A criança está matriculada na creche ou pré-escola? Qual? (6m-6anos)", "tipo": "enum", "visivel_se": "idade_meses >= 6 E idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p10_nome_instituicao", "label": "10) Nome da creche/pré-escola", "tipo": "string", "obrigatorio_condicional": "p10_creche_pre_escola == 'S'", "max_length": 120 },
+          { "id": "p11_faltou_creche", "label": "11) Criança faltou por algum motivo? Qual? (6m-6anos)", "tipo": "enum", "visivel_se": "idade_meses >= 6 E idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+          { "id": "p11_motivo_falta", "label": "11) Motivo da falta", "tipo": "text", "obrigatorio_condicional": "p11_faltou_creche == 'S'", "max_length": 200 },
+
+          { "id": "p12_contraturno", "label": "12) A criança tem acesso à atividade de contraturno? (4-6 anos)", "tipo": "enum", "visivel_se": "idade_meses >= 48 E idade_meses <= 72", "enum_ref": "_shared.enums.sim_nao" },
+
+          { "id": "outras_informacoes", "label": "Outras Informações", "tipo": "text", "obrigatorio": false, "max_length": 1000, "descricao": "Registros e alterações relatadas pela pessoa entrevistada" }
+        ]
+      }
+    },
+
+    {
+      "id": "calendario_vacinal",
+      "label": "Calendário Vacinal",
+      "ordem": 4,
+      "descricao": "Histórico de vacinas administradas. Comparar com calendário PNI para flag de atraso.",
+      "campos": [
+        { "id": "bcg_data", "label": "BCG (ao nascer)", "tipo": "date", "obrigatorio": false },
+        { "id": "hepatite_b_1d", "label": "Hepatite B 1ª D (ao nascer)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "pentavalente_1d", "label": "Pentavalente 1ª D (2 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "poliomielite_vip_1d", "label": "Poliomielite VIP 1ª D (2 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "pneumo10_1d", "label": "Pneumo 10 1ª D (2 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "rotavirus_1d", "label": "Rotavírus 1ª D (2 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "meningo_c_1d", "label": "Meningo C 1ª D (3 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "pentavalente_2d", "label": "Pentavalente 2ª D (4 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "poliomielite_vip_2d", "label": "Poliomielite VIP 2ª D (4 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "pneumo10_2d", "label": "Pneumo 10 2ª D (4 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "rotavirus_2d", "label": "Rotavírus 2ª D (4 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "meningo_c_2d", "label": "Meningo C 2ª D (5 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "pentavalente_3d", "label": "Pentavalente 3ª D (6 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "poliomielite_vip_3d", "label": "Poliomielite VIP 3ª D (6 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "febre_amarela_1d", "label": "Febre Amarela 1ª D (9 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "triplice_viral_1d", "label": "Tríplice Viral 1ª D (12 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "pneumo10_dr", "label": "Pneumo 10 DR (12 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "meningo_c_dr", "label": "Meningo C DR (12 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "triplice_viral_varicela_1d", "label": "Tríplice Viral + Varicela 1ª D (15 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "hepatite_a_du", "label": "Hepatite A Dose Única (15 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "dtp_1d_reforco", "label": "DTP 1ª D Reforço (15 meses)", "tipo": "date", "obrigatorio": false },
+        { "id": "poliomielite_vop_1d_reforco", "label": "Poliomielite VOP 1ª D Reforço (15 meses)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "dtp_2d_reforco", "label": "DTP 2ª D Reforço (4 anos)", "tipo": "date", "obrigatorio": false },
+        { "id": "poliomielite_vop_2d_reforco", "label": "Poliomielite VOP 2ª D Reforço (4 anos)", "tipo": "date", "obrigatorio": false },
+        { "id": "varicela_2d", "label": "Varicela 2ª D (4 anos)", "tipo": "date", "obrigatorio": false },
+        { "id": "febre_amarela_dr", "label": "Febre Amarela Reforço (4 anos)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "hpv_1d", "label": "HPV 1ª D (9 anos)", "tipo": "date", "obrigatorio": false },
+        { "id": "hpv_2d", "label": "HPV 2ª D (9 anos)", "tipo": "date", "obrigatorio": false },
+
+        { "id": "covid19_1d", "label": "Covid-19 1ª D", "tipo": "date", "obrigatorio": false },
+        { "id": "covid19_2d", "label": "Covid-19 2ª D", "tipo": "date", "obrigatorio": false },
+        { "id": "covid19_1d_reforco", "label": "Covid-19 1ª D Reforço", "tipo": "date", "obrigatorio": false },
+        { "id": "covid19_2d_reforco", "label": "Covid-19 2ª D Reforço", "tipo": "date", "obrigatorio": false },
+
+        { "id": "vacinas_adicionais", "label": "Outras vacinas (não listadas)", "tipo": "text", "obrigatorio": false, "max_length": 1000 }
+      ]
+    }
+  ],
+
+  "regras_negocio": [
+    { "id": "RN001", "descricao": "P1 == 'N' (primeira consulta não feita em 7 dias) → encaminhamento urgente", "tipo": "downstream" },
+    { "id": "RN002", "descricao": "P2 in [2 (chão), 3 (cama com outros), 4 (sofá/rede)] → orientação segurança do sono — risco SMSL", "tipo": "downstream" },
+    { "id": "RN003", "descricao": "P4 == 'N' (vacinação atrasada) → encaminhar para campanha + verificar calendário vacinal", "tipo": "downstream" },
+    { "id": "RN004", "descricao": "P6 inclui sinais críticos (cansaço respirar, gemido, não suga) → URGÊNCIA — encaminhamento imediato", "tipo": "downstream" },
+    { "id": "RN005", "descricao": "P7 == 'S' (alteração desenvolvimento) → encaminhar para puericultura especializada", "tipo": "downstream" },
+    { "id": "RN006", "descricao": "P8 == 'S' (perfil BPC sem benefício) → encaminhar para assistente social", "tipo": "downstream" },
+    { "id": "RN007", "descricao": "P9 == 'S' (insegurança alimentar) → encaminhar para CRAS + Bolsa Família", "tipo": "downstream" },
+    { "id": "RN008", "descricao": "Visibilidade das perguntas P1-P12 muda conforme idade_meses", "tipo": "conditional_visibility" },
+    { "id": "RN009", "descricao": "Comparar calendário vacinal vs PNI por idade → flag de atraso > 30 dias dispara alerta de defaulter", "tipo": "downstream" },
+    { "id": "RN010", "descricao": "Cadência: mensal (regra Rio: 7-8 visitas/ano para criança < 1 ano)", "tipo": "cadencia" }
+  ],
+
+  "indicadores_gerados": [
+    "Cobertura de primeira consulta em até 7 dias (Previne Brasil)",
+    "Cobertura vacinal infantil (Previne Brasil — polio + penta)",
+    "% crianças com alimentação adequada por idade",
+    "Detecção precoce de alteração de desenvolvimento",
+    "% crianças com perfil BPC encaminhadas",
+    "Segurança alimentar familiar (P9)",
+    "Cobertura escolar / creche (P10)",
+    "Acesso a contraturno (P12)"
+  ]
+}
