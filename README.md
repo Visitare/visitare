@@ -238,20 +238,3 @@ Detalhes de integração e schema: [`docs/SUPABASE.md`](docs/SUPABASE.md).
 | Motor | **SQL puro** com `STABLE` functions | Auditável, determinístico, sem dependência de LLM |
 | Dataset | **4 parquets anonimizados** (Prefeitura do Rio) | k-anon ≥ 5, date-shifted, ruído geo 100m |
 
----
-
-## Status — hackathon `2026-05-24`
-
-- [x] Exploração e perfilamento do dataset
-- [x] Schema Postgres + carga dos 4 parquets no Supabase
-- [x] Motor PRIO-ACS server-side (5 migrations aplicadas)
-- [x] Ficha estendida (view + signals do form alimentam o motor)
-- [x] Realtime: lista reage à captura em campo
-- [x] Multi-ACS via picker + `equipe_do_profissional`
-- [x] Web app mobile-first (lista · paciente · visita · supervisor)
-- [x] Form contextual com perguntas oficiais e-SUS AB / SMS-Rio
-- [x] PRD + arquitetura técnica + segurança/LGPD documentados
-- [ ] Deploy preview público no Vercel
-- [ ] Vídeo demo 60s
-
-Critério do desafio: **primeiro commit após 09:30 de 24/05** ✅
