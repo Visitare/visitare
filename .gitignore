@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.vercel/
+.env
+.env.local
+.env*.local
+.DS_Store
+*.log
+.idea/
+.vscode/
+.venv/
+__pycache__/
