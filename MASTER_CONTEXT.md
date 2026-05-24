@@ -602,29 +602,91 @@ flowchart TD
 
 ## 9. Métricas de Impacto Para o Pitch
 
+> **Análise completa em `docs/ROI.md`** — números, premissas e fontes detalhadas. Esta seção resume os 4 números-chave + atualiza o que ficou defasado em outras seções deste doc.
+
+### 9.0 Os 4 números-chave do pitch (cenário base Rio)
+
+| # | Métrica | Valor | O que significa |
+|---|---------|-------|-----------------|
+| 1 | **ROI 47×** em regime | R$ 1 → R$ 47 retorno | Mais lucrativo que qualquer ativo financeiro |
+| 2 | **R$ 40 milhões/ano** | Benefício direto Rio | R$ 10M ICSAP evitadas + R$ 30M Previne capturado |
+| 3 | **1,1 milhão horas-ACS/ano** | Capacidade liberada | = 907 ACS extras sem concurso |
+| 4 | **6.000 internações/ano evitadas** | ICSAP em Rio | ~10% das internações sensíveis à APS |
+
+**Payback < 30 dias · NPV 5 anos = R$ 135M · Custo: R$ 0,31 por ACS por dia**
+
+### 9.0-bis Framing alternativo (B) — produtividade como contratação evitada
+
+Para audiência de Fazenda / Casa Civil / RH:
+
+| Métrica | Valor | Cálculo |
+|---------|-------|---------|
+| Ganho bruto de produtividade por ACS | **20%** | 1h/dia em 5h efetivas (Camila) |
+| Adesão realista | 60% | Mesma do cenário base |
+| Ganho efetivo | 12% | 60% × 20% |
+| **Contratações de ACS evitadas (Rio)** | **907** | 12% × 7.555 |
+| Custo-empresa/ACS/ano | R$ 60.000 | Piso 2025 + encargos |
+| **Folha de pagamento evitada (Rio)** | **R$ 54M/ano** | 907 × R$ 60k |
+| **ROI framing B** | **64×** | R$ 54M / R$ 0,85M custo |
+| **Escala nacional (281k ACS, 12%)** | **R$ 2 bilhões/ano** | 33.727 ACS-equivalente × R$ 60k |
+
+> ⚠️ **NÃO somar com 9.0** — as horas-ACS liberadas são as mesmas. A Prefeitura escolhe entre "usar para qualidade" (A) ou "usar para crescer sem contratar" (B). Detalhes em `docs/ROI.md` §5.
+
 ### 9.1 Métrica primária — Mortalidade materno-infantil
 - Prioridade zero declarada da Prefeitura
 - 43% das gestantes da amostra tiveram urgência/emergência/internação
 - Combo crítico: gestante + DM + vulnerabilidade
+- **Marginal da solução: 15–30 mortes infantis evitadas/ano em Rio** (Aquino 2009 + Rasella BMJ 2014 aplicados sobre baseline ESF atual)
+- **Escala nacional: 1.750–3.500 mortes infantis evitadas/ano**
 
 ### 9.2 Métrica secundária — ICSAP (Portaria 221/2008)
-- 7,2% de todas as internações SUS são ICSAP (836.873/ano)
-- Solução reduz visitas faltantes em hipertensos/diabéticos → reduz grupos 9 e 13 ICSAP
+- **~2 milhões de internações ICSAP/ano no Brasil** (Bordin et al. C&SC 2024 — atualiza o 836k antigo)
+- 15-20% das internações SUS são ICSAP (27% pela classificação DRG)
+- Custo médio ICSAP: **R$ 1.500-2.000/internação**
+- Estimativa Rio: ~60.000 ICSAP/ano; solução evita **6.000 (10% redução)** = **R$ 10,2M/ano**
+- **Escala nacional: 200k internações evitadas × R$ 1.700 = R$ 340M/ano**
 
 ### 9.3 Métrica de produtividade — Tempo economizado
-- Camila: ~1h/dia em registro duplo
-- 1h × 6.200 ACS × 22 dias úteis × 11 meses = **1.500.000 horas/ano** liberadas para campo
-- A 5 visitas/h adicionais (extrapolação conservadora) = **~7,5M visitas adicionais/ano**
+- Camila: ~1h/dia em registro duplo (validado em entrevista)
+- **7.555 ACS** (atualizado Fiocruz dez/2024, era 6.200 antigo) × 1h × 242 dias × 60% adesão = **1.097.000 horas/ano**
+- Em valor de mão-de-obra: × R$ 31/h = **R$ 34M/ano em capacidade reaproveitada**
+- Equivale a **~565 ACS extras de capacidade** sem contratar ninguém
+- ⚠️ **Tratar como capacidade, não caixa** — alimenta os ganhos ICSAP+Previne, não somar separadamente
 
 ### 9.4 Métrica financeira — Previne Brasil 2026
-- 15 indicadores de qualidade (Portaria 3.493/2024)
-- Cada melhoria mensurável libera mais financiamento federal
-- 4 dos 15 indicadores mapeiam direto com os 4 flags do dataset
+- Novo modelo (Portaria 6.907/2025): pagamento por classificação composta (Ótimo/Bom/Suficiente/Regular)
+- **Diferença "Bom → Excelente" = R$ 8.000/mês = R$ 96.000/ano por equipe**
+- Rio: 1.240 equipes ESF · cenário base: 25% sobem para Excelente = 310 equipes
+- **Receita federal extra: R$ 29,8M/ano em regime** (R$ 11,9M no ano 1 com 10% adesão)
+- 4 dos 7 indicadores mapeiam direto com os flags do dataset (HAS, DM, gestação, vulnerabilidade)
 
-### 9.5 Métricas operacionais
+### 9.5 Métricas operacionais (metas internas)
 - 49,9% pacientes nunca visitados em 2025 → meta: reduzir a <20%
 - P50 de gap = 90 dias → meta: <30 dias
 - Cobertura por linha de cuidado: >90% para gestantes (alto-risco semanal)
+
+### 9.6 Custos da solução (consolidado)
+
+| | Ano 1 | Anos 2-5 (cada) |
+|--|-------|-----------------|
+| CAPEX dev (6 meses) | R$ 347k | — |
+| Claude API + Infra | R$ 567k | R$ 567k |
+| OPEX humano | R$ 283k | R$ 283k |
+| **TOTAL** | **R$ 1,2M** | **R$ 0,85M** |
+| **R$/ACS/ano** | R$ 158 | **R$ 113** |
+
+### 9.7 Sensibilidade (stress test)
+
+| Cenário | Benefício/ano | ROI |
+|---------|--------------|-----|
+| Pessimista (40% adesão, 5% redução, 10% Previne) | R$ 15M | 17× |
+| **Base (60/10/25%)** | **R$ 40M** | **47×** |
+| Otimista (80/15/50%) | R$ 83,5M | 98× |
+| **Stress test "tudo dá errado"** (30/2/0%) | R$ 0,9M | **>1×** (ainda paga) |
+
+### 9.8 Benchmark internacional
+- **Penn IMPaCT** (RCT, EUA, Kangovi et al. Health Affairs 2020): ROI 2,5× ($2,47/$1), -30% admissões, -38% custo
+- Nossa solução é **extensiva** (amplifica ACS existentes) em vez de intensiva (1 novo CHW por 100 pacientes) → ROI maior é defensável
 
 ---
 
@@ -737,6 +799,7 @@ flowchart TD
 - [CDC SVI](https://www.atsdr.cdc.gov/place-health/php/svi/index.html)
 
 ### Artefatos locais deste projeto
+- `docs/ROI.md` ← **análise financeira + saúde pública + sensibilidade + extrato pitch**
 - `docs/2026-05-24-problem-deep-dive/INDEX.md`
 - `docs/2026-05-24-problem-deep-dive/PROBLEM_ANALYSIS.md`
 - `docs/2026-05-24-problem-deep-dive/FIELD_NOTES_CAMILA_ACS.md`

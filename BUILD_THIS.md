@@ -231,6 +231,7 @@ EXEMPLO: "Oi Maria, soube que você passou na UPA semana passada — vim ver com
 
 ✅ **Script já implementado:** [scripts/gerar_lista_do_dia.py](scripts/gerar_lista_do_dia.py)
 ✅ **Outputs de exemplo já versionados:** [out/lista_do_dia.json](out/lista_do_dia.json) + [out/dashboard_supervisor.json](out/dashboard_supervisor.json)
+✅ **Adaptador pro front React:** [scripts/gerar_realdata_frontend.py](scripts/gerar_realdata_frontend.py) → gera [frontend/src/realData.ts](frontend/src/realData.ts) (mesma assinatura de mockData; Vini troca 1 import)
 
 ```bash
 # Setup (pandas + duckdb já em requirements.txt)

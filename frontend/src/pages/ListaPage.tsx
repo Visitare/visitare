@@ -5,59 +5,63 @@ import { CondicaoBadge } from '../components/CondicaoBadge'
 import { SyncBar } from '../components/SyncBar'
 import { MapaVisitas } from '../components/MapaVisitas'
 import { useSync } from '../hooks/useSync'
+import { usePacientesSemana } from '../hooks/usePacientesSemana'
+import { useAcsAtual } from '../hooks/useAcsAtual'
 import { db } from '../db'
-import { getPacientesSemana } from '../mockData'
 import type { Paciente } from '../types'
-
-const PROFISSIONAL_ID = 'acs-demo-001'
-const NOME_ACS = 'Ana Paula'
 
 const DIAS_PT: Record<string, string> = {
   '0': 'Dom', '1': 'Seg', '2': 'Ter', '3': 'Qua', '4': 'Qui', '5': 'Sex', '6': 'Sáb',
 }
 
-function formatarDia(iso: string): { nomeDia: string; numeroDia: string; ehHoje: boolean } {
+function formatarDia(iso: string) {
   const d = new Date(iso + 'T12:00:00')
-  const hoje = new Date().toISOString().split('T')[0]
   return {
     nomeDia: DIAS_PT[String(d.getDay())],
     numeroDia: String(d.getDate()).padStart(2, '0'),
-    ehHoje: iso === hoje,
+    ehHoje: iso === new Date().toISOString().split('T')[0],
   }
+}
+
+function rangeSemanaDias(dias: string[]): string {
+  if (dias.length === 0) return ''
+  const ini = formatarDia(dias[0])
+  const fim = formatarDia(dias[dias.length - 1])
+  return `${ini.nomeDia} ${ini.numeroDia} – ${fim.nomeDia} ${fim.numeroDia}`
 }
 
 export function ListaPage() {
   const navigate = useNavigate()
+  const { profissionalId, equipeId, loading: acsLoading } = useAcsAtual()
   const { pendentes, status, isOnline, sincronizar } = useSync()
   const [visitadosSemana, setVisitadosSemana] = useState<Set<string>>(new Set())
   const [aba, setAba] = useState<'lista' | 'mapa'>('lista')
-  const [diaAtivo, setDiaAtivo] = useState<string>(() => {
-    const hoje = new Date().toISOString().split('T')[0]
-    const semanaTemp = getPacientesSemana()
-    const dias = Array.from(semanaTemp.keys()).sort()
-    return semanaTemp.has(hoje) ? hoje : (dias[0] ?? hoje)
-  })
 
-  const semana = getPacientesSemana()
+  // Sem ACS escolhido → vai pro picker
+  useEffect(() => {
+    if (!acsLoading && !profissionalId) navigate('/selecionar-acs', { replace: true })
+  }, [acsLoading, profissionalId, navigate])
+
+  const { semana, loading, error } = usePacientesSemana(equipeId)
   const diasOrdenados = Array.from(semana.keys()).sort()
+  const todosPacientes = diasOrdenados.flatMap((d) => semana.get(d) ?? [])
+  const totalSemana = todosPacientes.length
+  const visitadosTotal = todosPacientes.filter((p) => visitadosSemana.has(p.id)).length
 
   useEffect(() => {
-    // carrega todos os registros da semana
+    if (!profissionalId || diasOrdenados.length === 0) return
     const inicio = diasOrdenados[0]
     const fim = diasOrdenados[diasOrdenados.length - 1]
     db.visitas
       .where('profissionalId')
-      .equals(PROFISSIONAL_ID)
+      .equals(profissionalId)
       .and((v) => v.dataVisita >= inicio && v.dataVisita <= fim)
       .toArray()
       .then((visitas) => setVisitadosSemana(new Set(visitas.map((v) => v.pacienteId))))
-  }, [])
+  }, [profissionalId, diasOrdenados[0], diasOrdenados[diasOrdenados.length - 1]])
 
-  const pacientesDia = semana.get(diaAtivo) ?? []
-  const totalSemana = Array.from(semana.values()).flat().length
-  const visitadosTotal = Array.from(semana.values())
-    .flat()
-    .filter((p) => visitadosSemana.has(p.id)).length
+  const nomeAcs = profissionalId ? `Profissional ${profissionalId.slice(-5)}` : 'ACS'
+  const labelEquipe = equipeId ? `Equipe ${equipeId.slice(0, 8)}…` : 'Sem equipe'
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
@@ -65,14 +69,29 @@ export function ListaPage() {
       <div className="bg-blue-700 text-white px-4 pt-10 pb-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-blue-200 text-sm">Semana atual</p>
-            <h1 className="text-2xl font-bold mt-0.5">Olá, {NOME_ACS} 👋</h1>
-            <p className="text-blue-200 text-sm mt-0.5">Clínica da Família Rocinha</p>
+            <h1 className="text-2xl font-bold">Olá, {nomeAcs} 👋</h1>
+            <p className="text-blue-200 text-sm mt-0.5">{labelEquipe}</p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold">{visitadosTotal}</div>
             <div className="text-blue-200 text-xs">de {totalSemana} visitas</div>
           </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate('/supervisor')}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-full border border-blue-500/40"
+          >
+            <span>📊</span>
+            Painel de gestão
+            <span className="opacity-70">›</span>
+          </button>
+          <button
+            onClick={() => navigate('/selecionar-acs')}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-full border border-blue-500/40"
+          >
+            🔄 Trocar ACS
+          </button>
         </div>
         {/* Progress */}
         <div className="mt-3 mb-4">
@@ -90,9 +109,7 @@ export function ListaPage() {
               key={a}
               onClick={() => setAba(a)}
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                aba === a
-                  ? 'bg-white text-blue-700'
-                  : 'text-blue-200'
+                aba === a ? 'bg-white text-blue-700' : 'text-blue-200'
               }`}
             >
               {a === 'lista' ? '☰ Lista' : '🗺 Mapa'}
@@ -101,80 +118,57 @@ export function ListaPage() {
         </div>
       </div>
 
-      {/* Seletor de dias — só na aba lista */}
-      {aba === 'lista' && (
-        <div className="bg-white border-b border-slate-200 px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {diasOrdenados.map((dia) => {
-              const { nomeDia, numeroDia, ehHoje } = formatarDia(dia)
-              const qtd = semana.get(dia)?.length ?? 0
-              const visitados = semana.get(dia)?.filter((p) => visitadosSemana.has(p.id)).length ?? 0
-              const ativo = dia === diaAtivo
-              return (
-                <button
-                  key={dia}
-                  onClick={() => setDiaAtivo(dia)}
-                  className={`flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-colors min-w-[52px] ${
-                    ativo
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-50 text-slate-600'
-                  }`}
-                >
-                  <span className={`text-xs font-medium ${ativo ? 'text-blue-200' : 'text-slate-400'}`}>
-                    {nomeDia}
-                  </span>
-                  <span className={`text-lg font-bold leading-tight ${ehHoje && !ativo ? 'text-blue-600' : ''}`}>
-                    {numeroDia}
-                  </span>
-                  <span className={`text-xs mt-0.5 ${ativo ? 'text-blue-200' : 'text-slate-400'}`}>
-                    {visitados}/{qtd}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
       {/* Sync bar */}
       <SyncBar pendentes={pendentes} status={status} isOnline={isOnline} onSync={sincronizar} />
 
       {/* Aba Mapa */}
       {aba === 'mapa' && (
         <div className="flex-1" style={{ minHeight: 0 }}>
-          <MapaVisitas
-            pacientes={Array.from(semana.values()).flat()}
-            visitados={visitadosSemana}
-          />
+          <MapaVisitas pacientes={todosPacientes} visitados={visitadosSemana} />
         </div>
       )}
 
-      {/* Aba Lista */}
+      {/* Aba Lista — todos os pacientes da semana */}
       {aba === 'lista' && (
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-            {pacientesDia.length} visitas planejadas
-          </h2>
-          <span className="text-xs text-slate-400">máx. 5/dia</span>
-        </div>
-
-        {pacientesDia.length === 0 && (
-          <div className="text-center py-12 text-slate-400 text-sm">
-            Nenhuma visita planejada para este dia.
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+          {/* Range da semana */}
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+              {rangeSemanaDias(diasOrdenados)}
+            </h2>
+            <span className="text-xs text-slate-400">{totalSemana} visitas</span>
           </div>
-        )}
 
-        {pacientesDia.map((paciente, i) => (
-          <PacienteCard
-            key={paciente.id}
-            paciente={paciente}
-            ordem={i + 1}
-            visitado={visitadosSemana.has(paciente.id)}
-            onClick={() => navigate(`/visita/${paciente.id}`)}
-          />
-        ))}
-      </div>
+          {loading && (
+            <div className="text-center py-12 text-slate-400 text-sm">
+              Calculando prioridades…
+            </div>
+          )}
+
+          {error && !loading && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              Não consegui falar com o servidor de prioridades.
+              <br />
+              <span className="text-red-500 text-xs">{error.message}</span>
+            </div>
+          )}
+
+          {!loading && !error && todosPacientes.length === 0 && (
+            <div className="text-center py-12 text-slate-400 text-sm">
+              Nenhuma visita planejada para esta semana.
+            </div>
+          )}
+
+          {todosPacientes.map((paciente, i) => (
+            <PacienteCard
+              key={paciente.id}
+              paciente={paciente}
+              ordem={i + 1}
+              visitado={visitadosSemana.has(paciente.id)}
+              onClick={() => navigate(`/paciente/${paciente.id}`)}
+            />
+          ))}
+        </div>
       )}
     </div>
   )

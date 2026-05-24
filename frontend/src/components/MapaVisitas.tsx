@@ -64,7 +64,7 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
           <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.4">${p.motivoPrioridade}</div>
           ${visitado
             ? '<span style="font-size:12px;color:#16a34a;font-weight:700">✓ Visitado</span>'
-            : `<button data-pid="${p.id}" style="background:#1d4ed8;color:white;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;touch-action:manipulation">Registrar visita →</button>`
+            : `<button data-pid="${p.id}" style="background:#1d4ed8;color:white;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;touch-action:manipulation">Ver paciente →</button>`
           }
         </div>
       `
@@ -79,7 +79,7 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
       const target = (e.target as HTMLElement).closest<HTMLElement>('[data-pid]')
       if (target?.dataset.pid) {
         map.closePopup()
-        navigate(`/visita/${target.dataset.pid}`)
+        navigate(`/paciente/${target.dataset.pid}`)
       }
     }
     container.addEventListener('click', onContainerClick)

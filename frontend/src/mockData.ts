@@ -307,11 +307,14 @@ export function getPacientesSemana(): Map<string, Paciente[]> {
     return diff !== 0 ? diff : b.prioScore - a.prioScore
   })
 
+  // Distribui igualmente: ceil(total / dias) por dia, máximo 5
+  const maxPorDia = Math.min(5, Math.ceil(ordenados.length / diasUteis.length))
+
   let diaIdx = 0
   for (const p of ordenados) {
     while (diaIdx < diasUteis.length) {
       const lista = mapa.get(diasUteis[diaIdx])!
-      if (lista.length < 5) {
+      if (lista.length < maxPorDia) {
         lista.push(p)
         break
       }
