@@ -183,7 +183,7 @@ ranking é um requisito (não opcional). Detalhes em
 
 ## Application URL
 
-🚧 _TBD — preview de Vercel será publicado durante a apresentação._
+**https://acs-digital.vercel.app**
 
 ## Demo video
 
