@@ -207,23 +207,18 @@ npm run dev
 # → http://localhost:5173
 ```
 
-Detalhes de integração e schema: [`docs/SUPABASE.md`](docs/SUPABASE.md).
+Detalhes de integração e schema: [`docs/supabase.md`](docs/supabase.md).
 
 ---
 
 ## Documentação
 
-- 📋 [`docs/PRD.md`](docs/PRD.md) — produto, princípios e perguntas em aberto.
-- 🏗️ [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arquitetura técnica
-  completa, com foco em segurança e LGPD.
-- 🗄️ [`docs/SUPABASE.md`](docs/SUPABASE.md) — schema do banco, todas as
-  RPCs, padrão de Realtime e exemplos de uso com `supabase-js`.
-- 📂 [`db/migrations/`](db/migrations/) — 5 migrations versionadas
-  (schema → motor → Realtime → ficha estendida → picker).
-- 📂 [`FICHAS/`](FICHAS/) — fichas oficiais SMS-Rio (Ficha A, Crônico,
-  Gestante, Primeira Infância, Tuberculose) em PDF + JSON estruturado.
-- 📂 [`manuais/`](manuais/) — manuais oficiais do Ministério da Saúde
-  consultados na construção das regras.
+- [`docs/prd.md`](docs/prd.md) — produto, princípios e perguntas em aberto.
+- [`docs/architecture.md`](docs/architecture.md) — arquitetura técnica completa, com foco em segurança e LGPD.
+- [`docs/supabase.md`](docs/supabase.md) — schema do banco, todas as RPCs, padrão de Realtime e exemplos de uso com `supabase-js`.
+- [`db/migrations/`](db/migrations/) — migrations versionadas (schema → motor → Realtime → ficha estendida → picker).
+- [`docs/fichas/`](docs/fichas/) — fichas oficiais SMS-Rio (Ficha A, Crônico, Gestante, Primeira Infância, Tuberculose) em PDF + JSON estruturado.
+- [`docs/manuais/`](docs/manuais/) — manuais oficiais do Ministério da Saúde consultados na construção das regras.
 
 ---
 
