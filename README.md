@@ -26,50 +26,26 @@ Comunitários de Saúde (ACS) da Atenção Primária do Rio de Janeiro.
 
 ## Solution summary
 
-**Camila** é Agente Comunitária de Saúde há 8 anos em uma comunidade no Rio de
-Janeiro. Ela é responsável por ~750 pessoas — gestantes, idosos com hipertensão,
-crianças menores de 5 anos, famílias em situação de vulnerabilidade social.
+**Claudia** é ACS há 8 anos no Rio. Responsável por ~750 pessoas. Toda segunda de manhã ela decide quem visitar de cabeça, com caderno e WhatsApp. Não sabe se a Dona Maria — diabética, sumida do posto há 3 meses — está bem. No fim do dia gasta ~1h transcrevendo em papel para o sistema. Todo dia.
 
-A segunda-feira de manhã de Camila começa assim: ela olha para um caderno com
-anotações da semana anterior, troca mensagens no WhatsApp com a enfermeira da
-UBS e decide de cabeça quem vai visitar. Sem sistema. Sem visão da fila. Sem
-saber se a Dona Maria, diabética que não aparece no posto há 3 meses, está bem.
-No fim do dia, ela gasta ~1h transcrevendo no formulário digital o que anotou
-em papel durante as visitas — trabalho duplicado, todo dia.
+O problema não é dedicação. É falta de informação organizada na hora certa.
 
-**O problema de Camila não é falta de dedicação. É falta de informação
-organizada na hora certa.**
+**ACS Digital** entrega a Claudia:
 
-**ACS Digital** resolve isso:
+1. **Lista priorizada da semana** — quem visitar, por quê, com que cadência. A lista reage em tempo real: ao registrar uma visita, o ranking se reordena sozinho.
+2. **Briefing antes de bater na porta** — condições crônicas, última visita, alertas clínicos do Vitacare + o que ela mesma anotou em campo.
+3. **Formulário contextual durante a visita** — adaptado ao perfil do paciente, funciona offline, sincroniza quando volta à cobertura.
 
-1. **Na segunda de manhã**, Camila abre o app e vê a lista priorizada da semana
-   — quem tem maior risco, por quê, e com que frequência o manual SUS recomenda
-   a visita. Ela continua decidindo a ordem final; o app dá o insumo.
-2. **Antes de bater na porta**, ela vê o briefing do paciente: condições
-   crônicas, última visita, alertas clínicos — tudo que o Vitacare tem, mais
-   o que ela mesma registrou em campo.
-3. **Durante a visita**, preenche o form no celular — perguntas adaptadas ao
-   perfil do paciente (gestante, hipertenso, criança). Funciona sem internet;
-   sincroniza quando volta à cobertura.
-4. **Ao terminar uma visita**, a lista se reordena automaticamente em tempo
-   real: o paciente visitado sai do topo, os demais sobem.
+Claudia não perde mais 1h transcrevendo. E a Dona Maria não cai no esquecimento.
 
-Camila não perde mais 1h transcrevendo. E a Dona Maria não cai no esquecimento.
-
-> *"um sistema nunca vai dar a lista que eu realmente vou fazer"* — ACS
-> entrevistada durante o desenvolvimento. O ACS Digital foi desenhado a partir
-> disso: **insumo para a decisão da Camila, nunca substituto.**
+> *"um sistema nunca vai dar a lista que eu realmente vou fazer"* — ACS entrevistada no desenvolvimento. O ACS Digital é **insumo para a decisão da Claudia, nunca substituto.**
 
 ### Impacto esperado
 
-- **~1h/dia recuperada por ACS** — eliminando a dupla transcrição. São
-  6.200 ACS na cidade: **~6.200h/dia** devolvidas ao cuidado.
-- **Famílias de alto risco alcançadas em dias, não semanas** — Dona Maria
-  aparece na lista antes de virar urgência.
-- **Cuidado preventivo, não reativo** — o motor prioriza quem está no limiar,
-  não só quem já está em crise.
-- **Equidade e gestão** — supervisores enxergam lacunas de cobertura por
-  equipe e Área Programática.
+- **~1h/dia recuperada por ACS** — 6.200 ACS no Rio: ~6.200h/dia devolvidas ao cuidado.
+- **Famílias de alto risco alcançadas em dias, não semanas.**
+- **Cuidado preventivo, não reativo** — o motor prioriza quem está no limiar, não só quem já está em crise.
+- **Equidade e gestão** — supervisores enxergam lacunas de cobertura por equipe e AP.
 
 ---
 
