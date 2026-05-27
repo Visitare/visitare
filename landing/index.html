@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACS Digital — O copiloto do agente comunitário de saúde</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="ACS Digital coloca a ficha clínica, a lista de visitas e o histórico do paciente direto no celular do agente comunitário de saúde. Menos papelada. Mais cuidado.">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://acs-digital.vercel.app/">
+<meta property="og:title" content="ACS Digital — O copiloto do agente comunitário de saúde">
+<meta property="og:description" content="6.200 agentes comunitários no Rio de Janeiro recuperam 1h por dia de burocracia. Ficha clínica no celular, lista priorizada por risco, sync direto com a clínica.">
+<meta property="og:image" content="https://acs-digital.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ACS Digital — O copiloto do agente comunitário de saúde">
+<meta name="twitter:description" content="6.200 agentes comunitários no Rio de Janeiro recuperam 1h por dia de burocracia. Ficha clínica no celular, lista priorizada por risco, sync direto com a clínica.">
+<meta name="twitter:image" content="https://acs-digital.vercel.app/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:     #173C72;
+    --navy-deep:#0E2B55;
+    --blue:     #0B57C2;
+    --blue-tint:#E7EEF8;
+    --blue-line:#C5D5EE;
+    --coral:    #F26849;
+    --coral-deep:#C9472C;
+    --coral-tint:#FDEAE2;
+    --coral-soft:#FFC9BC;
+    --amber:    #E8920C;
+    --sun-tint: #FBEFD3;
+    --red:      #D6443C;
+    --red-tint: #FBE6E5;
+    --required: #FBF1CC;
+    --ink:      #15203A;
+    --ink-2:    #3C4A66;
+    --muted:    #6B7790;
+    --paper:    #F4F6FB;
+    --surface:  #FFFFFF;
+    --line:     #DCE3EF;
+    --line-soft:#E9EDF5;
+    --radius:   14px;
+    --radius-sm:9px;
+    --shadow:   0 1px 2px rgba(14,43,85,.05), 0 12px 30px -18px rgba(14,43,85,.30);
+    --shadow-sm:0 1px 2px rgba(14,43,85,.06), 0 6px 16px -12px rgba(14,43,85,.24);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    background-image:
+      linear-gradient(rgba(23,60,114,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23,60,114,.03) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; border-top: 1px solid var(--line-soft); }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+
+  /* ── WORDMARK ── */
+  .wm { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1; }
+  .wm .wm-acs { font-weight: 700; letter-spacing: -.03em; line-height: .85; color: var(--navy); }
+  .wm .wm-dig { font-family: "IBM Plex Mono"; font-weight: 600; letter-spacing: .26em; margin-top: .42em; color: var(--coral-deep); }
+  .wm.inv .wm-acs { color: #fff; }
+  .wm.inv .wm-dig { color: var(--coral-soft); }
+
+  /* ── SECTION LABEL ── */
+  .mono-label { display: inline-flex; align-items: center; gap: 10px; font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; font-weight: 600; color: var(--navy); }
+  .mono-label .nbox { color: #fff; background: var(--navy); padding: 2px 8px; border-radius: 4px; letter-spacing: .05em; }
+  h2.sec { font-weight: 600; font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; margin: 14px 0 12px; letter-spacing: -.02em; color: var(--navy); }
+  .sec-sub { color: var(--ink-2); max-width: 60ch; font-size: 17px; margin: 0 0 40px; line-height: 1.65; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--coral); color: #fff; border: none; border-radius: 11px;
+    padding: 16px 32px; font-weight: 600; font-size: 16px; font-family: "IBM Plex Sans";
+    cursor: pointer; text-decoration: none;
+    box-shadow: 0 10px 28px -10px rgba(242,104,73,.6);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -10px rgba(242,104,73,.7); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: transparent; color: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 11px; padding: 15px 28px; font-weight: 500; font-size: 15px;
+    font-family: "IBM Plex Sans"; cursor: pointer; text-decoration: none;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--navy-deep); border-bottom: 2px solid var(--coral);
+    padding: 14px 0; position: sticky; top: 0; z-index: 100;
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  nav .right { display: flex; align-items: center; gap: 20px; }
+  nav a.nav-link { font-size: 13px; color: rgba(255,255,255,.7); text-decoration: none; font-weight: 500; transition: color .15s; }
+  nav a.nav-link:hover { color: #fff; }
+  .nav-demo {
+    font-size: 13px; font-weight: 600; font-family: "IBM Plex Sans";
+    background: var(--coral); color: #fff; border: none; border-radius: 8px;
+    padding: 8px 18px; cursor: pointer; text-decoration: none;
+    transition: opacity .15s;
+  }
+  .nav-demo:hover { opacity: .88; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(158deg, #0E2B55 0%, #173C72 55%, #1E54A8 100%);
+    color: #fff; position: relative; overflow: hidden;
+    padding: 80px 0 88px; border-top: none;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(700px 350px at 90% 0%, rgba(242,104,73,.25), transparent 60%);
+  }
+  .hero .wrap { position: relative; z-index: 2; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .08em; font-weight: 500;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+    padding: 5px 13px; border-radius: 6px; color: rgba(255,255,255,.9); margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-weight: 600; font-size: clamp(36px, 5.2vw, 60px); line-height: 1.05;
+    letter-spacing: -.03em; margin: 0 0 22px; max-width: 16ch;
+  }
+  .hero h1 em { font-style: normal; color: var(--coral-soft); }
+  .hero .lede {
+    font-size: clamp(16px, 1.8vw, 19px); max-width: 50ch; color: rgba(255,255,255,.88);
+    margin: 0 0 40px; line-height: 1.65;
+  }
+  .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 64px; }
+  .impact-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius);
+    overflow: hidden; background: rgba(255,255,255,.05);
+  }
+  .impact-grid div { padding: 24px 28px; border-right: 1px solid rgba(255,255,255,.15); }
+  .impact-grid div:last-child { border-right: none; }
+  .impact-grid .num {
+    font-family: "IBM Plex Mono"; font-weight: 600;
+    font-size: clamp(28px, 3.8vw, 44px); line-height: 1; letter-spacing: -.03em;
+  }
+  .impact-grid .num small { font-size: .46em; font-weight: 500; opacity: .75; letter-spacing: 0; }
+  .impact-grid .lab { font-size: 13px; color: rgba(255,255,255,.78); margin-top: 10px; line-height: 1.45; }
+
+  /* ── CLAUDIA / PROBLEM ── */
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .problem-text p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 18px; }
+  .problem-text p:last-child { margin-bottom: 0; }
+  .problem-text p strong { color: var(--ink); font-weight: 600; }
+  .callout {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--coral); border-radius: var(--radius);
+    padding: 28px; box-shadow: var(--shadow-sm);
+  }
+  .callout .c-label { font-family: "IBM Plex Mono"; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .callout .c-name { font-size: 24px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .callout .c-role { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+  .callout .c-stat { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .callout .c-stat .s-num { font-family: "IBM Plex Mono"; font-size: 32px; font-weight: 600; color: var(--coral-deep); line-height: 1; }
+  .callout .c-stat .s-desc { font-size: 14px; color: var(--ink-2); line-height: 1.4; }
+  .callout .c-divider { border: none; border-top: 1px solid var(--line-soft); margin: 16px 0; }
+  .callout .c-quote { font-size: 14px; color: var(--ink-2); font-style: italic; line-height: 1.6; }
+
+  /* ── FEATURES ── */
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .feat {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-sm);
+  }
+  .feat-icon {
+    width: 44px; height: 44px; border-radius: 10px; background: var(--blue-tint);
+    color: var(--navy); display: grid; place-items: center; margin-bottom: 18px;
+  }
+  .feat h3 { font-size: 17px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+  .feat p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ── MOTOR ── */
+  .motor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .motor-text p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 18px; }
+  .motor-text .principle {
+    background: var(--navy); color: #fff; border-radius: var(--radius);
+    padding: 20px 24px; margin-top: 8px; font-size: 15px; font-weight: 500;
+    line-height: 1.6; border-left: 3px solid var(--coral);
+  }
+  .motor-text .principle em { font-style: normal; color: var(--coral-soft); font-weight: 600; }
+  .legend-box { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm); }
+  .legend-head { background: var(--navy); color: #fff; padding: 12px 18px; font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between; }
+  .legend-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 14px; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
+  .legend-row:last-child { border-bottom: none; }
+  .legend-row .ln { font-family: "IBM Plex Mono"; font-weight: 600; color: #fff; background: var(--blue); border-radius: 5px; text-align: center; padding: 3px 0; font-size: 12px; }
+  .legend-row .pts { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .score-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
+  .score-pill .pd { width: 8px; height: 8px; border-radius: 50%; }
+  .pill-gest { background: #FBE7F0; color: #A21B59; } .pill-gest .pd { background: #C3306E; }
+  .pill-cron { background: var(--blue-tint); color: var(--navy); } .pill-cron .pd { background: var(--blue); }
+  .pill-vuln { background: var(--sun-tint); color: #8A5A06; } .pill-vuln .pd { background: var(--amber); }
+  .pill-gap  { background: var(--coral-tint); color: var(--coral-deep); } .pill-gap .pd  { background: var(--coral); }
+  .tiers-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .tier-card { border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid; }
+  .tier-card.verde  { background: #F0FDF4; border-color: #22c55e44; }
+  .tier-card.amarelo{ background: #FFFBEB; border-color: #f59e0b44; }
+  .tier-card.vermelho{ background: #FFF1F2; border-color: #ef444444; }
+  .tier-card .t-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .tier-card.verde .t-name  { color: #15803d; }
+  .tier-card.amarelo .t-name{ color: #b45309; }
+  .tier-card.vermelho .t-name{ color: #b91c1c; }
+  .tier-card .t-range { font-family: "IBM Plex Mono"; font-size: 13px; color: var(--muted); }
+  .tier-card .t-cad   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── FIELD SECTION ── */
+  .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .field-card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .field-card .fc-icon {
+    width: 40px; height: 40px; border-radius: 9px; background: var(--blue-tint);
+    color: var(--navy); display: grid; place-items: center; flex-shrink: 0;
+  }
+  .field-card h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
+  .field-card p  { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+
+  /* ── WHO BUILT IT ── */
+  .who-box {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 40px; box-shadow: var(--shadow-sm);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+  }
+  .who-box p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 16px; }
+  .who-box p:last-child { margin-bottom: 0; }
+  .who-box strong { color: var(--ink); }
+  .badges { display: flex; flex-wrap: wrap; gap: 10px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-family: "IBM Plex Mono"; font-size: 11px; font-weight: 600;
+    padding: 6px 12px; border-radius: 6px; letter-spacing: .04em;
+    background: var(--blue-tint); color: var(--navy); border: 1px solid var(--blue-line);
+  }
+
+  /* ── CTA FINAL ── */
+  .cta-section {
+    background: linear-gradient(158deg, #0E2B55 0%, #173C72 60%, #1E54A8 100%);
+    padding: 88px 0; border-top: none; position: relative; overflow: hidden;
+  }
+  .cta-section::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(500px 300px at 80% 50%, rgba(242,104,73,.2), transparent 60%);
+  }
+  .cta-section .wrap { position: relative; z-index: 2; text-align: center; }
+  .cta-section h2 { font-size: clamp(28px, 3.5vw, 44px); font-weight: 600; color: #fff; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 14px; }
+  .cta-section h2 em { font-style: normal; color: var(--coral-soft); }
+  .cta-section p { font-size: 17px; color: rgba(255,255,255,.78); margin-bottom: 36px; max-width: 48ch; margin-left: auto; margin-right: auto; }
+  .cta-section .email-link { font-family: "IBM Plex Mono"; font-size: 14px; color: rgba(255,255,255,.55); margin-top: 18px; display: block; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--navy-deep); color: #fff; padding: 0; }
+  footer .fbar-top { height: 3px; background: var(--coral); }
+  footer .wrap { padding: 48px 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
+  footer .f-left p { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 10px; font-family: "IBM Plex Mono"; letter-spacing: .02em; }
+  footer .f-right { font-family: "IBM Plex Mono"; font-size: 11px; color: rgba(255,255,255,.4); text-align: right; line-height: 1.8; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .problem-grid, .motor-layout, .who-box { grid-template-columns: 1fr; gap: 32px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .field-grid { grid-template-columns: 1fr; }
+    .impact-grid { grid-template-columns: 1fr; }
+    .impact-grid div { border-right: none; border-bottom: 1px solid rgba(255,255,255,.15); }
+    .impact-grid div:last-child { border-bottom: none; }
+    nav .right .nav-link { display: none; }
+    .tiers-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="wrap">
+    <span class="wm inv" style="font-size: 20px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+    <div class="right">
+      <a href="#problema" class="nav-link">O problema</a>
+      <a href="#solucao" class="nav-link">A solução</a>
+      <a href="#motor" class="nav-link">Motor</a>
+      <a href="#quem-fez" class="nav-link">Quem fez</a>
+      <a href="/demo" class="nav-demo">Ver demo →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="wrap">
+    <h1>O agente de saúde que cuida de todo mundo merece uma ferramenta <em>à altura.</em></h1>
+    <p class="lede">ACS Digital é o copiloto dos Agentes Comunitários de Saúde — colocando a ficha clínica, a lista de visitas e o histórico do paciente direto no celular, na porta de casa.</p>
+    <div class="hero-ctas">
+      <a href="/demo" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg>
+        Ver o produto
+      </a>
+      <a href="https://wa.me/5524992679147" class="btn-secondary" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Mais informações
+      </a>
+    </div>
+    <div class="impact-grid">
+      <div>
+        <div class="num">6.200</div>
+        <div class="lab">agentes comunitários no Rio de Janeiro</div>
+      </div>
+      <div>
+        <div class="num">1<small>h/dia</small></div>
+        <div class="lab">recuperada de papelada por agente</div>
+      </div>
+      <div>
+        <div class="num">1,5<small> mi</small></div>
+        <div class="lab">de horas por ano devolvidas ao cuidado</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── PROBLEMA ── -->
+<section id="problema">
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">01</span> O problema</span>
+    <h2 class="sec">Claudia cuida de todo mundo. Quem cuida da Claudia?</h2>
+    <div class="problem-grid">
+      <div class="problem-text">
+        <p>Claudia é Agente Comunitária de Saúde na Rocinha, no Rio de Janeiro. Todo dia, ela visita famílias, avalia pacientes, anota sintomas, checa medicamentos, identifica quem está em risco.</p>
+        <p>É ela quem percebe quando <strong>Dona Maria não abriu a porta há três semanas.</strong> É ela quem leva a gestante até a UBS quando o pré-natal atrasa.</p>
+        <p>Mas quando Claudia volta pra clínica, ela gasta uma hora — todo dia — digitando à mão tudo o que viu em campo. Sem sistema no celular. Sem lista de prioridades. Sem registro em tempo real.</p>
+        <p><strong>São 6.200 Claudias só no Rio de Janeiro.</strong> E o problema é o mesmo em todo o Brasil.</p>
+      </div>
+      <div class="callout">
+        <div class="c-label">Retrato da rotina</div>
+        <div class="c-name">Claudia</div>
+        <div class="c-role">Agente Comunitária de Saúde · Rocinha, Rio de Janeiro</div>
+        <div class="c-stat">
+          <div class="s-num">1h</div>
+          <div class="s-desc">por dia perdida digitando<br>notas na clínica após o campo</div>
+        </div>
+        <hr class="c-divider">
+        <div class="c-stat">
+          <div class="s-num">750+</div>
+          <div class="s-desc">famílias sob responsabilidade<br>de cada agente</div>
+        </div>
+        <hr class="c-divider">
+        <div class="c-quote">"A gente sai de casa cedo, vai de porta em porta, e quando volta ainda tem que digitar tudo. Quando não esqueceu metade."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOLUÇÃO ── -->
+<section id="solucao">
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">02</span> A solução</span>
+    <h2 class="sec">Tudo o que a Claudia precisa. No bolso. Em campo.</h2>
+    <p class="sec-sub">ACS Digital leva para o celular do agente o que antes só existia no papel e no PC da clínica — e ainda decide quem visitar primeiro.</p>
+    <div class="features-grid">
+      <div class="feat">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Lista priorizada de visitas</h3>
+        <p>Antes de sair de casa, a Claudia já sabe quem precisa de atenção hoje — ordenada por risco clínico real, não por intuição ou ordem alfabética.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>
+        </div>
+        <h3>Ficha na porta do paciente</h3>
+        <p>Formulários oficiais do SUS preenchidos no celular, durante a visita. Sem papel, sem memória, sem digitação depois.</p>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 10-3 6.3" stroke-linecap="round"/><path d="M20 16v-4h-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Sync direto com a clínica</h3>
+        <p>Tudo que ela registra aparece na clínica em tempo real. Funciona com sinal fraco — o estado normal nas comunidades onde ela trabalha.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MOTOR ── -->
+<section id="motor">
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">03</span> Motor de priorização</span>
+    <h2 class="sec">A Claudia não decide sozinha. Ela tem um motor.</h2>
+    <div class="motor-layout">
+      <div class="motor-text">
+        <p>O ACS Digital calcula automaticamente um score de risco para cada paciente com base em critérios clínicos reais do protocolo SUS: gestante, hipertenso, diabético, idoso, visita atrasada, passagem recente por urgência.</p>
+        <p>Quem tem score alto aparece no topo da lista. O score é recalculado em tempo real — cada visita registrada reorganiza a fila.</p>
+        <div class="principle">
+          <em>"A Claudia decide a ordem final."</em><br>O motor é insumo, nunca comando. Determinístico, auditável, construído sobre as portarias do Ministério da Saúde.
+        </div>
+      </div>
+      <div>
+        <div class="legend-box">
+          <div class="legend-head"><span>Fatores do score</span></div>
+          <div class="legend-row">
+            <span class="ln">1</span>
+            <span class="score-pill pill-gest"><span class="pd"></span> Fase de vida vulnerável</span>
+          </div>
+          <div class="legend-row">
+            <span class="ln">2</span>
+            <span class="score-pill pill-cron"><span class="pd"></span> Carga crônica</span>
+          </div>
+          <div class="legend-row">
+            <span class="ln">3</span>
+            <span class="score-pill pill-vuln"><span class="pd"></span> Vulnerabilidade social</span>
+          </div>
+          <div class="legend-row">
+            <span class="ln">4</span>
+            <span class="score-pill pill-gap"><span class="pd"></span> Gap de cuidado / urgência</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CAMPO ── -->
+<section id="campo">
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">04</span> Construído para o campo</span>
+    <h2 class="sec">Feito pra rua, pro sol, pro morro.</h2>
+    <p class="sec-sub">O ACS Digital não foi projetado para um escritório. Foi projetado para a Rocinha — e para toda comunidade com conexão intermitente e agentes trabalhando com uma mão só, com pressa.</p>
+    <div class="field-grid">
+      <div class="field-card">
+        <div class="fc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114 0" stroke-linecap="round"/><line x1="2" y1="2" x2="22" y2="22" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h4>Funciona sem sinal</h4>
+          <p>Salva no aparelho primeiro, sincroniza quando o sinal volta. Sem perder dado, sem culpar o agente.</p>
+        </div>
+      </div>
+      <div class="field-card">
+        <div class="fc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg>
+        </div>
+        <div>
+          <h4>Só precisa do celular</h4>
+          <p>Nenhuma dependência de PC na clínica. O agente resolve tudo no campo, onde o paciente está.</p>
+        </div>
+      </div>
+      <div class="field-card">
+        <div class="fc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h4>Uma tela, uma tarefa</h4>
+          <p>Interface simples e direta — legível no sol, operável com uma mão, rápida mesmo em Android de entrada.</p>
+        </div>
+      </div>
+      <div class="field-card">
+        <div class="fc-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <h4>Amplifica, não substitui</h4>
+          <p>O vínculo humano entre o agente e a família é insubstituível. O app cuida da burocracia para a Claudia cuidar das pessoas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUEM FEZ ── -->
+<section id="quem-fez">
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">05</span> Quem fez</span>
+    <h2 class="sec">Nasceu em um dia. Feito pra durar.</h2>
+    <div class="who-box">
+      <div>
+        <p>ACS Digital nasceu no <strong>Claude Impact Lab Rio</strong> — um hackathon de um dia em parceria com a Secretaria Municipal de Saúde do Rio de Janeiro.</p>
+        <p>O projeto foi construído por um time de médica, designers e engenheiros, com <strong>escuta real de agentes de saúde em campo.</strong></p>
+        <p>Em um dia, do zero a um produto que pode ser usado amanhã.</p>
+      </div>
+      <div>
+        <div class="badges">
+          <span class="badge">🏥 SMS-Rio</span>
+          <span class="badge">🤖 Claude Impact Lab</span>
+          <span class="badge">⚕️ Médica na equipe</span>
+          <span class="badge">🗣️ Escuta com ACS</span>
+          <span class="badge">🏙️ Rocinha</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA FINAL ── -->
+<section class="cta-section">
+  <div class="wrap">
+    <h2>Sua cidade tem agentes comunitários.<br><em>Eles merecem isso.</em></h2>
+    <p>Se você é gestor de saúde municipal ou estadual e quer levar o ACS Digital para a sua rede, fale com a gente.</p>
+    <a href="/demo" class="btn-primary" style="font-size: 17px; padding: 18px 40px;">
+      Ver o produto ao vivo →
+    </a>
+    <a href="https://wa.me/5524992679147" class="email-link" target="_blank" rel="noopener">Mais informações? Fale no WhatsApp →</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="fbar-top"></div>
+  <div class="wrap">
+    <div class="f-left">
+      <span class="wm inv" style="font-size: 26px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+      <p>AGENTE COMUNITÁRIO DE SAÚDE · RIO DE JANEIRO · 2026</p>
+    </div>
+    <div class="f-right">
+      Portaria SAS/MS 221/2008 · Manual ACS-MS<br>
+      Carteira APS SMS-Rio 2021 · PNAB 2017<br>
+      Claude Impact Lab Rio
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

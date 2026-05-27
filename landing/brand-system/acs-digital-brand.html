@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACS Digital — Sistema de Marca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Azul — inspirado no cabeçalho do formulário de papel */
+    --navy:#173C72;        /* Azul Ficha — faixa de cabeçalho */
+    --navy-deep:#0E2B55;
+    --blue:#0B57C2;        /* Azul Rio — interativo */
+    --blue-tint:#E7EEF8;
+    --blue-line:#C5D5EE;
+    --coral:#F26849;       /* Calor — acento humano (restrito) */
+    --coral-deep:#C9472C;
+    --coral-tint:#FDEAE2;
+    --coral-soft:#FFC9BC;
+    --amber:#E8920C;
+    --sun-tint:#FBEFD3;
+    --red:#D6443C;         /* obrigatório · alta prioridade */
+    --red-tint:#FBE6E5;
+    --required:#FBF1CC;    /* destaque de campo obrigatório (igual ao papel) */
+    --required-ink:#9A6B00;
+    --ink:#15203A;
+    --ink-2:#3C4A66;
+    --muted:#6B7790;
+    --paper:#F4F6FB;
+    --surface:#FFFFFF;
+    --line:#DCE3EF;
+    --line-soft:#E9EDF5;
+    --radius:14px;
+    --radius-sm:9px;
+    --shadow:0 1px 2px rgba(14,43,85,.05), 0 12px 30px -18px rgba(14,43,85,.30);
+    --shadow-sm:0 1px 2px rgba(14,43,85,.06), 0 6px 16px -12px rgba(14,43,85,.24);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.55;
+    background-image:linear-gradient(rgba(23,60,114,.035) 1px, transparent 1px),linear-gradient(90deg, rgba(23,60,114,.035) 1px, transparent 1px);
+    background-size:28px 28px;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  section{padding:80px 0;border-top:1px solid var(--line-soft)}
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  /* ficha-style numbered section label */
+  .mono-label{display:inline-flex;align-items:center;gap:10px;font-family:"IBM Plex Mono";font-size:12px;letter-spacing:.13em;text-transform:uppercase;font-weight:600;color:var(--navy)}
+  .mono-label .nbox{color:#fff;background:var(--navy);padding:2px 8px;border-radius:4px;letter-spacing:.05em}
+  h2.sec{font-weight:600;font-size:clamp(28px,3.6vw,40px);line-height:1.08;margin:16px 0 14px;letter-spacing:-.02em;color:var(--navy)}
+  .sec-sub{color:var(--ink-2);max-width:60ch;font-size:17px;margin:0 0 38px}
+  .req-star{color:var(--red);font-weight:700}
+
+  /* segmented cells — homage to the paper boxes */
+  .cells{display:inline-flex;gap:3px;align-items:center}
+  .cells .c{min-width:17px;height:23px;padding:0 2px;border:1px solid var(--blue-line);border-radius:3px;display:grid;place-items:center;font-family:"IBM Plex Mono";font-size:12.5px;font-weight:600;color:var(--ink);background:#fff}
+  .cells .c.fill{background:var(--blue-tint)}
+  .cells .c.req{background:var(--required);border-color:#EAD79A}
+  .cells .sep{font-family:"IBM Plex Mono";color:var(--muted);font-weight:700;padding:0 1px}
+
+  /* ---------- WORDMARK ---------- */
+  .wm{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1}
+  .wm .wm-acs{font-weight:700;letter-spacing:-.03em;line-height:.85}
+  .wm .wm-dig{font-family:"IBM Plex Mono";font-weight:600;letter-spacing:.26em;margin-top:.42em}
+  .wm .wm-acs{color:var(--navy)} .wm .wm-dig{color:var(--coral-deep)}
+  .wm.inv .wm-acs{color:#fff} .wm.inv .wm-dig{color:var(--coral-soft)}
+  .wm.mono-c .wm-acs,.wm.mono-c .wm-dig{color:currentColor}
+  .tile{border-radius:24%;display:grid;place-items:center;box-shadow:0 8px 22px -10px rgba(14,43,85,.5)}
+  .tile-wm{display:flex;flex-direction:column;align-items:center;line-height:.8;text-align:center}
+  .tile-wm .a{font-weight:700;letter-spacing:-.03em;color:#fff}
+  .tile-wm .d{font-family:"IBM Plex Mono";font-weight:600;letter-spacing:.2em;color:var(--coral-soft);margin-top:.34em}
+
+  /* ---------- HERO ---------- */
+  .hero{background:linear-gradient(158deg,#0E2B55 0%, #173C72 55%, #1E54A8 100%);color:#fff;position:relative;overflow:hidden;border-top:none;padding:0 0 78px}
+  .hero::after{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background:radial-gradient(720px 360px at 90% 0%, rgba(242,104,73,.28), transparent 60%)}
+  .hero-bar{background:var(--navy-deep);border-bottom:2px solid var(--coral);padding:14px 0}
+  .hero-bar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .hero-bar .left{display:flex;align-items:center;gap:14px}
+  .cobrand{display:flex;align-items:center;gap:9px;font-family:"IBM Plex Mono";font-size:10.5px;letter-spacing:.1em;color:rgba(255,255,255,.6);text-transform:uppercase}
+  .cobrand .dot{width:1px;height:16px;background:rgba(255,255,255,.25)}
+  .hero .wrap.main{position:relative;z-index:2;padding-top:62px}
+  .hero-badge{display:inline-flex;align-items:center;gap:9px;font-family:"IBM Plex Mono";font-size:11.5px;letter-spacing:.06em;font-weight:500;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);padding:6px 13px;border-radius:6px;color:#fff;margin-bottom:26px}
+  .hero h1{font-weight:600;font-size:clamp(36px,5.5vw,62px);line-height:1.04;letter-spacing:-.03em;margin:0 0 22px;max-width:17ch}
+  .hero h1 em{font-style:normal;color:#FFC9BC}
+  .hero p.lede{font-size:clamp(17px,2vw,20px);max-width:54ch;color:rgba(255,255,255,.9);margin:0 0 40px}
+  .impact{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.2);border-radius:var(--radius);overflow:hidden;background:rgba(255,255,255,.05)}
+  .impact div{padding:22px 24px;border-right:1px solid rgba(255,255,255,.16)}
+  .impact div:last-child{border-right:none}
+  .impact .num{font-family:"IBM Plex Mono";font-weight:600;font-size:clamp(28px,4vw,42px);line-height:1;letter-spacing:-.03em}
+  .impact .num small{font-size:.46em;font-weight:500;opacity:.78;letter-spacing:0}
+  .impact .lab{font-size:13px;color:rgba(255,255,255,.8);margin-top:9px;line-height:1.4}
+
+  /* ---------- ESSENCE ---------- */
+  .essence-quote{font-weight:600;font-size:clamp(24px,3vw,36px);line-height:1.2;letter-spacing:-.02em;color:var(--navy);max-width:20ch}
+  .essence-quote b{color:var(--blue)}
+  .pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .pillar{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm)}
+  .pillar h4{margin:14px 0 6px;font-size:16px;font-weight:600}
+  .pillar p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.5}
+  .pillar .ico{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:var(--blue-tint);color:var(--navy)}
+
+  /* ---------- LOGO ---------- */
+  .logo-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm)}
+  .panel.dark{background:var(--navy);border-color:transparent;color:#fff}
+  .panel .cap{font-family:"IBM Plex Mono";font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .panel.dark .cap{color:rgba(255,255,255,.7)}
+  .logo-stage{display:grid;place-items:center;min-height:196px}
+  .variant-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:20px}
+  .variant{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:30px 24px;display:flex;flex-direction:column;align-items:center;gap:18px;box-shadow:var(--shadow-sm)}
+  .variant.onblue{background:var(--navy);border-color:transparent}
+  .variant.onink{background:var(--ink);border-color:transparent;color:#fff}
+  .swatch-name{font-family:"IBM Plex Mono";font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.04em}
+  .onblue .swatch-name,.onink .swatch-name{color:rgba(255,255,255,.65)}
+  .construction{display:flex;gap:30px;align-items:center;flex-wrap:wrap}
+  .cobrand-zone{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px}
+  .ph-mark{border:1px dashed var(--blue-line);border-radius:8px;padding:10px 16px;font-family:"IBM Plex Mono";font-size:11px;letter-spacing:.08em;color:var(--muted);background:var(--blue-tint);text-transform:uppercase}
+  .divline{width:1px;height:34px;background:var(--line)}
+  .misuse{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px}
+  .miss{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:18px;text-align:center}
+  .miss .box{height:80px;display:grid;place-items:center;margin-bottom:12px;border-radius:6px;background:var(--line-soft);overflow:hidden}
+  .miss span{font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:center;gap:6px}
+  .x{color:var(--red);font-weight:700}
+
+  /* ---------- COLOR ---------- */
+  .color-rows{display:grid;gap:14px}
+  .color-card{display:flex;align-items:stretch;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-sm);background:var(--surface)}
+  .color-chip{width:160px;flex:none;display:flex;flex-direction:column;justify-content:flex-end;padding:16px;color:#fff;min-height:106px}
+  .color-meta{padding:16px 20px;display:flex;flex-direction:column;justify-content:center}
+  .color-meta .nm{font-weight:600;font-size:15px}
+  .color-meta .use{font-size:13.5px;color:var(--ink-2);margin-top:3px}
+  .color-meta .hexline{font-family:"IBM Plex Mono";font-size:12px;color:var(--muted);margin-top:8px;letter-spacing:.01em}
+  .tag-aa{font-family:"IBM Plex Sans";font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--blue-tint);color:var(--navy);letter-spacing:.02em}
+  .priority-scale{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .pr{border-radius:var(--radius);padding:18px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow-sm)}
+  .pr .dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+  .pr .lev{display:flex;align-items:center;gap:9px;font-weight:600;font-size:15px}
+  .pr p{margin:8px 0 0;font-size:13px;color:var(--ink-2)}
+
+  /* ---------- TYPE ---------- */
+  .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .type-spec .big{font-size:62px;line-height:.95;font-weight:600;letter-spacing:-.03em}
+  .type-spec .big.m{font-family:"IBM Plex Mono";font-weight:500}
+  .type-spec .name{font-size:18px;font-weight:600;margin-top:14px}
+  .type-spec .role{font-size:14px;color:var(--ink-2);margin-top:2px}
+  .charset{font-size:19px;color:var(--ink-2);margin-top:14px;letter-spacing:.01em}
+  .charset.m{font-family:"IBM Plex Mono";font-size:16px}
+  .scale-list{margin-top:20px;display:grid;gap:2px}
+  .scale-list .row{display:flex;align-items:baseline;gap:16px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
+  .scale-list .row .meta{font-family:"IBM Plex Mono";font-size:11.5px;color:var(--muted);width:168px;flex:none}
+
+  /* ---------- ICONS + LEGEND ---------- */
+  .icon-rail{display:flex;flex-wrap:wrap;gap:14px}
+  .icon-cell{width:80px;height:80px;background:var(--surface);border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;color:var(--navy);box-shadow:var(--shadow-sm)}
+  .legend-box{margin-top:22px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface);box-shadow:var(--shadow-sm)}
+  .legend-box .lhead{background:var(--navy);color:#fff;padding:10px 18px;font-family:"IBM Plex Mono";font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;display:flex;justify-content:space-between}
+  .legend-row{display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--line-soft);font-size:14px}
+  .legend-row:last-child{border-bottom:none}
+  .legend-row .ln{font-family:"IBM Plex Mono";font-weight:600;color:#fff;background:var(--blue);border-radius:5px;text-align:center;padding:3px 0;font-size:12px}
+  .legend-row .pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill .pd{width:8px;height:8px;border-radius:50%}
+  .pill.gest{background:#FBE7F0;color:#A21B59} .pill.gest .pd{background:#C3306E}
+  .pill.cron{background:var(--blue-tint);color:var(--navy)} .pill.cron .pd{background:var(--blue)}
+  .pill.vuln{background:var(--sun-tint);color:#8A5A06} .pill.vuln .pd{background:var(--amber)}
+  .pill.gap{background:var(--coral-tint);color:var(--coral-deep)} .pill.gap .pd{background:var(--coral)}
+  .legend-row .wt{font-family:"IBM Plex Mono";font-size:12px;color:var(--muted)}
+
+  /* ---------- VOICE ---------- */
+  .voice{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .voice .col{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .voice .head{padding:14px 22px;font-weight:600;display:flex;align-items:center;gap:9px;font-size:15px}
+  .voice .do .head{background:var(--blue-tint);color:var(--navy)}
+  .voice .dont .head{background:var(--red-tint);color:var(--red)}
+  .voice ul{list-style:none;margin:0;padding:8px 22px 20px}
+  .voice li{padding:12px 0;border-bottom:1px solid var(--line-soft);font-size:14.5px}
+  .voice li:last-child{border-bottom:none}
+  .voice .ex{display:block;color:var(--ink);font-weight:500;margin-top:3px}
+  .voice .dont .ex{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(214,68,60,.4)}
+
+  /* ---------- PHONES ---------- */
+  .phones{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+  .phone{background:#0B1422;border-radius:36px;padding:11px;box-shadow:0 30px 60px -30px rgba(8,30,60,.55),0 0 0 1px rgba(0,0,0,.04);position:relative}
+  .phone .screen{background:var(--paper);border-radius:27px;overflow:hidden;height:570px;display:flex;flex-direction:column}
+  .phone .notch{position:absolute;top:20px;left:50%;transform:translateX(-50%);width:84px;height:6px;background:#000;border-radius:6px;opacity:.55;z-index:5}
+  .st{display:flex;justify-content:space-between;align-items:center;padding:13px 18px 7px;font-family:"IBM Plex Mono";font-size:11px;font-weight:600;color:var(--ink)}
+  .appbar{padding:6px 18px 13px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .appbar .hello{font-size:12px;color:var(--muted);font-weight:500}
+  .appbar .title{font-weight:600;font-size:20px;margin-top:3px;display:flex;align-items:center;gap:9px}
+  .mini-tile{width:26px;height:26px;border-radius:6px;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:.7;flex:none}
+  .mini-tile .a{font-weight:700;font-size:9px;color:#fff;letter-spacing:-.04em}
+  .mini-tile .d{font-family:"IBM Plex Mono";font-weight:600;font-size:3px;letter-spacing:.1em;color:var(--coral-soft);margin-top:1px}
+  .route-strip{display:flex;gap:8px;margin-top:12px}
+  .chip{flex:1;background:var(--blue-tint);border-radius:9px;padding:9px 11px}
+  .chip .v{font-family:"IBM Plex Mono";font-weight:600;font-size:16px;color:var(--navy)}
+  .chip .k{font-size:10px;color:var(--navy);opacity:.8;font-weight:500;margin-top:1px}
+  .offline{display:flex;align-items:center;gap:8px;background:var(--sun-tint);color:#8A5A06;font-size:11px;font-weight:600;padding:8px 18px}
+  .feed{padding:12px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px}
+  .pcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;box-shadow:var(--shadow-sm)}
+  .pcard.alta{border-left:4px solid var(--red)} .pcard.media{border-left:4px solid var(--amber)} .pcard.baixa{border-left:4px solid var(--blue)}
+  .pcard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .pcard .nm{font-weight:600;font-size:14.5px;line-height:1.2}
+  .pcard .addr{font-size:12px;color:var(--muted);margin-top:2px}
+  .score{flex:none;text-align:center}
+  .score .s{font-family:"IBM Plex Mono";font-weight:600;font-size:18px}
+  .score .l{font-family:"IBM Plex Mono";font-size:8.5px;color:var(--muted);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
+  .alta .score .s{color:var(--red)} .media .score .s{color:var(--amber)} .baixa .score .s{color:var(--blue)}
+  .ptags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .minipill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:5px}
+  .minipill .pd{width:6px;height:6px;border-radius:50%}
+  .mp-gest{background:#FBE7F0;color:#A21B59}.mp-gest .pd{background:#C3306E}
+  .mp-cron{background:var(--blue-tint);color:var(--navy)}.mp-cron .pd{background:var(--blue)}
+  .mp-vuln{background:var(--sun-tint);color:#8A5A06}.mp-vuln .pd{background:var(--amber)}
+  .mp-gap{background:var(--coral-tint);color:var(--coral-deep)}.mp-gap .pd{background:var(--coral)}
+  /* ficha form */
+  .fbar{padding:0}
+  .fbar .band{background:var(--navy);color:#fff;padding:13px 18px;display:flex;align-items:center;justify-content:space-between}
+  .fbar .band .t{font-weight:600;font-size:13.5px}
+  .fbar .band .code{font-family:"IBM Plex Mono";font-size:9.5px;letter-spacing:.1em;color:rgba(255,255,255,.6)}
+  .fbar .back{padding:9px 18px;color:var(--navy);font-weight:600;font-size:12px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .form{padding:15px 16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px;background:var(--paper)}
+  .fld label{font-family:"IBM Plex Mono";font-size:10px;font-weight:600;color:var(--ink-2);letter-spacing:.05em;text-transform:uppercase;display:flex;align-items:center;gap:3px}
+  .fld .inp{margin-top:6px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-size:13.5px;color:var(--ink);min-height:44px;display:flex;align-items:center}
+  .fld .inp.req{background:var(--required);border-color:#EAD79A}
+  .fld .inp.ph{color:var(--muted)}
+  .seg{display:flex;gap:8px}
+  .seg .opt{flex:1;text-align:center;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:12.5px;font-weight:500;color:var(--ink-2);background:var(--surface)}
+  .seg .opt.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .save{margin:auto 16px 16px;background:var(--coral);color:#fff;border:none;border-radius:11px;padding:15px;font-weight:600;font-size:15px;font-family:"IBM Plex Sans";box-shadow:0 10px 22px -10px rgba(242,104,73,.7)}
+  .sync-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center}
+  .sync-ring{width:92px;height:92px;border-radius:50%;border:5px solid var(--blue-tint);border-top-color:var(--blue);animation:spin 1.4s linear infinite;margin-bottom:14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sync-wrap h3{font-weight:600;font-size:19px;margin:0}
+  .sync-wrap p{font-size:13px;color:var(--ink-2);margin:3px 0 0;max-width:24ch}
+  .sync-list{width:100%;margin-top:22px;display:flex;flex-direction:column;gap:8px}
+  .sync-item{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:12.5px;font-weight:500;text-align:left}
+  .sync-item .ok{margin-left:auto;font-family:"IBM Plex Mono";color:var(--blue);font-weight:600;font-size:11px}
+  .sync-item .wait{margin-left:auto;font-family:"IBM Plex Mono";color:var(--amber);font-weight:600;font-size:11px}
+  .phone-cap{text-align:center;font-size:13px;color:var(--ink-2);margin-top:16px;font-weight:500}
+
+  /* ---------- PRINCIPLES ---------- */
+  .principles{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .prin{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);display:flex;gap:16px}
+  .prin .n{font-family:"IBM Plex Mono";font-weight:600;font-size:22px;color:var(--blue);flex:none;width:40px}
+  .prin h4{margin:0 0 5px;font-size:16px;font-weight:600}
+  .prin p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.5}
+
+  /* ---------- FOOTER ---------- */
+  footer{background:var(--navy-deep);color:#fff;padding:0;border-top:none}
+  footer .fbarred{height:3px;background:var(--coral)}
+  footer .wrap{padding-top:60px;padding-bottom:56px}
+  footer .f-quote{font-weight:600;font-size:clamp(24px,3vw,34px);line-height:1.18;max-width:22ch;margin:0 0 28px;letter-spacing:-.02em}
+  footer .f-quote em{font-style:normal;color:#FFC9BC}
+  footer .meta{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:20px;border-top:1px solid rgba(255,255,255,.15);padding-top:22px;font-family:"IBM Plex Mono";font-size:11.5px;color:rgba(255,255,255,.65);letter-spacing:.02em}
+
+  @media(max-width:880px){
+    .pillars,.priority-scale,.principles,.misuse{grid-template-columns:repeat(2,1fr)}
+    .logo-grid,.type-grid,.voice{grid-template-columns:1fr}
+    .phones{grid-template-columns:1fr;max-width:340px;margin:0 auto}
+    .impact{grid-template-columns:1fr}
+    .impact div{border-right:none;border-bottom:1px solid rgba(255,255,255,.16)}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======= HERO ======= -->
+<header class="hero">
+  <div class="hero-bar">
+    <div class="wrap">
+      <div class="left">
+        <span class="wm inv" style="font-size:19px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+      </div>
+      <div class="cobrand">PWA <span class="dot"></span> Offline-first <span class="dot"></span> Saúde comunitária</div>
+    </div>
+  </div>
+  <div class="wrap main">
+    <span class="hero-badge">SISTEMA DE MARCA · v2.1</span>
+    <h1>A ferramenta que o agente de saúde <em>merece.</em></h1>
+    <p class="lede">A ficha de papel, agora no bolso. Um app de campo que devolve tempo de papelada para o que importa: as famílias. O agente é o herói — o app é só o copiloto.</p>
+    <div class="impact">
+      <div><div class="num">6.200</div><div class="lab">agentes comunitários no Rio</div></div>
+      <div><div class="num">1<small>h/dia</small></div><div class="lab">recuperada de papelada por agente</div></div>
+      <div><div class="num">1,5<small> mi</small></div><div class="lab">de horas/ano devolvidas ao cuidado</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ======= ESSENCE ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">01</span> Essência</span>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;margin-top:18px">
+      <div>
+        <p class="essence-quote">“O agente é o <b>herói</b>. O app é o <b>copiloto</b>.”</p>
+        <p class="sec-sub" style="margin-top:18px">A marca nunca rouba o protagonismo. Ela some quando o agente está com a família e aparece só quando é útil: organizando a rota, guardando o registro, avisando que sincronizou. Serviço público de verdade — não vitrine de startup.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>Humana</h4><p>Fala como gente, valoriza quem cuida.</p></div>
+        <div class="pillar"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg></div><h4>Confiável</h4><p>Séria e estável. Sem firula.</p></div>
+        <div class="pillar"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h4>Direta</h4><p>Clara e curta. Resolve, não enrola.</p></div>
+        <div class="pillar"><div class="ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" stroke-linejoin="round"/></svg></div><h4>De campo</h4><p>Feita pra rua, pro sol, pro morro.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= LOGO ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">02</span> Logotipo</span>
+    <h2 class="sec">O nome já é a marca</h2>
+    <p class="sec-sub">ACS já carrega o trabalho de 6.200 agentes comunitários — não precisa de símbolo decorativo. O logotipo é o próprio nome: <b>ACS</b> em peso forte (a função) e <b>DIGITAL</b> em monoespaçada (a versão digital, o eco das caixinhas do formulário), com um traço de coral marcando que é gente cuidando de gente.</p>
+
+    <div class="logo-grid">
+      <div class="panel">
+        <span class="cap">Logotipo principal</span>
+        <div class="logo-stage">
+          <span class="wm" style="font-size:62px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+        </div>
+      </div>
+      <div class="panel dark">
+        <span class="cap">Ícone do app</span>
+        <div class="logo-stage">
+          <span class="tile" style="width:124px;height:124px;background:linear-gradient(150deg,#173C72,#1E54A8)">
+            <span class="tile-wm"><span class="a" style="font-size:42px">ACS</span><span class="d" style="font-size:11px">DIGITAL</span></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="variant-row">
+      <div class="variant"><span class="wm" style="font-size:32px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span><span class="swatch-name">positivo / sobre claro</span></div>
+      <div class="variant onblue"><span class="wm inv" style="font-size:32px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span><span class="swatch-name">sobre azul</span></div>
+      <div class="variant onink" style="color:#fff"><span class="wm mono-c" style="font-size:32px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span><span class="swatch-name">monocromático / 1 cor</span></div>
+    </div>
+
+    <span class="cap" style="display:block;margin:26px 0 0;color:var(--muted);font-family:'IBM Plex Mono';font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Usos proibidos</span>
+    <div class="misuse">
+      <div class="miss"><div class="box"><span class="wm" style="font-size:18px;transform:skewX(-13deg)"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span></div><span><span class="x">✕</span> Distorcer / inclinar</span></div>
+      <div class="miss"><div class="box"><span style="font-family:Georgia,serif;font-style:italic;font-weight:700;color:var(--navy);text-align:center;line-height:1">ACS<br><small style="font-size:8px;letter-spacing:.2em">DIGITAL</small></span></div><span><span class="x">✕</span> Trocar a fonte</span></div>
+      <div class="miss"><div class="box"><span class="wm" style="font-size:18px"><span class="wm-acs" style="color:#8E44AD">ACS</span><span class="wm-dig" style="color:#27AE60">DIGITAL</span></span></div><span><span class="x">✕</span> Recolorir</span></div>
+      <div class="miss"><div class="box"><span style="display:flex;align-items:center;gap:6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M12 21s-7-4.4-7-10a7 7 0 0114 0c0 5.6-7 10-7 10z"/></svg><span class="wm" style="font-size:13px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span></span></div><span><span class="x">✕</span> Adicionar símbolos</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= COLOR ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">03</span> Cores</span>
+    <h2 class="sec">A paleta vem do papel</h2>
+    <p class="sec-sub">Direto do formulário de papel: o azul-marinho do cabeçalho, o vermelho do <span class="req-star">*</span> obrigatório, e o amarelo-claro que o papel usa para destacar campos obrigatórios. O coral é o único acréscimo — o calor humano, usado com parcimônia. Tudo testado para contraste AA+, porque a tela é lida no sol.</p>
+
+    <div class="color-rows">
+      <div class="color-card">
+        <div class="color-chip" style="background:#173C72"><span style="font-weight:600">Azul Cabeçalho</span></div>
+        <div class="color-meta"><span class="nm">Primária / marca</span><span class="use">Faixas de cabeçalho, "ACS" do logotipo, navegação, rodapé.</span><span class="hexline">#173C72 · RGB 23 60 114 · <span class="tag-aa">AAA</span></span></div>
+      </div>
+      <div class="color-card">
+        <div class="color-chip" style="background:#0B57C2"><span style="font-weight:600">Azul Rio</span></div>
+        <div class="color-meta"><span class="nm">Interativo</span><span class="use">Links, estado selecionado, prioridade baixa/rotina, dados.</span><span class="hexline">#0B57C2 · RGB 11 87 194 · <span class="tag-aa">AA · texto branco</span></span></div>
+      </div>
+      <div class="color-card">
+        <div class="color-chip" style="background:#F26849"><span style="font-weight:600">Coral Calor</span></div>
+        <div class="color-meta"><span class="nm">Acento humano</span><span class="use">Ação principal (1 por tela), "DIGITAL" do logotipo. Restrito.</span><span class="hexline">#F26849 · RGB 242 104 73 · <span class="tag-aa">AA · texto branco</span></span></div>
+      </div>
+      <div class="color-card">
+        <div class="color-chip" style="background:#FBF1CC;color:#9A6B00"><span style="font-weight:600">Amarelo Obrigatório</span></div>
+        <div class="color-meta"><span class="nm">Destaque funcional</span><span class="use">Realce de campo obrigatório — exatamente como no papel.</span><span class="hexline">#FBF1CC · RGB 251 241 204</span></div>
+      </div>
+      <div class="color-card">
+        <div class="color-chip" style="background:#15203A"><span style="font-weight:600">Tinta</span></div>
+        <div class="color-meta"><span class="nm">Texto principal</span><span class="use">Preto frio azul-marinho, menos duro que #000.</span><span class="hexline">#15203A · sobre #F4F6FB · <span class="tag-aa">AAA</span></span></div>
+      </div>
+    </div>
+
+    <span class="cap" style="display:block;margin:34px 0 0;color:var(--muted);font-family:'IBM Plex Mono';font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Escala de prioridade — o motor de pontuação ganha cor</span>
+    <p style="font-size:14px;color:var(--ink-2);margin:8px 0 0;max-width:62ch">Cores semânticas separadas da marca. Sempre com ícone + texto — cor nunca carrega o sentido sozinha (daltonismo, sol forte).</p>
+    <div class="priority-scale">
+      <div class="pr" style="border-left:4px solid var(--red)"><div class="lev"><span class="dot" style="background:var(--red)"></span> Alta prioridade</div><p>Gestante, crônico descompensado, longo atraso. Topo da rota. <span class="mono" style="color:var(--red)">#D6443C</span></p></div>
+      <div class="pr" style="border-left:4px solid var(--amber)"><div class="lev"><span class="dot" style="background:var(--amber)"></span> Média</div><p>Rotina com sinal de atenção ou vulnerabilidade. <span class="mono" style="color:#B5720A">#E8920C</span></p></div>
+      <div class="pr" style="border-left:4px solid var(--blue)"><div class="lev"><span class="dot" style="background:var(--blue)"></span> Baixa / em dia</div><p>Visita programada, sem pendências. Usa o Azul Rio. <span class="mono" style="color:var(--blue)">#0B57C2</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= TYPE ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">04</span> Tipografia</span>
+    <h2 class="sec">Clara primeiro. Sempre.</h2>
+    <p class="sec-sub">Nada de serifa de revista. <b>IBM Plex Sans</b> carrega tudo — direta, neutra, desenhada para tela e papel, fácil de ler com pressa e no sol. <b>IBM Plex Mono</b> entra nos dados, códigos e nas caixinhas de preenchimento — o eco direto da ficha de papel, e o "DIGITAL" do logotipo. Uma só superfamília: sistema limpo, zero ruído.</p>
+
+    <div class="type-grid">
+      <div class="panel type-spec">
+        <span class="cap">Interface + texto</span>
+        <div class="big" style="color:var(--navy)">Aa</div>
+        <div class="name">IBM Plex Sans</div>
+        <div class="role">Títulos, listas, formulários, botões, microcopy. Legível, sóbria, sem firula.</div>
+        <div class="charset">Dona Cleusa — Rua 4, casa 12. ÇÃÕ áéíóú</div>
+      </div>
+      <div class="panel type-spec">
+        <span class="cap">Dados + caixinhas + "DIGITAL"</span>
+        <div class="big m" style="color:var(--coral-deep)">Aa</div>
+        <div class="name">IBM Plex Mono</div>
+        <div class="role">CPF, datas, CNES, score, rótulos de campo. O alinhamento por caractere é o DNA do formulário de papel.</div>
+        <div class="charset m">CPF 000.000.000-00 · DN 05/03/1961</div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px">
+      <span class="cap">As caixinhas da ficha, na tela</span>
+      <div style="display:flex;gap:30px;flex-wrap:wrap;margin-top:16px;align-items:flex-end">
+        <div>
+          <div style="font-family:'IBM Plex Mono';font-size:10px;color:var(--ink-2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Data de nascimento <span class="req-star">*</span></div>
+          <div class="cells"><span class="c req">0</span><span class="c req">5</span><span class="sep">/</span><span class="c req">0</span><span class="c req">3</span><span class="sep">/</span><span class="c req">1</span><span class="c req">9</span><span class="c req">6</span><span class="c req">1</span></div>
+        </div>
+        <div>
+          <div style="font-family:'IBM Plex Mono';font-size:10px;color:var(--ink-2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">CNES</div>
+          <div class="cells"><span class="c">2</span><span class="c">7</span><span class="c">9</span><span class="c">8</span><span class="c">5</span><span class="c">6</span><span class="c">1</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px">
+      <span class="cap">Escala tipográfica</span>
+      <div class="scale-list">
+        <div class="row"><span class="meta">Plex Mono 600 · 42px</span><span class="mono" style="font-size:32px;font-weight:600;color:var(--navy)">1,5 mi horas</span></div>
+        <div class="row"><span class="meta">Plex Sans 600 · 20px</span><span style="font-size:20px;font-weight:600">Minha rota hoje</span></div>
+        <div class="row"><span class="meta">Plex Sans 600 · 16px</span><span style="font-size:16px;font-weight:600">Dona Cleusa Santos</span></div>
+        <div class="row"><span class="meta">Plex Sans 400 · 14px</span><span style="font-size:14px">Rua 4, casa 12 — Rocinha</span></div>
+        <div class="row"><span class="meta">Plex Mono 600 · 10px ↑</span><span class="mono" style="font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">MOTIVO DA VISITA *</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= ICONS + LEGEND ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">05</span> Ícones & legenda</span>
+    <h2 class="sec">A legenda do papel vira regra do app</h2>
+    <p class="sec-sub">Traço de 2px, geometria aberta. E o motor de priorização é documentado como uma legenda — igualzinho às caixas de legenda do formulário de papel, que o agente já conhece de cor.</p>
+    <div class="icon-rail">
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6v10a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" stroke-linejoin="round"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.4-7-10a7 7 0 0114 0c0 5.6-7 10-7 10z" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.5"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12a8 8 0 10-8 8" stroke-linecap="round"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0114 0M2 9a16 16 0 0120 0" stroke-linecap="round"/><line x1="2" y1="2" x2="22" y2="22" stroke-linecap="round"/></svg></div>
+      <div class="icon-cell"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round"/></svg></div>
+    </div>
+
+    <div class="legend-box">
+      <div class="lhead"><span>Legenda — motor de priorização</span><span>fator → peso</span></div>
+      <div class="legend-row"><span class="ln">1</span><span class="pill gest"><span class="pd"></span> Gestante</span><span class="wt">alta</span></div>
+      <div class="legend-row"><span class="ln">2</span><span class="pill cron"><span class="pd"></span> Condição crônica descompensada</span><span class="wt">alta / média</span></div>
+      <div class="legend-row"><span class="ln">3</span><span class="pill gap"><span class="pd"></span> Atraso no cuidado (dias s/ visita)</span><span class="wt">alta</span></div>
+      <div class="legend-row"><span class="ln">4</span><span class="pill vuln"><span class="pd"></span> Vulnerabilidade social</span><span class="wt">média</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= VOICE ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">06</span> Voz & tom</span>
+    <h2 class="sec">Fala de gente, não de sistema</h2>
+    <p class="sec-sub">O app conversa com quem cuida — valoriza, nunca fiscaliza. Frases curtas, sem jargão de TI, e culpa zero pela conexão. O agente nunca é o problema.</p>
+    <div class="voice">
+      <div class="col do">
+        <div class="head"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Faça assim</div>
+        <ul>
+          <li>Saudar e situar. <span class="ex">"Bom dia, Marcos. Você tem 12 visitas hoje."</span></li>
+          <li>Tranquilizar no offline. <span class="ex">"Salvo aqui. Vai sincronizar quando voltar o sinal."</span></li>
+          <li>Apontar a pessoa, não o dado. <span class="ex">"Dona Cleusa está há 40 dias sem visita."</span></li>
+          <li>Comemorar o trabalho. <span class="ex">"Rota concluída. 12 famílias atendidas hoje. 👏"</span></li>
+        </ul>
+      </div>
+      <div class="col dont">
+        <div class="head"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg> Evite</div>
+        <ul>
+          <li>Jargão de máquina. <span class="ex">"Erro 422: payload inválido."</span></li>
+          <li>Tom de cobrança. <span class="ex">"Meta de visitas não atingida."</span></li>
+          <li>Frieza de cadastro. <span class="ex">"Registro nº 0042 pendente de sincronização."</span></li>
+          <li>Culpar o agente. <span class="ex">"Falha de envio. Verifique sua conexão."</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= UI IN CONTEXT ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">07</span> Marca em uso</span>
+    <h2 class="sec">No bolso do agente, na rua</h2>
+    <p class="sec-sub">As três telas que importam: a rota priorizada, a ficha preenchida no local (com as caixinhas do papel), e a sincronização — sempre visível, sempre tranquila.</p>
+    <div class="phones">
+      <!-- ROTA -->
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="st"><span>7:42</span><span>▰▰▰ 4G 84%</span></div>
+          <div class="appbar">
+            <div class="hello">Bom dia, Marcos</div>
+            <div class="title"><span class="mini-tile"><span class="a">ACS</span><span class="d">DIGITAL</span></span> Minha rota hoje</div>
+            <div class="route-strip">
+              <div class="chip"><div class="v">12</div><div class="k">visitas</div></div>
+              <div class="chip"><div class="v">~3,4</div><div class="k">km a pé</div></div>
+              <div class="chip"><div class="v">02</div><div class="k">alta prior.</div></div>
+            </div>
+          </div>
+          <div class="offline"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12.55a11 11 0 0114 0M2 9a16 16 0 0120 0" stroke-linecap="round"/><line x1="2" y1="2" x2="22" y2="22" stroke-linecap="round"/></svg> Sem sinal agora · tudo salvo no aparelho</div>
+          <div class="feed">
+            <div class="pcard alta"><div class="top"><div><div class="nm">Cleusa Santos, 64</div><div class="addr">Rua 4, casa 12 — Rocinha</div></div><div class="score"><div class="s">92</div><div class="l">score</div></div></div><div class="ptags"><span class="minipill mp-cron"><span class="pd"></span>Crônico</span><span class="minipill mp-gap"><span class="pd"></span>40 dias s/ visita</span></div></div>
+            <div class="pcard alta"><div class="top"><div><div class="nm">Aline Ferreira, 27</div><div class="addr">Beco do Boiadeiro, 8</div></div><div class="score"><div class="s">88</div><div class="l">score</div></div></div><div class="ptags"><span class="minipill mp-gest"><span class="pd"></span>Gestante 32s</span><span class="minipill mp-vuln"><span class="pd"></span>Vulnerab.</span></div></div>
+            <div class="pcard media"><div class="top"><div><div class="nm">Seu Antônio, 71</div><div class="addr">Rua 2, casa 30</div></div><div class="score"><div class="s">61</div><div class="l">score</div></div></div><div class="ptags"><span class="minipill mp-cron"><span class="pd"></span>Hipertensão</span></div></div>
+            <div class="pcard baixa"><div class="top"><div><div class="nm">Família Lima</div><div class="addr">Travessa 1, casa 5</div></div><div class="score"><div class="s">34</div><div class="l">score</div></div></div><div class="ptags"><span class="minipill mp-cron" style="background:var(--line-soft);color:var(--muted)"><span class="pd" style="background:var(--muted)"></span>Rotina</span></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- FICHA / CADASTRO -->
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="st"><span>8:05</span><span>▰▰▱ 3G 81%</span></div>
+          <div class="fbar">
+            <div class="back">‹ Rota</div>
+            <div class="band"><span class="t">Ficha de cadastro</span><span class="code">p. 1 / 4</span></div>
+          </div>
+          <div class="form">
+            <div class="fld"><label>Nome do cidadão <span class="req-star">*</span></label><div class="inp">Cleusa Maria Santos</div></div>
+            <div class="fld"><label>Data de nascimento <span class="req-star">*</span></label>
+              <div class="inp req" style="gap:3px;padding:9px 12px"><span class="cells"><span class="c">0</span><span class="c">5</span><span class="sep">/</span><span class="c">0</span><span class="c">3</span><span class="sep">/</span><span class="c">1</span><span class="c">9</span><span class="c">6</span><span class="c">1</span></span></div>
+            </div>
+            <div class="fld"><label>Sexo biológico</label><div class="seg"><span class="opt on">F · Feminino</span><span class="opt">M · Masculino</span></div></div>
+            <div class="fld"><label>CPF / DNV <span class="req-star">*</span></label>
+              <div class="inp" style="padding:9px 12px"><span class="cells"><span class="c">0</span><span class="c">4</span><span class="c">1</span><span class="sep">.</span><span class="c">2</span><span class="c">2</span><span class="c">7</span><span class="sep">.</span><span class="c">8</span><span class="c">9</span><span class="c">0</span></span></div>
+            </div>
+            <div class="fld"><label>Doenças / condições referidas</label><div class="inp ph">Toque para adicionar 🎤</div></div>
+          </div>
+          <button class="save">Salvar cadastro</button>
+        </div>
+      </div>
+      <!-- SYNC -->
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="screen">
+          <div class="st"><span>13:18</span><span>▰▰▰ 4G 67%</span></div>
+          <div class="sync-wrap">
+            <div class="sync-ring"></div>
+            <h3>Sincronizando…</h3>
+            <p>Voltou o sinal. Mandando suas fichas pro Vitacare.</p>
+            <div class="sync-list">
+              <div class="sync-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round"/></svg> Cleusa Santos <span class="ok">enviada</span></div>
+              <div class="sync-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round"/></svg> Aline Ferreira <span class="ok">enviada</span></div>
+              <div class="sync-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2" stroke-linecap="round"/></svg> Seu Antônio <span class="wait">enviando</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-cap">As caixinhas do papel viram campos na tela. O logotipo fica discreto no topo e some quando o agente está com a família.</div>
+  </div>
+</section>
+
+<!-- ======= PRINCIPLES ======= -->
+<section>
+  <div class="wrap">
+    <span class="mono-label"><span class="nbox">08</span> Princípios de campo</span>
+    <h2 class="sec">Desenhado para a rua, não pro slide</h2>
+    <p class="sec-sub">Decisões não-negociáveis — porque a tela vai ser usada no sol forte, com uma mão só, com pressa, e sem sinal.</p>
+    <div class="principles">
+      <div class="prin"><div class="n">01</div><div><h4>Contraste AA+ sempre</h4><p>Legível sob sol direto. Texto crítico nunca depende de cor sozinha — leva ícone e rótulo junto.</p></div></div>
+      <div class="prin"><div class="n">02</div><div><h4>Alvos de toque ≥ 48px</h4><p>Uso com uma mão, andando, com pressa. Ação principal sempre ao alcance do polegar.</p></div></div>
+      <div class="prin"><div class="n">03</div><div><h4>Offline é o estado normal</h4><p>Salva primeiro no aparelho, sincroniza depois. Status visível, culpa nunca do agente.</p></div></div>
+      <div class="prin"><div class="n">04</div><div><h4>Leve no aparelho e nos dados</h4><p>PWA enxuta para Android de entrada. Pouca bateria, pouco dado, abre rápido.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= FOOTER ======= -->
+<footer>
+  <div class="fbarred"></div>
+  <div class="wrap">
+    <p class="f-quote">Menos tempo no <em>papel</em>.<br>Mais tempo com quem <em>precisa</em>.</p>
+    <span class="wm inv" style="font-size:28px;margin-bottom:6px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+    <div class="meta">
+      <span>SISTEMA DE MARCA · AGENTE COMUNITÁRIO DE SAÚDE · RIO DE JANEIRO</span>
+      <span>#173C72 · #0B57C2 · #F26849 · IBM PLEX SANS + MONO</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
