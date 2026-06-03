@@ -1,11 +1,55 @@
 # Visitare — Master TODO
 
-> Last updated: 2026-05-28
+> Last updated: 2026-06-03
 > Stack: Astro (LP) · React PWA · Expo (mobile) · FastAPI (engine) · Supabase (DB)
 
 ---
 
-## 0. Supabase — blocker for everything
+## ★ Piloto v1 — cerca de escopo (LEIA PRIMEIRO)
+
+> **Mire o ideal, construa só a v1.** A v1 é **um piloto de 1 clínica no Rio** provando
+> *"1h/dia salva"* com número. Tags: **`[V1]`** construir · **`[V1-GATED-SMS]`** construir
+> mas só vai ao ar quando a SMS/LGPD liberar · **`[ROADMAP]`** ideal, não construir.
+> Detalhe e racional em `docs/architecture.md §0`. `/to-prd` gera tarefa só de `[V1]` e
+> `[V1-GATED-SMS]`.
+
+**Trilha A — Código `[V1]` (começa já):**
+- `§0` Supabase — **schema do piloto** (`tenant_id` dormente; sem maquinaria white-label).
+- `§4` App PWA — lê `allocations`, escreve `visitas_capturadas` + status. **+ timestamps
+  de tempo-em-tarefa** (mede o "depois" da métrica — item novo abaixo).
+- `§6` Engine — **só scoring + ordenação** da lista fixa de cada ACS (microárea fixa).
+- **Auth real** — magic-link + senha **via WhatsApp/SMS** (item novo abaixo).
+- `origin` na lista — casos (a) crítico-do-motor e (b) existente-não-crítico de passagem.
+
+**Trilha B — SMS/LGPD `[V1-GATED-SMS]` (paralelo, gate externo):**
+- **Base legal/convênio SMS** → **export único** da carteira real de 1 clínica (bootstrap).
+- `§7` Vitacare **READ** ao vivo (upgrade do export) e **WRITE** (pivô: fecha a 1h +
+  cadastro full). Stopgap: **extensão Chrome** na LAN.
+- Cadastramento de novo paciente (full, sem pré-cadastro leve) — só com canal Vitacare.
+
+**Trilha C — Medição (ops, pré-rollout):**
+- **Baseline manual:** sombrear as ACS 1-2 semanas **antes** do rollout.
+- Métrica escrita: mediana de min/dia em digitação fim-de-dia, antes vs depois + adesão.
+
+**`[ROADMAP]` — fora da v1 (documentado, não construir):**
+`§1` monorepo restructure completo · `§2` DNS multi-subdomínio · `§3` site Astro ·
+`§5` mobile Expo · `§6` alocação entre ACS (balanceamento/clustering/`patient_cap`) ·
+`§8` later/v2 inteiro · white-label/dashboard/Previne (arch §7/§8/§8.3).
+
+### ★ Requisitos novos do grill (não estavam neste TODO)
+
+- [ ] **Timestamps em `visitas_capturadas`** — abertura da visita → submit, p/ medir tempo. `[V1]`
+- [ ] **Canal WhatsApp/SMS** p/ credenciais (Meta WhatsApp Business / Zenvia / Twilio). `[V1]`
+- [ ] **Auth magic-link + senha** com JWT carregando `acs_id`/`clinica_id` → RLS. `[V1]`
+- [ ] **Protocolo de baseline** (sombreamento time-and-motion) documentado e aplicado. `[V1]` (ops)
+- [ ] **Instrumento legal SMS** (convênio/base LGPD) p/ liberar export da carteira real. `[V1-GATED-SMS]`
+- [ ] **Spike Vitacare** — ir na clínica, ver o sistema na LAN, decidir A/B/C de write-back. `[V1-GATED-SMS]`
+- [ ] **Extensão Chrome** stopgap de write-back no Vitacare. `[V1-GATED-SMS]`
+- [ ] **Cadastramento full** de novo paciente (dedup nome+nascimento + escrita Vitacare). `[V1-GATED-SMS]`
+
+---
+
+## 0. Supabase — blocker for everything  `[V1]`
 
 - [ ] Create new Supabase project (`visitare`)
 - [ ] Run migrations in order: `db/migrations/001` → `005`
@@ -40,7 +84,8 @@ allocations (
 
 ---
 
-## 1. Monorepo restructure (visitare/)
+## 1. Monorepo restructure (visitare/)  `[V1 parcial]`
+> Só `frontend/ → app/` e ajustes do `app/` são v1. Criar `site/` e `mobile/` = `[ROADMAP]`.
 
 - [ ] Rename `frontend/` → `app/`
 - [ ] Update `.vercel/project.json` inside `app/`
@@ -61,7 +106,8 @@ visitare/
 
 ---
 
-## 2. DNS — GoDaddy (one record missing)
+## 2. DNS — GoDaddy (one record missing)  `[V1 parcial]`
+> Um domínio único pro app do piloto é v1. Wildcard `*.app.visitare.app` (multi-tenant) = `[ROADMAP]`.
 
 - [ ] Add CNAME `acs` → `cname.vercel-dns.com` in GoDaddy
 - [ ] Add `acs.visitare.app` domain to the React PWA Vercel project
@@ -69,7 +115,7 @@ visitare/
 
 ---
 
-## 3. Astro landing page (`site/`)
+## 3. Astro landing page (`site/`)  `[ROADMAP]`
 
 - [ ] Scaffold Astro project (`npm create astro@latest site`)
 - [ ] Port LP design from `acs-digital.vercel.app` (use as visual reference)
@@ -79,7 +125,8 @@ visitare/
 
 ---
 
-## 4. React PWA (`app/`)
+## 4. React PWA (`app/`)  `[V1]` ← coração do piloto
+> + adicionar timestamps de tempo-em-tarefa (ver "Requisitos novos do grill").
 
 - [ ] Fix Supabase crash — set env vars in Vercel
 - [ ] Verify app works end-to-end with new Supabase project
@@ -90,7 +137,7 @@ visitare/
 
 ---
 
-## 5. Expo mobile (`mobile/`)
+## 5. Expo mobile (`mobile/`)  `[ROADMAP]`
 
 - [ ] Scaffold Expo project (`npx create-expo-app mobile`)
 - [ ] Install: `@supabase/supabase-js`, `nativewind`, `expo-location`
@@ -109,7 +156,10 @@ visitare/
 
 ---
 
-## 6. PRIO-ACS Engine (private repo: `rafaelbressan/prio-acs-engine`)
+## 6. PRIO-ACS Engine (private repo: `rafaelbressan/prio-acs-engine`)  `[V1 parcial]`
+> v1 = scoring + ordenação da lista fixa de cada ACS. Distribuição entre ACS
+> (balanceamento, clustering geográfico, `patient_cap`, overflow) = `[ROADMAP]`
+> (microárea é fixa; motor não realoca). Ver `engine-spec.md §5`.
 
 ### Setup
 - [ ] `gh repo create rafaelbressan/prio-acs-engine --private`
@@ -194,7 +244,9 @@ clinic_defaults:
 
 ---
 
-## 7. Sync job — Vitacare ↔ Supabase (future, when API access granted)
+## 7. Sync job — Vitacare ↔ Supabase  `[V1-GATED-SMS]`
+> Pivô do piloto, não "future". Separar READ (export único desacopla o início) de WRITE
+> (fecha a 1h + cadastro full). Em negociação com a SMS. Ver `architecture.md §13`.
 
 - [ ] `pull_from_vitacare()` — fetch patients, visits, events → upsert Supabase
 - [ ] `push_to_vitacare()` — flush `visitas_capturadas` → Vitacare API
@@ -204,7 +256,7 @@ clinic_defaults:
 
 ---
 
-## 8. Later / v2
+## 8. Later / v2  `[ROADMAP]`
 
 - [ ] **Geo C5 component** — distance from clinic as optional score factor (config-gated)
 - [ ] **Real-time ACS location** — collect current ACS position for live routing optimization

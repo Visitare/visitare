@@ -18,6 +18,13 @@ Given a clinic and a time period, it:
 
 The app never calls the engine. The engine runs on a schedule and the app reads its output.
 
+> **v1 scope (grill 2026-06-03):** the patient→ACS link is **fixed by the registry
+> microárea** — each ACS owns a fixed micro-territory (~150 families); the engine does
+> **not** reassign patients across ACS. So for the **pilot**, the engine does steps **1, 3,
+> 4 only** (score → order each ACS's own list). **Step 2 (distribute across ACS) and all of
+> §5 — balancing, geo clustering, capacity — are `[ROADMAP]`** (needed only for coverage
+> edge cases: ACS on leave, patient with no microárea). See `architecture.md §0`/§12.
+
 ---
 
 ## 2. Trigger and schedule
@@ -144,6 +151,11 @@ score 61–100 → Alto      (weekly to biweekly)
 
 ## 5. Allocation — distributing patients across ACS
 
+> **`[ROADMAP]` — not in the pilot.** In v1 the patient→ACS assignment comes **fixed from
+> the registry** (microárea), not computed here. The engine only **orders** each ACS's
+> already-fixed list (see §5.4, which stays `[V1]`). §5.1 balancing, §5.2 geo clustering,
+> §5.3 capacity/overflow are roadmap for coverage edge cases. `/to-prd`: build §5.4 only.
+
 After scoring all patients, the engine assigns each patient to one ACS and orders that ACS's list.
 
 This is a **constrained assignment problem** with three objectives:
@@ -167,7 +179,9 @@ Each ACS has a maximum patient count per period, set in the clinic YAML (`patien
 
 Patients that cannot be assigned within capacity limits are marked `status: 'overflow'` and flagged for supervisor review — they are not silently dropped.
 
-### 5.4 Priority ordering within each ACS list
+### 5.4 Priority ordering within each ACS list  `[V1]`
+> This is the only part of §5 that runs in the pilot: order each ACS's fixed list by tier
+> then score. The nearest-neighbor route step (3) is optional polish for v1.
 Once patients are assigned to an ACS, the list is ordered by:
 1. `tier` descending (Alto before Médio before Habitual)
 2. `score` descending within tier

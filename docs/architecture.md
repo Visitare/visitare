@@ -1,13 +1,83 @@
 # Arquitetura — Visitare
 
-> Versão 1.0 — 2026-06-02
+> Versão 1.1 — 2026-06-03 (sessão de grill: cerca de escopo Piloto v1, ver §0)
 > Documento-fonte da arquitetura do sistema. Alimenta geração de tarefas.
 > Complementa: `TODO.md` (o quê fazer), `docs/engine-spec.md` (o motor PRIO-ACS),
 > `docs/prd.md` (produto), `docs/supabase.md` (schema atual).
 >
-> Convenção: blocos marcados **[PROPOSTA]** são decisões recomendadas mas ainda
-> não confirmadas — não gerar tarefas de implementação a partir delas sem aval.
-> Blocos **[EM ABERTO]** são questões para discutir antes de modelar.
+> Convenção de status: **[PROPOSTA]** = decisão recomendada não confirmada (não gerar
+> tarefa sem aval); **[EM ABERTO]** = questão a discutir antes de modelar.
+> Convenção de **escopo** (ver §0): **[V1]** = construir no piloto · **[V1-GATED-SMS]**
+> = construir, mas só vai ao ar quando a SMS/LGPD liberar · **[ROADMAP]** = ideal, não
+> construir na v1.
+
+---
+
+## 0. Escopo — Piloto v1 vs. Ideal  ⚠️ LEIA PRIMEIRO (to-prd / to-issues)
+
+Este documento descreve o **sistema ideal** — a plataforma multi-município white-label.
+Mas a **v1 é o Piloto**: uma única clínica no Rio, provando *"1h/dia salva"* com número.
+A regra que orienta tudo: **mire o ideal, construa só a v1.**
+
+> **Geração de tarefas:** construir **apenas** o que estiver marcado **`[V1]`** ou
+> **`[V1-GATED-SMS]`**. Tratar **`[ROADMAP]`** como contexto/visão — **não** gerar
+> tarefa de implementação a partir dele. Quando uma seção inteira é roadmap, há um
+> banner de escopo no topo dela.
+
+### 0.1 Legenda de escopo
+
+| Tag | Significado | to-prd |
+|---|---|---|
+| `[V1]` | No piloto. Não depende de terceiros. Trilha A (código). | **construir** |
+| `[V1-GATED-SMS]` | No piloto, mas bloqueado por acesso/base-legal da SMS-Rio (Trilha B). Construir o caminho de código; só vai ao ar quando o gate abrir. | **construir + marcar o gate** |
+| `[ROADMAP]` | Visão ideal, fora da v1. | **não construir** |
+
+### 0.2 A régua do piloto (o que define sucesso)
+
+Provar, **com número**, que o Visitare devolve ~1h/dia à ACS (menos re-digitação), em
+**1 clínica · N ACS · M semanas**. Métrica: **mediana de min/dia em digitação de fim de
+expediente, antes vs depois**, + adesão. Sem esse número, o piloto falha
+estrategicamente mesmo funcionando tecnicamente. Implica instrumentar o app (§10) e
+medir um baseline manual **antes** do rollout (Trilha C).
+
+### 0.3 As três trilhas
+
+**Trilha A — Código `[V1]` (começa já, não espera ninguém):**
+1. **App de campo** PWA — lista + ficha + form de captura, offline, **com timestamps**
+   de tempo-em-tarefa (mede o "depois"). §10.
+2. **Engine mínimo** — **só scoring + ordenação da lista fixa de cada ACS.** Microárea é
+   fixa do cadastro; o motor **não realoca** pacientes entre ACS. §12 + engine-spec §5
+   (balanceamento/clustering/capacidade marcados ROADMAP).
+3. **Auth real** — magic-link + senha **entregue por WhatsApp/SMS** (ACS tem baixa
+   literacia digital, muita sem email). JWT carrega `acs_id`/`clinica_id` → RLS. Dropdown
+   sobrevive **só** no modo demo sintético. §5.
+4. **Composição da lista** via `allocations.origin` — cobre (a) crítico sugerido pelo
+   motor e (b) paciente **existente não-crítico** que a ACS visita de passagem. §8.1.
+5. **Supabase** — schema do piloto; `tenant_id` **dormente** (barato), **sem** a
+   maquinaria white-label / RLS de distrito-município ainda.
+
+**Trilha B — SMS / LGPD `[V1-GATED-SMS]` (em paralelo, gate externo que não controlamos):**
+- **Base legal / convênio SMS** → libera o **export único** da carteira real de 1 clínica
+  (bootstrap do dia 1). Desacopla *iniciar o piloto* de *integração ao vivo*. É a forma
+  preferida, mas tem peso LGPD (entrega de PHI real exige base legal).
+- **Vitacare READ ao vivo** → upgrade do export único para sync contínuo.
+- **Vitacare WRITE** → **o pivô.** Destrava de uma vez: (1) fechar o loop da
+  re-digitação (a 1h) e (2) **cadastramento full** de paciente novo (caso c — *completo
+  ou nada*, sem pré-cadastro leve). Stopgap enquanto a API oficial não vem: **extensão
+  Chrome** auto-preenchendo o Vitacare na LAN da clínica.
+
+**Trilha C — Medição (ops, pré-rollout):**
+- **Baseline manual:** sombrear as ACS do piloto **1-2 semanas antes** de implantar, pra
+  capturar o "antes" da re-digitação. Se não medir agora, some.
+- Métrica escrita conforme §0.2.
+
+### 0.4 Fora da v1 (o ideal, `[ROADMAP]`)
+
+White-label / editor de tema (§7) · dashboard do gestor (§8) · indicadores Previne Brasil
+(§8.3) · mobile Expo (§11) · site/blog Astro (§9) · realocação entre ACS, balanceamento,
+clustering geográfico e `patient_cap` (engine-spec §5) · RLS de distrito/município/admin
+(§5.2 além de ACS + gestor de clínica) · ConecteSUS/gov.br (§13) · cadastramento sem
+canal Vitacare. **Tudo documentado, nada construído na v1.**
 
 ---
 
@@ -147,6 +217,11 @@ municipio  →  distrito (Área Programática / CAP)  →  clinica (equipe)  →
 
 ### 5.2 Os 4 níveis de role
 
+> **Escopo:** na **v1** só existem **ACS** + **gestor_clinica** (`[V1]`). Distrito,
+> municipal e `visitare_admin` são `[ROADMAP]` — a hierarquia inteira fica documentada,
+> mas a RLS do piloto cobre só os dois primeiros níveis. Auth da v1: magic-link + senha
+> via WhatsApp/SMS (§0.3), **não** o dropdown (que vira só modo demo).
+
 Toda query de escopo vem do **claim no JWT**, nunca do cliente. RLS compara o claim
 à coluna correspondente:
 
@@ -196,6 +271,11 @@ Por isso a escala do Rio **não força o Next** (§4.1): o peso mora no banco.
 ---
 
 ## 7. White-label / motor de temas
+
+> **`[ROADMAP]` — seção inteira fora da v1.** O piloto é uma clínica do Rio: marca única,
+> sem editor de tema, sem `tenants.theme` ao vivo. A coluna `tenant_id` nasce **dormente**
+> (§0.3) para não exigir migração depois, mas a maquinaria de theming/admin não se constrói
+> agora. Documentado como visão; `/to-prd` não gera tarefa daqui.
 
 O Visitare é **um app** que cada cliente veste. A ideia **não** é fazer release de
 N apps — é um app que se adapta por configuração lida do backend.
@@ -297,6 +377,11 @@ de propósito.
 
 ## 8. Painel do gestor (`dashboard/`)
 
+> **Escopo misto — ler com atenção:** o **app `dashboard/` em si é `[ROADMAP]`** (não se
+> constrói na v1). Mas **§8.1 (origem/propriedade da lista, campo `origin`) é `[V1]`** —
+> é regra de dados do **motor + app de campo**, não do painel, e o piloto depende dela.
+> §8.2 (pull manual) e §8.3 (Previne Brasil) são `[ROADMAP]`.
+
 App React/Vite separado, desktop, online, white-label. Funcionalidades por role:
 
 **Gestor de clínica** (5–10 ACS):
@@ -317,7 +402,7 @@ cross-tenant; editor de white-label (§7.6).
 Itens de relatório saem de materialized views (§6.2). Export PDF/Excel via Edge
 Function.
 
-### 8.1 A lista é orientação, não meta — propriedade e origem
+### 8.1 A lista é orientação, não meta — propriedade e origem  `[V1]`
 
 O motor **gera** a lista, mas ela é editável depois: o gestor pode sobrescrever,
 alterar, reduzir ou aumentar conforme a necessidade. No futuro, a própria ACS poderá
@@ -343,6 +428,23 @@ Regra do motor no re-run (detalhe em `engine-spec.md §6`):
 
 Assim a lista é um **briefing** (consistente com `prd.md §5`): o motor sugere, humano
 decide, e a decisão humana é soberana sobre a sugestão.
+
+**Três casos de entrada na lista — não confundir (escopo difere):**
+
+| Caso | O que é | `origin` | Escopo |
+|---|---|---|---|
+| **(a)** | Paciente crítico **sugerido pelo motor** | `engine` | `[V1]` |
+| **(b)** | Paciente **existente, não-crítico**, que a ACS visita de passagem (busca por nome / nome+nascimento na carteira) | `acs`/`gestor` | `[V1]` |
+| **(c)** | **Cadastrar gente nova** que **não existe** no cadastro ainda | `acs` + novo `pacientes` | `[V1-GATED-SMS]` |
+
+Casos (a) e (b) são o **mesmo fluxo** "visita + form" e entram na v1. O caso (c) é
+**cadastramento de novo paciente** — função-núcleo da ACS (a volumetria §6.1 conta
+~15 cadastros/semana), mas **não modelado** no fluxo do app (§10 só lê `allocations` e
+escreve `visitas_capturadas`). Decisão do grill: cadastro novo **depende do canal Vitacare**
+e, se existir, é **full** (paciente real + dedup nome+nascimento + escrita no Vitacare) —
+**sem pré-cadastro leve**, porque meio-cadastro que o gestor refaz é o trabalho-dobrado
+que o produto existe pra matar. Um cadastro que não chega ao Vitacare é registro órfão;
+por isso (c) é `[V1-GATED-SMS]`, atrelado ao mesmo gate do write-back.
 
 ### 8.2 Atualização do painel — pull manual com cooldown
 
@@ -386,6 +488,9 @@ quem está **abaixo da meta** de cada indicador.
 
 ## 9. Site (`site/`, Astro)
 
+> **`[ROADMAP]` — fora da v1.** Marketing/blog não é caminho crítico do piloto. A
+> `landing/` atual já cobre a demo. Documentado; `/to-prd` não gera tarefa daqui.
+
 Marca **Visitare** (nova identidade em construção — fontes/cores próprias,
 distintas do tema dos apps). Porta a LP de `landing/` (8 seções, ver
 `landing/landingpage.md`) para componentes Astro.
@@ -410,10 +515,17 @@ CTA do site → `<muni>.app.visitare.app` (ou tela de seleção de município).
 
 ---
 
-## 10. App de campo (`app/`, React/Vite PWA)
+## 10. App de campo (`app/`, React/Vite PWA)  `[V1]`
+
+> **É o coração da v1.** Único frontend que se constrói no piloto.
 
 Já existe. Stack: React 19, Vite 8, react-router 7, Tailwind 4, `vite-plugin-pwa`+
 `workbox`, **Dexie** (cache offline), **Leaflet** (mapa), `supabase-js`.
+
+> **Requisito novo da v1 — instrumentação de tempo (§0.2):** o app precisa carimbar
+> timestamps de tempo-em-tarefa (abertura da visita → submit do form) para que o piloto
+> compute o "depois" da métrica de 1h/dia automaticamente. `visitas_capturadas` nasce com
+> esses campos. Sem isso, não há como provar a economia de tempo com número.
 
 - **Lê:** `allocations` (sua lista do período, ordenada por `priority_order`) — uma
   vez no início do período, cacheada no Dexie. Ver `engine-spec.md §7`.
@@ -427,7 +539,10 @@ Pendências em `TODO.md §4` (corrigir env Supabase, migrar para ler de `allocat
 
 ---
 
-## 11. Mobile (`mobile/`, Expo)
+## 11. Mobile (`mobile/`, Expo)  `[ROADMAP]`
+
+> **Fora da v1.** O PWA (§10) cobre o piloto inteiro, inclusive o "ícone do município"
+> (§7.5). Nativo só quando houver razão de App Store. `/to-prd` não gera tarefa daqui.
 
 Track nativo futuro. Espelha o PWA: 5 telas (Lista, Paciente, Visita, Selecionar ACS,
 Supervisor), mesmo Supabase, AsyncStorage offline, EAS Build. White-label dinâmico no
@@ -444,6 +559,15 @@ Serviço de **alocação em batch** (não é API por request). Roda em cron por 
 ACS com balanceamento de carga e clustering geográfico, e escreve a `allocations`. O
 app só lê. Repo: `rafaelbressan/prio-acs-engine`, FastAPI, deploy Railway. Patente no
 INPI.
+
+> **Escopo v1 (decisão do grill):** o vínculo paciente→ACS é **fixo pela microárea do
+> cadastro** — a ACS é dona de uma microárea (~150 famílias) e o motor **não realoca**
+> ninguém entre ACS. Logo, na v1 o motor é **`[V1]` só para scoring + ordenação da lista
+> própria de cada ACS**. **Distribuição entre ACS, balanceamento, clustering geográfico e
+> `patient_cap` são `[ROADMAP]`** (úteis só para casos de cobertura: ACS de licença,
+> paciente novo sem microárea). Ver engine-spec §5, marcada ROADMAP. O valor do piloto
+> (1h/dia) vem da **captura + write-back**, não da qualidade da alocação — então cortar a
+> alocação não corta músculo.
 
 ---
 
@@ -470,6 +594,19 @@ Apps (PWA / dashboard / Expo) — leem Supabase direto (anon key + JWT + RLS)
 Ponte de volta ao Vitacare (sem API pública conhecida): (A) extensão Chrome na LAN,
 (B) API oficial via SMS-Rio, (C) relay local. Hoje simulado
 (`sincronizado_vitacare=false`). Ver `architecture` histórico e `prd.md §4.5`.
+
+> **Decompor Vitacare em READ vs WRITE (decisão do grill) — tudo `[V1-GATED-SMS]`:**
+> O acesso está **em negociação com a SMS-Rio**; o caminho crítico de código (Trilha A)
+> **não pode hard-blockar** nisso. Separar:
+> - **READ — bootstrap do dia 1:** preferir um **export único** (snapshot da carteira real
+>   de 1 clínica) a esperar o sync ao vivo. Desacopla *iniciar o piloto* de *integração
+>   contínua*. Tem peso LGPD (entrega de PHI real exige base legal/convênio) — pode rolar
+>   **antes** do sync total. Sync Vitacare ao vivo é o upgrade.
+> - **WRITE — o pivô:** destrava (1) fechar o loop da re-digitação (a 1h) e (2)
+>   cadastramento full (§8.1 caso c). Stopgap: **extensão Chrome** na LAN enquanto a API
+>   oficial não vem.
+> Os parquets anonimizados (`data/`) servem só ao desenvolvimento/demo — **não** dá pra
+> visitar paciente anonimizado, então o piloto **exige** a carteira real (export ou sync).
 
 ---
 
@@ -510,6 +647,24 @@ extensão/API; + cert pinning e pen test antes do piloto.
 | 6 | Indicadores Previne Brasil no painel | ✅ feature-âncora [ROADMAP]; mapeado §8.3 |
 | 7 | Identidade visual nova do Visitare (site) | em construção pelo Rafael |
 | 8 | Questões matemáticas do motor | ver `engine-spec.md §9` |
+
+### 15.1 Decisões da sessão de grill (2026-06-03) — definem o escopo da v1
+
+| # | Tema | Decisão |
+|---|---|---|
+| 9 | **Milestone da v1** | ✅ **Piloto de 1 clínica no Rio** provando "1h/dia salva" com número. Plataforma/white-label/dashboard/mobile/site → `[ROADMAP]`. Ver §0. |
+| 10 | Vínculo paciente→ACS | ✅ **Fixo pela microárea** do cadastro; motor **não realoca**. v1 = score+order. Balanceamento/clustering = `[ROADMAP]`. §12 + engine-spec §5. |
+| 11 | Autenticação da v1 | ✅ **Magic-link + senha via WhatsApp/SMS** (baixa literacia digital da ACS). Dropdown só demo. ConecteSUS = `[ROADMAP]`. §5.2. |
+| 12 | Cadastramento de novo paciente (caso c) | ✅ `[V1-GATED-SMS]`; se existir, é **full** (sem pré-cadastro leve), atrelado ao canal Vitacare. §8.1. |
+| 13 | Acesso Vitacare | ✅ Em negociação SMS. Separar **READ** (export único desacopla início; LGPD-gated) de **WRITE** (pivô; stopgap extensão Chrome). Não hard-blocka a Trilha A. §13. |
+| 14 | Métrica de sucesso do piloto | ✅ **Baseline manual (sombreamento pré-rollout) + app instrumentado** com timestamps. §0.2, §10. |
+| 15 | Bootstrap de dados do dia 1 | ✅ Preferir **export único** da carteira real de 1 clínica (LGPD-gated) a esperar sync ao vivo. §13. |
+
+### 15.2 Ainda em aberto (não grelhado)
+
+- **Quem constrói** — quantos full-time dos 5 do hackathon? Bound de cronograma/escopo.
+- **Conflito offline** — multi-device por ACS; para o piloto, assumir **1 device por ACS**
+  e diferir o resto.
 
 Itens [EM ABERTO] precisam de decisão de produto antes de modelar.
 ```
