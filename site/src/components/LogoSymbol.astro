@@ -1,0 +1,38 @@
+---
+interface Props {
+  /** px altura — largura calculada pela proporção 100.33:142.39 */
+  height?: number;
+  variant?: 'dark' | 'light';
+  class?: string;
+}
+
+const { height = 28, variant = 'dark', class: cls = '' } = Astro.props;
+const width = Math.round((height * 100.33) / 142.39);
+
+// Versão 'dark': fundo escuro (nav/footer teal-dark) — frame mint 55% + porta ivory
+// Versão 'light': fundo claro — frame mint sólido + porta teal (estados da marca)
+const frameFill = variant === 'dark' ? 'rgba(131,197,190,0.55)' : '#83C5BE';
+const doorFill  = variant === 'dark' ? '#FFFEF1'                 : '#006D77';
+---
+<!--
+  Coordenadas do visitare-symbol.svg (100.33 × 142.39).
+  .door-anim é o seletor do logo-animation.ts.
+-->
+<svg
+  class={`logo-symbol block shrink-0 ${cls}`}
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 100.33 142.39"
+  width={width}
+  height={height}
+>
+  <polygon
+    fill={frameFill}
+    points="20.73,41.74 20.73,34.23 27.23,30.48 80.02,0 0,0 0,100.33 20.73,100.33 20.73,41.74"
+  />
+  <polygon
+    class="door-anim"
+    fill={doorFill}
+    points="100.33,103.94 100.33,3.28 33.73,41.74 33.73,142.39"
+  />
+</svg>

@@ -1,0 +1,49 @@
+---
+import SectionLabel from './SectionLabel.astro';
+---
+<section id="motor" class="py-22 border-t border-surface-container">
+  <div class="max-w-[1100px] mx-auto px-6">
+    <SectionLabel number="03" label="Motor de priorização" />
+    <h2 class="font-semibold mt-3.5 mb-8 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
+      A Claudia não decide sozinha. Ela tem um motor.
+    </h2>
+
+    <div class="grid grid-cols-2 gap-12 items-start max-md:grid-cols-1 max-md:gap-8">
+
+      <div class="space-y-[18px]">
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          O Visitare calcula automaticamente um score de risco para cada paciente com base em critérios clínicos reais do protocolo SUS: gestante, hipertenso, diabético, idoso, visita atrasada, passagem recente por urgência.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Quem tem score alto aparece no topo da lista. O score é recalculado em tempo real — cada visita registrada reorganiza a fila.
+        </p>
+        <div class="bg-primary-dark text-white rounded-lg p-5 mt-2 text-[15px] font-medium leading-[1.6] border-l-[3px] border-secondary">
+          <em class="not-italic text-secondary font-semibold">"A Claudia decide a ordem final."</em><br />
+          O motor é insumo, nunca comando. Determinístico, auditável, construído sobre as portarias do Ministério da Saúde.
+        </div>
+      </div>
+
+      <!-- Legenda de fatores -->
+      <div class="border border-surface-container-high rounded-lg overflow-hidden bg-white shadow-sm">
+        <div class="bg-primary-dark text-white px-[18px] py-3 font-mono text-[11px] tracking-[0.1em] uppercase font-semibold flex justify-between">
+          <span>Fatores do score</span>
+        </div>
+        {[
+          { pill: 'pill-gest', dot: '#C3306E', bg: '#FBE7F0', color: '#A21B59', label: 'Fase de vida vulnerável' },
+          { pill: 'pill-cron', dot: '#006D77', bg: '#EDF6F9', color: '#00565E', label: 'Carga crônica' },
+          { pill: 'pill-vuln', dot: '#C87A2A', bg: '#FBEEDA', color: '#8A4A09', label: 'Vulnerabilidade social' },
+          { pill: 'pill-gap',  dot: '#C66B4F', bg: '#EAAFA0', color: '#5A2616', label: 'Gap de cuidado / urgência' },
+        ].map((f, i) => (
+          <div class="grid gap-3.5 items-center px-[18px] py-3.5 border-b border-surface-container last:border-b-0" style="grid-template-columns: 32px 1fr">
+            <span class="font-mono font-semibold text-on-primary bg-primary rounded text-center py-0.5 text-xs">{i + 1}</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12.5px] font-semibold" style={`background:${f.bg};color:${f.color}`}>
+              <span class="w-2 h-2 rounded-full inline-block shrink-0" style={`background:${f.dot}`}></span>
+              {f.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</section>

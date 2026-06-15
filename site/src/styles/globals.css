@@ -1,0 +1,112 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────
+   DESIGN TOKENS — fonte única: /DESIGN.md
+   Usados aqui (Astro/LP) e em /frontend (PWA).
+   Altere aqui → reflete em todo o sistema.
+   ───────────────────────────────────────────── */
+@theme {
+  /* Tipografia */
+  --font-sans:    "Prompt", system-ui, sans-serif;
+  --font-heading: "Prompt", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", monospace;
+
+  /* Primary — teal (ação, marca, confiança) */
+  --color-primary:      #006D77;
+  --color-primary-dark: #00565E;
+  --color-on-primary:   #FFFEF1;
+
+  /* Secondary — mint (sustenta, preenche) */
+  --color-secondary:              #83C5BE;
+  --color-on-secondary:           #13272A;
+  --color-secondary-container:    #C9E6E2;
+  --color-on-secondary-container: #13403C;
+
+  /* Tertiary — coral (acento de marca, acolhimento) */
+  --color-tertiary:              #C66B4F;
+  --color-on-tertiary:           #2B0F07;
+  --color-tertiary-container:    #EAAFA0;
+  --color-on-tertiary-container: #5A2616;
+
+  /* Superfícies */
+  --color-surface:                #FAF9F6;
+  --color-surface-container:      #EDF6F9;
+  --color-surface-container-high: #DDEBEF;
+  --color-on-surface:             #13272A;
+  --color-on-surface-variant:     #36454F;
+
+  /* Urgência / erro (vermelho ≠ coral) */
+  --color-error:              #C62828;
+  --color-on-error:           #FFFEF1;
+  --color-error-container:    #F7D6D2;
+  --color-on-error-container: #5A1410;
+  --color-error-strong:       #B42318;
+
+  /* Contexto: subtle (fundo) + strong (texto/borda) */
+  --color-success-subtle: #E7F4EA;
+  --color-success-strong: #1F7A33;
+  --color-warning-subtle: #FBEEDA;
+  --color-warning-strong: #8A4A09;
+  --color-info-subtle:    #E4F0FB;
+  --color-info-strong:    #0369A1;
+
+  /* Raios */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+}
+
+/* ─────────────────────────────────────────────
+   ALIASES para CossUI / shadcn CLI
+   Componentes copiados via `shadcn add @coss/ui`
+   esperam esses nomes. Apontam para os tokens acima.
+   ───────────────────────────────────────────── */
+:root {
+  /* Espaçamentos semânticos (como CSS vars, não como utils Tailwind) */
+  --spacing-xxs:  2px;
+  --spacing-xs:   4px;
+  --spacing-sm:   12px;
+  --spacing-md:   16px;
+  --spacing-lg:   24px;
+  --spacing-xl:   40px;
+  --spacing-xxl:  64px;
+  --spacing-xxxl: 96px;
+
+  /* Aliases CossUI / shadcn */
+  --background:           var(--color-surface);
+  --foreground:           var(--color-on-surface);
+  --primary:              var(--color-primary);
+  --primary-foreground:   var(--color-on-primary);
+  --secondary:            var(--color-secondary);
+  --secondary-foreground: var(--color-on-secondary);
+  --destructive:          var(--color-error);
+  --muted:                var(--color-surface-container);
+  --muted-foreground:     var(--color-on-surface-variant);
+  --accent:               var(--color-tertiary);
+  --accent-foreground:    var(--color-on-tertiary);
+  --border:               var(--color-surface-container-high);
+  --input:                var(--color-surface-container);
+  --ring:                 var(--color-primary);
+}
+
+/* ─────────────────────────────────────────────
+   BASE GLOBAL
+   ───────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+    background-image:
+      linear-gradient(rgba(0,109,119,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,109,119,.025) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}

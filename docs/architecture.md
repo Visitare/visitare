@@ -491,9 +491,10 @@ quem está **abaixo da meta** de cada indicador.
 > **`[ROADMAP]` — fora da v1.** Marketing/blog não é caminho crítico do piloto. A
 > `landing/` atual já cobre a demo. Documentado; `/to-prd` não gera tarefa daqui.
 
-Marca **Visitare** (nova identidade em construção — fontes/cores próprias,
-distintas do tema dos apps). Porta a LP de `landing/` (8 seções, ver
-`landing/landingpage.md`) para componentes Astro.
+Marca **Visitare** (identidade fechada em `DESIGN.md` na raiz — teal+coral, fonte
+Prompt; ver §15.2). A marca Visitare é própria, distinta do tema branco-rotulado
+de cada tenant. Porta a LP de `landing/` (8 seções, ver `landing/landingpage.md`)
+para componentes Astro, aplicando os tokens do `DESIGN.md`.
 
 **Blog:** Astro Content Collections — artigos em markdown em `src/content/blog/*.md`,
 com layout próprio e índice. Para publicar conteúdo (casos, resultados, institucional)
@@ -645,7 +646,7 @@ extensão/API; + cert pinning e pen test antes do piloto.
 | 4 | Atualização do painel ("horas em atividade") | ✅ pull manual + cooldown 1 min §8.2 |
 | 5 | Gestor/ACS editam a lista do motor | ✅ lista é orientação editável; campo `origin` §8.1 |
 | 6 | Indicadores Previne Brasil no painel | ✅ feature-âncora [ROADMAP]; mapeado §8.3 |
-| 7 | Identidade visual nova do Visitare (site) | em construção pelo Rafael |
+| 7 | Identidade visual nova do Visitare (site) | ✅ fechada 2026-06-05 — marca teal+coral em `DESIGN.md` (raiz). Ver nota abaixo. |
 | 8 | Questões matemáticas do motor | ver `engine-spec.md §9` |
 
 ### 15.1 Decisões da sessão de grill (2026-06-03) — definem o escopo da v1
@@ -660,7 +661,31 @@ extensão/API; + cert pinning e pen test antes do piloto.
 | 14 | Métrica de sucesso do piloto | ✅ **Baseline manual (sombreamento pré-rollout) + app instrumentado** com timestamps. §0.2, §10. |
 | 15 | Bootstrap de dados do dia 1 | ✅ Preferir **export único** da carteira real de 1 clínica (LGPD-gated) a esperar sync ao vivo. §13. |
 
-### 15.2 Ainda em aberto (não grelhado)
+### 15.2 Identidade visual fechada (2026-06-05) — decisão #7
+
+Marca **Visitare = teal + coral**, formalizada em **`DESIGN.md`** na raiz do repo
+(formato [DESIGN.md](https://github.com/google-labs-code/design.md) do Google Labs:
+tokens YAML + prosa). O `DESIGN.md` é **fonte-mestra**: a marca Visitare **e** a
+base técnica do theming — cada tenant white-label (§7.3/§7.7) herda tudo e
+sobrescreve **apenas** os tokens de `colors`.
+
+- **Referência de marca:** *a visita domiciliar de saúde — a porta que se abre para
+  receber o cuidado* (Visitare = "visitar" em latim; aconchego/acolhimento).
+- **Dinâmica de cor:** teal `#006D77` age · mint `#83C5BE` sustenta · coral
+  `#C66B4F` acentua · **vermelho `#C62828` = urgência** (separado do coral; tier
+  ALTO é vermelho, nunca a cor de marca). Surfaces ivory `#FFFEF1` + azul pálido
+  `#EDF6F9`; tinta teal-charcoal `#13272A` (sem preto puro).
+- **Tipografia:** Prompt (Google Fonts) + IBM Plex Mono (dados/timestamps §0.2/§10).
+- **Validação:** lint do `@google/design.md` limpo (0 erros/warnings, contraste
+  WCAG AA em todos os pares). Export Tailwind v4 → `frontend/src/theme.css`.
+- **Artefatos:** `DESIGN.md` (fonte) · `frontend/src/theme.css` (gerado) ·
+  `landing/brand-system/visitare-brand.html` (style-guide/documentação) ·
+  espelho no Obsidian (`Projects/Claude Impact Lab - Visitare/`).
+
+> Atualiza a §9: a marca não está mais "em construção" — está fechada no `DESIGN.md`.
+> O que resta é **aplicar** (portar a `landing/` e o `app/` para os tokens).
+
+### 15.3 Ainda em aberto (não grelhado)
 
 - **Quem constrói** — quantos full-time dos 5 do hackathon? Bound de cronograma/escopo.
 - **Conflito offline** — multi-device por ACS; para o piloto, assumir **1 device por ACS**

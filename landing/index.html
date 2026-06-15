@@ -3,105 +3,121 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ACS Digital — O copiloto do agente comunitário de saúde</title>
+<title>Visitare — O copiloto do Agente Comunitário de Saúde</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<meta name="description" content="ACS Digital coloca a ficha clínica, a lista de visitas e o histórico do paciente direto no celular do agente comunitário de saúde. Menos papelada. Mais cuidado.">
+<meta name="description" content="Visitare coloca a ficha clínica, a lista de visitas e o histórico do paciente direto no celular do agente comunitário de saúde. Menos papelada. Mais cuidado.">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://acs-digital.vercel.app/">
-<meta property="og:title" content="ACS Digital — O copiloto do agente comunitário de saúde">
+<meta property="og:url" content="https://visitare.app/">
+<meta property="og:title" content="Visitare — O copiloto do Agente Comunitário de Saúde">
 <meta property="og:description" content="6.200 agentes comunitários no Rio de Janeiro recuperam 1h por dia de burocracia. Ficha clínica no celular, lista priorizada por risco, sync direto com a clínica.">
-<meta property="og:image" content="https://acs-digital.vercel.app/og-image.png">
+<meta property="og:image" content="https://visitare.app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ACS Digital — O copiloto do agente comunitário de saúde">
+<meta name="twitter:title" content="Visitare — O copiloto do Agente Comunitário de Saúde">
 <meta name="twitter:description" content="6.200 agentes comunitários no Rio de Janeiro recuperam 1h por dia de burocracia. Ficha clínica no celular, lista priorizada por risco, sync direto com a clínica.">
-<meta name="twitter:image" content="https://acs-digital.vercel.app/og-image.png">
+<meta name="twitter:image" content="https://visitare.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Prompt:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+  /* ── DESIGN TOKENS (fonte: DESIGN.md) ── */
   :root {
-    --navy:     #173C72;
-    --navy-deep:#0E2B55;
-    --blue:     #0B57C2;
-    --blue-tint:#E7EEF8;
-    --blue-line:#C5D5EE;
-    --coral:    #F26849;
-    --coral-deep:#C9472C;
-    --coral-tint:#FDEAE2;
-    --coral-soft:#FFC9BC;
-    --amber:    #E8920C;
-    --sun-tint: #FBEFD3;
-    --red:      #D6443C;
-    --red-tint: #FBE6E5;
-    --required: #FBF1CC;
-    --ink:      #15203A;
-    --ink-2:    #3C4A66;
-    --muted:    #6B7790;
-    --paper:    #F4F6FB;
-    --surface:  #FFFFFF;
-    --line:     #DCE3EF;
-    --line-soft:#E9EDF5;
-    --radius:   14px;
-    --radius-sm:9px;
-    --shadow:   0 1px 2px rgba(14,43,85,.05), 0 12px 30px -18px rgba(14,43,85,.30);
-    --shadow-sm:0 1px 2px rgba(14,43,85,.06), 0 6px 16px -12px rgba(14,43,85,.24);
+    /* Cores */
+    --primary:            #006D77;
+    --primary-dark:       #00565E;
+    --on-primary:         #FFFEF1;
+    --secondary:          #83C5BE;
+    --on-secondary:       #13272A;
+    --secondary-container:#C9E6E2;
+    --tertiary:           #C66B4F;
+    --on-tertiary:        #2B0F07;
+    --tertiary-container: #EAAFA0;
+    --tertiary-soft:      #E8C4B8;
+    --surface:            #FAF9F6;
+    --surface-container:  #EDF6F9;
+    --surface-container-high: #DDEBEF;
+    --on-surface:         #13272A;
+    --on-surface-variant: #36454F;
+    --muted:              #5E7177;
+    --error:              #C62828;
+    --error-container:    #F7D6D2;
+    --on-error-container: #5A1410;
+    --warning-subtle:     #FBEEDA;
+    --warning-strong:     #8A4A09;
+    --border:             #DDEBEF;
+    --border-soft:        #EDF6F9;
+    /* Raios */
+    --radius-sm: 6px;
+    --radius:    14px;
+    --radius-xl: 20px;
+    /* Sombras (tint teal) */
+    --shadow:    0 1px 2px rgba(0,86,94,.05), 0 12px 30px -18px rgba(0,86,94,.25);
+    --shadow-sm: 0 1px 2px rgba(0,86,94,.06), 0 6px 16px -12px rgba(0,86,94,.18);
   }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    font-family: "IBM Plex Sans", system-ui, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
+    font-family: "Prompt", system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--on-surface);
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
     background-image:
-      linear-gradient(rgba(23,60,114,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(23,60,114,.03) 1px, transparent 1px);
+      linear-gradient(rgba(0,109,119,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,109,119,.025) 1px, transparent 1px);
     background-size: 28px 28px;
   }
   .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-  section { padding: 88px 0; border-top: 1px solid var(--line-soft); }
+  section { padding: 88px 0; border-top: 1px solid var(--border-soft); }
   .mono { font-family: "IBM Plex Mono", monospace; }
 
-  /* ── WORDMARK ── */
-  .wm { display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1; }
-  .wm .wm-acs { font-weight: 700; letter-spacing: -.03em; line-height: .85; color: var(--navy); }
-  .wm .wm-dig { font-family: "IBM Plex Mono"; font-weight: 600; letter-spacing: .26em; margin-top: .42em; color: var(--coral-deep); }
-  .wm.inv .wm-acs { color: #fff; }
-  .wm.inv .wm-dig { color: var(--coral-soft); }
-
   /* ── SECTION LABEL ── */
-  .mono-label { display: inline-flex; align-items: center; gap: 10px; font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; font-weight: 600; color: var(--navy); }
-  .mono-label .nbox { color: #fff; background: var(--navy); padding: 2px 8px; border-radius: 4px; letter-spacing: .05em; }
-  h2.sec { font-weight: 600; font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; margin: 14px 0 12px; letter-spacing: -.02em; color: var(--navy); }
-  .sec-sub { color: var(--ink-2); max-width: 60ch; font-size: 17px; margin: 0 0 40px; line-height: 1.65; }
+  .mono-label {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .13em;
+    text-transform: uppercase; font-weight: 600; color: var(--primary);
+  }
+  .mono-label .nbox {
+    color: var(--on-primary); background: var(--primary);
+    padding: 2px 8px; border-radius: 4px; letter-spacing: .05em;
+  }
+  h2.sec {
+    font-weight: 600; font-size: clamp(26px, 3.2vw, 38px);
+    line-height: 1.1; margin: 14px 0 12px; letter-spacing: -.02em; color: var(--primary-dark);
+  }
+  .sec-sub { color: var(--on-surface-variant); max-width: 60ch; font-size: 17px; margin: 0 0 40px; line-height: 1.65; }
 
   /* ── BUTTONS ── */
   .btn-primary {
     display: inline-flex; align-items: center; gap: 10px;
-    background: var(--coral); color: #fff; border: none; border-radius: 11px;
-    padding: 16px 32px; font-weight: 600; font-size: 16px; font-family: "IBM Plex Sans";
-    cursor: pointer; text-decoration: none;
-    box-shadow: 0 10px 28px -10px rgba(242,104,73,.6);
-    transition: transform .15s, box-shadow .15s;
+    background: var(--primary); color: var(--on-primary); border: none;
+    border-radius: var(--radius); padding: 16px 32px; font-weight: 600;
+    font-size: 16px; font-family: "Prompt"; cursor: pointer; text-decoration: none;
+    box-shadow: 0 10px 28px -10px rgba(0,109,119,.5);
+    transition: transform .15s, box-shadow .15s, background .15s;
   }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -10px rgba(242,104,73,.7); }
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px); box-shadow: 0 14px 32px -10px rgba(0,109,119,.6);
+  }
   .btn-secondary {
     display: inline-flex; align-items: center; gap: 10px;
-    background: transparent; color: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.3);
-    border-radius: 11px; padding: 15px 28px; font-weight: 500; font-size: 15px;
-    font-family: "IBM Plex Sans"; cursor: pointer; text-decoration: none;
+    background: transparent; color: rgba(255,255,255,.9);
+    border: 1px solid rgba(255,255,255,.3); border-radius: var(--radius);
+    padding: 15px 28px; font-weight: 500; font-size: 15px;
+    font-family: "Prompt"; cursor: pointer; text-decoration: none;
     transition: background .15s, border-color .15s;
   }
   .btn-secondary:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.5); }
 
   /* ── NAV ── */
   nav {
-    background: var(--navy-deep); border-bottom: 2px solid var(--coral);
+    background: var(--primary-dark);
+    border-bottom: 2px solid var(--secondary);
     padding: 14px 0; position: sticky; top: 0; z-index: 100;
   }
   nav .wrap { display: flex; align-items: center; justify-content: space-between; }
@@ -109,22 +125,33 @@
   nav a.nav-link { font-size: 13px; color: rgba(255,255,255,.7); text-decoration: none; font-weight: 500; transition: color .15s; }
   nav a.nav-link:hover { color: #fff; }
   .nav-demo {
-    font-size: 13px; font-weight: 600; font-family: "IBM Plex Sans";
-    background: var(--coral); color: #fff; border: none; border-radius: 8px;
-    padding: 8px 18px; cursor: pointer; text-decoration: none;
+    font-size: 13px; font-weight: 600; font-family: "Prompt";
+    background: var(--tertiary); color: var(--on-primary); border: none;
+    border-radius: 8px; padding: 8px 18px; cursor: pointer; text-decoration: none;
     transition: opacity .15s;
   }
   .nav-demo:hover { opacity: .88; }
 
+  /* ── LOGO LOCKUP (nav + footer) ── */
+  .logo-lockup {
+    display: inline-flex; align-items: center; gap: 14px;
+    text-decoration: none; cursor: default; line-height: 1;
+  }
+  .logo-symbol { flex-shrink: 0; display: block; }
+  .logo-wordmark {
+    font-family: "Prompt"; font-weight: 600; letter-spacing: -.01em;
+    color: var(--on-primary);
+  }
+
   /* ── HERO ── */
   .hero {
-    background: linear-gradient(158deg, #0E2B55 0%, #173C72 55%, #1E54A8 100%);
+    background: linear-gradient(158deg, #00565E 0%, #006D77 55%, #007B85 100%);
     color: #fff; position: relative; overflow: hidden;
     padding: 80px 0 88px; border-top: none;
   }
   .hero::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(700px 350px at 90% 0%, rgba(242,104,73,.25), transparent 60%);
+    background: radial-gradient(700px 350px at 90% 0%, rgba(198,107,79,.22), transparent 60%);
   }
   .hero .wrap { position: relative; z-index: 2; }
   .hero-badge {
@@ -137,7 +164,7 @@
     font-weight: 600; font-size: clamp(36px, 5.2vw, 60px); line-height: 1.05;
     letter-spacing: -.03em; margin: 0 0 22px; max-width: 16ch;
   }
-  .hero h1 em { font-style: normal; color: var(--coral-soft); }
+  .hero h1 em { font-style: normal; color: var(--tertiary-soft); }
   .hero .lede {
     font-size: clamp(16px, 1.8vw, 19px); max-width: 50ch; color: rgba(255,255,255,.88);
     margin: 0 0 40px; line-height: 1.65;
@@ -157,120 +184,138 @@
   .impact-grid .num small { font-size: .46em; font-weight: 500; opacity: .75; letter-spacing: 0; }
   .impact-grid .lab { font-size: 13px; color: rgba(255,255,255,.78); margin-top: 10px; line-height: 1.45; }
 
-  /* ── CLAUDIA / PROBLEM ── */
+  /* ── PROBLEMA / CLAUDIA ── */
   .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
-  .problem-text p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 18px; }
+  .problem-text p { font-size: 17px; color: var(--on-surface-variant); line-height: 1.75; margin-bottom: 18px; }
   .problem-text p:last-child { margin-bottom: 0; }
-  .problem-text p strong { color: var(--ink); font-weight: 600; }
+  .problem-text p strong { color: var(--on-surface); font-weight: 600; }
   .callout {
-    background: var(--surface); border: 1px solid var(--line);
-    border-left: 4px solid var(--coral); border-radius: var(--radius);
+    background: #fff; border: 1px solid var(--border);
+    border-left: 4px solid var(--tertiary); border-radius: var(--radius);
     padding: 28px; box-shadow: var(--shadow-sm);
   }
-  .callout .c-label { font-family: "IBM Plex Mono"; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
-  .callout .c-name { font-size: 24px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .callout .c-label {
+    font-family: "IBM Plex Mono"; font-size: 10px; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+  }
+  .callout .c-name { font-size: 24px; font-weight: 600; color: var(--primary-dark); margin-bottom: 4px; }
   .callout .c-role { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
   .callout .c-stat { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
-  .callout .c-stat .s-num { font-family: "IBM Plex Mono"; font-size: 32px; font-weight: 600; color: var(--coral-deep); line-height: 1; }
-  .callout .c-stat .s-desc { font-size: 14px; color: var(--ink-2); line-height: 1.4; }
-  .callout .c-divider { border: none; border-top: 1px solid var(--line-soft); margin: 16px 0; }
-  .callout .c-quote { font-size: 14px; color: var(--ink-2); font-style: italic; line-height: 1.6; }
+  .callout .c-stat .s-num { font-family: "IBM Plex Mono"; font-size: 32px; font-weight: 600; color: var(--tertiary); line-height: 1; }
+  .callout .c-stat .s-desc { font-size: 14px; color: var(--on-surface-variant); line-height: 1.4; }
+  .callout .c-divider { border: none; border-top: 1px solid var(--border-soft); margin: 16px 0; }
+  .callout .c-quote { font-size: 14px; color: var(--on-surface-variant); font-style: italic; line-height: 1.6; }
 
   /* ── FEATURES ── */
   .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .feat {
-    background: var(--surface); border: 1px solid var(--line);
+    background: #fff; border: 1px solid var(--border);
     border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow-sm);
   }
   .feat-icon {
-    width: 44px; height: 44px; border-radius: 10px; background: var(--blue-tint);
-    color: var(--navy); display: grid; place-items: center; margin-bottom: 18px;
+    width: 44px; height: 44px; border-radius: 10px; background: var(--surface-container);
+    color: var(--primary); display: grid; place-items: center; margin-bottom: 18px;
   }
-  .feat h3 { font-size: 17px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
-  .feat p { font-size: 15px; color: var(--ink-2); line-height: 1.6; }
+  .feat h3 { font-size: 17px; font-weight: 600; color: var(--primary-dark); margin-bottom: 8px; }
+  .feat p { font-size: 15px; color: var(--on-surface-variant); line-height: 1.6; }
 
   /* ── MOTOR ── */
   .motor-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
-  .motor-text p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 18px; }
+  .motor-text p { font-size: 17px; color: var(--on-surface-variant); line-height: 1.75; margin-bottom: 18px; }
   .motor-text .principle {
-    background: var(--navy); color: #fff; border-radius: var(--radius);
+    background: var(--primary-dark); color: #fff; border-radius: var(--radius);
     padding: 20px 24px; margin-top: 8px; font-size: 15px; font-weight: 500;
-    line-height: 1.6; border-left: 3px solid var(--coral);
+    line-height: 1.6; border-left: 3px solid var(--secondary);
   }
-  .motor-text .principle em { font-style: normal; color: var(--coral-soft); font-weight: 600; }
-  .legend-box { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); box-shadow: var(--shadow-sm); }
-  .legend-head { background: var(--navy); color: #fff; padding: 12px 18px; font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between; }
-  .legend-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 14px; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
+  .motor-text .principle em { font-style: normal; color: var(--secondary); font-weight: 600; }
+  .legend-box {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; background: #fff; box-shadow: var(--shadow-sm);
+  }
+  .legend-head {
+    background: var(--primary-dark); color: #fff; padding: 12px 18px;
+    font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: .1em;
+    text-transform: uppercase; font-weight: 600; display: flex; justify-content: space-between;
+  }
+  .legend-row {
+    display: grid; grid-template-columns: 32px 1fr auto; gap: 14px;
+    align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border-soft); font-size: 14px;
+  }
   .legend-row:last-child { border-bottom: none; }
-  .legend-row .ln { font-family: "IBM Plex Mono"; font-weight: 600; color: #fff; background: var(--blue); border-radius: 5px; text-align: center; padding: 3px 0; font-size: 12px; }
+  .legend-row .ln {
+    font-family: "IBM Plex Mono"; font-weight: 600; color: var(--on-primary);
+    background: var(--primary); border-radius: 5px; text-align: center;
+    padding: 3px 0; font-size: 12px;
+  }
   .legend-row .pts { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--muted); white-space: nowrap; }
   .score-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; }
   .score-pill .pd { width: 8px; height: 8px; border-radius: 50%; }
-  .pill-gest { background: #FBE7F0; color: #A21B59; } .pill-gest .pd { background: #C3306E; }
-  .pill-cron { background: var(--blue-tint); color: var(--navy); } .pill-cron .pd { background: var(--blue); }
-  .pill-vuln { background: var(--sun-tint); color: #8A5A06; } .pill-vuln .pd { background: var(--amber); }
-  .pill-gap  { background: var(--coral-tint); color: var(--coral-deep); } .pill-gap .pd  { background: var(--coral); }
+  .pill-gest { background: #FBE7F0; color: #A21B59; }    .pill-gest .pd { background: #C3306E; }
+  .pill-cron { background: var(--surface-container); color: var(--primary-dark); } .pill-cron .pd { background: var(--primary); }
+  .pill-vuln { background: var(--warning-subtle); color: var(--warning-strong); } .pill-vuln .pd { background: #C87A2A; }
+  .pill-gap  { background: var(--tertiary-container); color: #5A2616; }           .pill-gap .pd  { background: var(--tertiary); }
   .tiers-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
   .tier-card { border-radius: var(--radius-sm); padding: 14px 16px; border: 1px solid; }
-  .tier-card.verde  { background: #F0FDF4; border-color: #22c55e44; }
-  .tier-card.amarelo{ background: #FFFBEB; border-color: #f59e0b44; }
-  .tier-card.vermelho{ background: #FFF1F2; border-color: #ef444444; }
+  .tier-card.verde   { background: #F0FDF4; border-color: #22c55e44; }
+  .tier-card.amarelo { background: #FFFBEB; border-color: #f59e0b44; }
+  .tier-card.vermelho{ background: var(--error-container); border-color: rgba(198,40,40,.27); }
   .tier-card .t-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-  .tier-card.verde .t-name  { color: #15803d; }
-  .tier-card.amarelo .t-name{ color: #b45309; }
-  .tier-card.vermelho .t-name{ color: #b91c1c; }
+  .tier-card.verde .t-name   { color: #15803d; }
+  .tier-card.amarelo .t-name { color: #b45309; }
+  .tier-card.vermelho .t-name{ color: var(--error); }
   .tier-card .t-range { font-family: "IBM Plex Mono"; font-size: 13px; color: var(--muted); }
   .tier-card .t-cad   { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-  /* ── FIELD SECTION ── */
+  /* ── CAMPO ── */
   .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
   .field-card {
-    background: var(--surface); border: 1px solid var(--line);
+    background: #fff; border: 1px solid var(--border);
     border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm);
     display: flex; gap: 18px; align-items: flex-start;
   }
   .field-card .fc-icon {
-    width: 40px; height: 40px; border-radius: 9px; background: var(--blue-tint);
-    color: var(--navy); display: grid; place-items: center; flex-shrink: 0;
+    width: 40px; height: 40px; border-radius: 9px; background: var(--surface-container);
+    color: var(--primary); display: grid; place-items: center; flex-shrink: 0;
   }
-  .field-card h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
-  .field-card p  { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+  .field-card h4 { font-size: 15px; font-weight: 600; color: var(--primary-dark); margin-bottom: 5px; }
+  .field-card p  { font-size: 14px; color: var(--on-surface-variant); line-height: 1.55; }
 
-  /* ── WHO BUILT IT ── */
+  /* ── QUEM FEZ ── */
   .who-box {
-    background: var(--surface); border: 1px solid var(--line);
+    background: #fff; border: 1px solid var(--border);
     border-radius: var(--radius); padding: 40px; box-shadow: var(--shadow-sm);
     display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
   }
-  .who-box p { font-size: 17px; color: var(--ink-2); line-height: 1.75; margin-bottom: 16px; }
+  .who-box p { font-size: 17px; color: var(--on-surface-variant); line-height: 1.75; margin-bottom: 16px; }
   .who-box p:last-child { margin-bottom: 0; }
-  .who-box strong { color: var(--ink); }
+  .who-box strong { color: var(--on-surface); }
   .badges { display: flex; flex-wrap: wrap; gap: 10px; }
   .badge {
     display: inline-flex; align-items: center; gap: 7px;
     font-family: "IBM Plex Mono"; font-size: 11px; font-weight: 600;
     padding: 6px 12px; border-radius: 6px; letter-spacing: .04em;
-    background: var(--blue-tint); color: var(--navy); border: 1px solid var(--blue-line);
+    background: var(--surface-container); color: var(--primary-dark);
+    border: 1px solid var(--surface-container-high);
   }
 
   /* ── CTA FINAL ── */
   .cta-section {
-    background: linear-gradient(158deg, #0E2B55 0%, #173C72 60%, #1E54A8 100%);
+    background: linear-gradient(158deg, #00565E 0%, #006D77 60%, #007B85 100%);
     padding: 88px 0; border-top: none; position: relative; overflow: hidden;
   }
   .cta-section::after {
     content: ""; position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(500px 300px at 80% 50%, rgba(242,104,73,.2), transparent 60%);
+    background: radial-gradient(500px 300px at 80% 50%, rgba(198,107,79,.18), transparent 60%);
   }
   .cta-section .wrap { position: relative; z-index: 2; text-align: center; }
   .cta-section h2 { font-size: clamp(28px, 3.5vw, 44px); font-weight: 600; color: #fff; letter-spacing: -.02em; line-height: 1.15; margin-bottom: 14px; }
-  .cta-section h2 em { font-style: normal; color: var(--coral-soft); }
+  .cta-section h2 em { font-style: normal; color: var(--tertiary-soft); }
   .cta-section p { font-size: 17px; color: rgba(255,255,255,.78); margin-bottom: 36px; max-width: 48ch; margin-left: auto; margin-right: auto; }
   .cta-section .email-link { font-family: "IBM Plex Mono"; font-size: 14px; color: rgba(255,255,255,.55); margin-top: 18px; display: block; }
 
   /* ── FOOTER ── */
-  footer { background: var(--navy-deep); color: #fff; padding: 0; }
-  footer .fbar-top { height: 3px; background: var(--coral); }
+  footer { background: var(--primary-dark); color: #fff; padding: 0; }
+  footer .fbar-top { height: 3px; background: var(--secondary); }
   footer .wrap { padding: 48px 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
   footer .f-left p { font-size: 13px; color: rgba(255,255,255,.55); margin-top: 10px; font-family: "IBM Plex Mono"; letter-spacing: .02em; }
   footer .f-right { font-family: "IBM Plex Mono"; font-size: 11px; color: rgba(255,255,255,.4); text-align: right; line-height: 1.8; }
@@ -293,7 +338,26 @@
 <!-- ── NAV ── -->
 <nav>
   <div class="wrap">
-    <span class="wm inv" style="font-size: 20px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+    <a class="logo-lockup" href="/" aria-label="Visitare — página inicial">
+      <!--
+        Logo símbolo Visitare: versão para fundo escuro (teal-dark).
+        Back frame = mint com 55% opacidade; front door = ivory.
+        Coordenadas idênticas ao visitare-symbol.svg (100.33 × 142.39),
+        renderizado em 20 × 28px (height: 28px mantém proporção do símbolo).
+      -->
+      <svg class="logo-symbol" aria-hidden="true"
+           xmlns="http://www.w3.org/2000/svg"
+           viewBox="0 0 100.33 142.39"
+           width="20" height="28">
+        <!-- frame mint — fundo escuro: 55% opacidade sobre teal-dark -->
+        <polygon fill="rgba(131,197,190,0.55)"
+                 points="20.73,41.74 20.73,34.23 27.23,30.48 80.02,0 0,0 0,100.33 20.73,100.33 20.73,41.74"/>
+        <!-- porta animada — ivory (#FFFEF1) para legibilidade no escuro -->
+        <polygon class="door-front" fill="#FFFEF1"
+                 points="100.33,103.94 100.33,3.28 33.73,41.74 33.73,142.39"/>
+      </svg>
+      <span class="logo-wordmark" style="font-size: 20px">visitare</span>
+    </a>
     <div class="right">
       <a href="#problema" class="nav-link">O problema</a>
       <a href="#solucao" class="nav-link">A solução</a>
@@ -307,8 +371,12 @@
 <!-- ── HERO ── -->
 <header class="hero">
   <div class="wrap">
+    <p class="hero-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>
+      Claude Impact Lab Rio · SMS-Rio · 2026
+    </p>
     <h1>O agente de saúde que cuida de todo mundo merece uma ferramenta <em>à altura.</em></h1>
-    <p class="lede">ACS Digital é o copiloto dos Agentes Comunitários de Saúde — colocando a ficha clínica, a lista de visitas e o histórico do paciente direto no celular, na porta de casa.</p>
+    <p class="lede">Visitare é o copiloto dos Agentes Comunitários de Saúde — colocando a ficha clínica, a lista de visitas e o histórico do paciente direto no celular, na porta de casa.</p>
     <div class="hero-ctas">
       <a href="/demo" class="btn-primary">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/></svg>
@@ -373,7 +441,7 @@
   <div class="wrap">
     <span class="mono-label"><span class="nbox">02</span> A solução</span>
     <h2 class="sec">Tudo o que a Claudia precisa. No bolso. Em campo.</h2>
-    <p class="sec-sub">ACS Digital leva para o celular do agente o que antes só existia no papel e no PC da clínica — e ainda decide quem visitar primeiro.</p>
+    <p class="sec-sub">Visitare leva para o celular do agente o que antes só existia no papel e no PC da clínica — e ainda decide quem visitar primeiro.</p>
     <div class="features-grid">
       <div class="feat">
         <div class="feat-icon">
@@ -407,7 +475,7 @@
     <h2 class="sec">A Claudia não decide sozinha. Ela tem um motor.</h2>
     <div class="motor-layout">
       <div class="motor-text">
-        <p>O ACS Digital calcula automaticamente um score de risco para cada paciente com base em critérios clínicos reais do protocolo SUS: gestante, hipertenso, diabético, idoso, visita atrasada, passagem recente por urgência.</p>
+        <p>O Visitare calcula automaticamente um score de risco para cada paciente com base em critérios clínicos reais do protocolo SUS: gestante, hipertenso, diabético, idoso, visita atrasada, passagem recente por urgência.</p>
         <p>Quem tem score alto aparece no topo da lista. O score é recalculado em tempo real — cada visita registrada reorganiza a fila.</p>
         <div class="principle">
           <em>"A Claudia decide a ordem final."</em><br>O motor é insumo, nunca comando. Determinístico, auditável, construído sobre as portarias do Ministério da Saúde.
@@ -443,7 +511,7 @@
   <div class="wrap">
     <span class="mono-label"><span class="nbox">04</span> Construído para o campo</span>
     <h2 class="sec">Feito pra rua, pro sol, pro morro.</h2>
-    <p class="sec-sub">O ACS Digital não foi projetado para um escritório. Foi projetado para a Rocinha — e para toda comunidade com conexão intermitente e agentes trabalhando com uma mão só, com pressa.</p>
+    <p class="sec-sub">O Visitare não foi projetado para um escritório. Foi projetado para a Rocinha — e para toda comunidade com conexão intermitente e agentes trabalhando com uma mão só, com pressa.</p>
     <div class="field-grid">
       <div class="field-card">
         <div class="fc-icon">
@@ -492,7 +560,7 @@
     <h2 class="sec">Nasceu em um dia. Feito pra durar.</h2>
     <div class="who-box">
       <div>
-        <p>ACS Digital nasceu no <strong>Claude Impact Lab Rio</strong> — um hackathon de um dia em parceria com a Secretaria Municipal de Saúde do Rio de Janeiro.</p>
+        <p>Visitare nasceu no <strong>Claude Impact Lab Rio</strong> — um hackathon de um dia em parceria com a Secretaria Municipal de Saúde do Rio de Janeiro.</p>
         <p>O projeto foi construído por um time de médica, designers e engenheiros, com <strong>escuta real de agentes de saúde em campo.</strong></p>
         <p>Em um dia, do zero a um produto que pode ser usado amanhã.</p>
       </div>
@@ -513,7 +581,7 @@
 <section class="cta-section">
   <div class="wrap">
     <h2>Sua cidade tem agentes comunitários.<br><em>Eles merecem isso.</em></h2>
-    <p>Se você é gestor de saúde municipal ou estadual e quer levar o ACS Digital para a sua rede, fale com a gente.</p>
+    <p>Se você é gestor de saúde municipal ou estadual e quer levar o Visitare para a sua rede, fale com a gente.</p>
     <a href="/demo" class="btn-primary" style="font-size: 17px; padding: 18px 40px;">
       Ver o produto ao vivo →
     </a>
@@ -526,7 +594,18 @@
   <div class="fbar-top"></div>
   <div class="wrap">
     <div class="f-left">
-      <span class="wm inv" style="font-size: 26px"><span class="wm-acs">ACS</span><span class="wm-dig">DIGITAL</span></span>
+      <a class="logo-lockup" href="/" aria-label="Visitare">
+        <svg class="logo-symbol" aria-hidden="true"
+             xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 100.33 142.39"
+             width="22" height="31">
+          <polygon fill="rgba(131,197,190,0.55)"
+                   points="20.73,41.74 20.73,34.23 27.23,30.48 80.02,0 0,0 0,100.33 20.73,100.33 20.73,41.74"/>
+          <polygon class="door-front-footer" fill="#FFFEF1"
+                   points="100.33,103.94 100.33,3.28 33.73,41.74 33.73,142.39"/>
+        </svg>
+        <span class="logo-wordmark" style="font-size: 22px">visitare</span>
+      </a>
       <p>AGENTE COMUNITÁRIO DE SAÚDE · RIO DE JANEIRO · 2026</p>
     </div>
     <div class="f-right">
@@ -536,6 +615,59 @@
     </div>
   </div>
 </footer>
+
+<script>
+  (function () {
+    // Animação do logo símbolo (nav + footer): porta fecha no hover do logo-lockup.
+    // Coordenadas do visitare-symbol.svg; dobradiça à direita (x=100.33).
+    const OPEN   = [[100.33, 103.94], [100.33, 3.28], [33.73, 41.74], [33.73, 142.39]];
+    const CLOSED = [[100.33, 100.33], [100.33, 0],    [0,     0],     [0,     100.33]];
+    const DUR = 300;
+
+    function easeInOutBack(x) {
+      const c1 = 1.70158, c2 = c1 * 1.525;
+      return x < 0.5
+        ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
+        : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (2 * x - 2) + c2) + 2) / 2;
+    }
+
+    function makeController(doorEl) {
+      let raf = null, startTs = null, from = 0, to = 0, cur = 0;
+
+      function setPoints(val) {
+        const pts = OPEN.map(([ox, oy], i) => {
+          const [cx, cy] = CLOSED[i];
+          return (ox + (cx - ox) * val) + ',' + (oy + (cy - oy) * val);
+        });
+        doorEl.setAttribute('points', pts.join(' '));
+      }
+
+      function animateTo(target) {
+        from = cur; to = target; startTs = null;
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function step(ts) {
+          if (!startTs) startTs = ts;
+          const p = Math.min((ts - startTs) / DUR, 1);
+          cur = from + (to - from) * easeInOutBack(p);
+          setPoints(cur);
+          if (p < 1) raf = requestAnimationFrame(step);
+          else { cur = to; setPoints(to); }
+        });
+      }
+
+      setPoints(0);
+      return animateTo;
+    }
+
+    document.querySelectorAll('.logo-lockup').forEach(function (lockup) {
+      const door = lockup.querySelector('.door-front, .door-front-footer');
+      if (!door) return;
+      const animateTo = makeController(door);
+      lockup.addEventListener('mouseenter', function () { animateTo(1); });
+      lockup.addEventListener('mouseleave', function () { animateTo(0); });
+    });
+  })();
+</script>
 
 </body>
 </html>

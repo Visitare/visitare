@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Problema from '../components/Problema.astro';
+import Solucao from '../components/Solucao.astro';
+import Motor from '../components/Motor.astro';
+import Campo from '../components/Campo.astro';
+import QuemFez from '../components/QuemFez.astro';
+import CtaFinal from '../components/CtaFinal.astro';
+import Footer from '../components/Footer.astro';
+---
+<Layout>
+  <Nav />
+  <Hero />
+  <Problema />
+  <Solucao />
+  <Motor />
+  <Campo />
+  <QuemFez />
+  <CtaFinal />
+  <Footer />
+</Layout>
+
+<script>
+  import { initLogoAnimations } from '../scripts/logo-animation';
+  initLogoAnimations();
+</script>

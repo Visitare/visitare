@@ -1,0 +1,37 @@
+---
+import SectionLabel from './SectionLabel.astro';
+
+const badges = ['🏥 SMS-Rio', '🤖 Claude Impact Lab', '⚕️ Médica na equipe', '🗣️ Escuta com ACS', '🏙️ Rocinha'];
+---
+<section id="quem-fez" class="py-22 border-t border-surface-container">
+  <div class="max-w-[1100px] mx-auto px-6">
+    <SectionLabel number="05" label="Quem fez" />
+    <h2 class="font-semibold mt-3.5 mb-8 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
+      Nasceu em um dia. Feito pra durar.
+    </h2>
+
+    <div class="bg-white border border-surface-container-high rounded-lg p-10 shadow-sm grid grid-cols-2 gap-12 items-center max-md:grid-cols-1 max-md:gap-8 max-md:p-6">
+
+      <div class="space-y-4">
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Visitare nasceu no <strong class="text-on-surface font-semibold">Claude Impact Lab Rio</strong> — um hackathon de um dia em parceria com a Secretaria Municipal de Saúde do Rio de Janeiro.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          O projeto foi construído por um time de médica, designers e engenheiros, com <strong class="text-on-surface font-semibold">escuta real de agentes de saúde em campo.</strong>
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Em um dia, do zero a um produto que pode ser usado amanhã.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-2.5">
+        {badges.map((b) => (
+          <span class="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold px-3 py-1.5 rounded bg-surface-container text-primary-dark border border-surface-container-high tracking-[0.04em]">
+            {b}
+          </span>
+        ))}
+      </div>
+
+    </div>
+  </div>
+</section>

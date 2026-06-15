@@ -1,0 +1,53 @@
+---
+import SectionLabel from './SectionLabel.astro';
+---
+<section id="problema" class="py-22 border-t border-surface-container">
+  <div class="max-w-[1100px] mx-auto px-6">
+    <SectionLabel number="01" label="O problema" />
+    <h2 class="font-semibold mt-3.5 mb-3 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
+      Claudia cuida de todo mundo. Quem cuida da Claudia?
+    </h2>
+
+    <div class="grid grid-cols-2 gap-12 items-center max-md:grid-cols-1 max-md:gap-8">
+
+      <div class="space-y-[18px]">
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Claudia é Agente Comunitária de Saúde na Rocinha, no Rio de Janeiro. Todo dia, ela visita famílias, avalia pacientes, anota sintomas, checa medicamentos, identifica quem está em risco.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          É ela quem percebe quando <strong class="text-on-surface font-semibold">Dona Maria não abriu a porta há três semanas.</strong> É ela quem leva a gestante até a UBS quando o pré-natal atrasa.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Mas quando Claudia volta pra clínica, ela gasta uma hora — todo dia — digitando à mão tudo o que viu em campo. Sem sistema no celular. Sem lista de prioridades. Sem registro em tempo real.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          <strong class="text-on-surface font-semibold">São 6.200 Claudias só no Rio de Janeiro.</strong> E o problema é o mesmo em todo o Brasil.
+        </p>
+      </div>
+
+      <!-- Callout Claudia -->
+      <div class="bg-white border border-surface-container-high border-l-4 border-l-tertiary rounded-lg p-7 shadow-sm">
+        <p class="font-mono text-[10px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant/70 mb-3.5">
+          Retrato da rotina
+        </p>
+        <p class="text-2xl font-semibold text-primary-dark mb-1">Claudia</p>
+        <p class="text-sm text-on-surface-variant mb-5">Agente Comunitária de Saúde · Rocinha, Rio de Janeiro</p>
+
+        <div class="flex items-baseline gap-2 mb-2.5">
+          <span class="font-mono text-[32px] font-semibold text-tertiary leading-none">1h</span>
+          <span class="text-sm text-on-surface-variant leading-[1.4]">por dia perdida digitando<br>notas na clínica após o campo</span>
+        </div>
+        <hr class="border-none border-t border-surface-container my-4" />
+        <div class="flex items-baseline gap-2 mb-2.5">
+          <span class="font-mono text-[32px] font-semibold text-tertiary leading-none">750+</span>
+          <span class="text-sm text-on-surface-variant leading-[1.4]">famílias sob responsabilidade<br>de cada agente</span>
+        </div>
+        <hr class="border-none border-t border-surface-container my-4" />
+        <p class="text-sm text-on-surface-variant italic leading-[1.6]">
+          "A gente sai de casa cedo, vai de porta em porta, e quando volta ainda tem que digitar tudo. Quando não esqueceu metade."
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>

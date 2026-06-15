@@ -1,0 +1,28 @@
+---
+import LogoSymbol from './LogoSymbol.astro';
+---
+<nav class="bg-primary-dark border-b-2 border-secondary sticky top-0 z-50 py-3.5">
+  <div class="max-w-[1100px] mx-auto px-6 flex items-center justify-between">
+
+    <a href="/" class="logo-lockup flex items-center gap-3.5 no-underline" aria-label="Visitare — página inicial">
+      <LogoSymbol height={28} variant="dark" />
+      <span class="font-heading font-semibold text-[20px] text-on-primary leading-none tracking-[-0.01em]">
+        visitare
+      </span>
+    </a>
+
+    <div class="flex items-center gap-5">
+      <a href="#problema" class="nav-link text-[13px] text-white/70 no-underline font-medium transition-colors hover:text-white hidden md:block">O problema</a>
+      <a href="#solucao"  class="nav-link text-[13px] text-white/70 no-underline font-medium transition-colors hover:text-white hidden md:block">A solução</a>
+      <a href="#motor"    class="nav-link text-[13px] text-white/70 no-underline font-medium transition-colors hover:text-white hidden md:block">Motor</a>
+      <a href="#quem-fez" class="nav-link text-[13px] text-white/70 no-underline font-medium transition-colors hover:text-white hidden md:block">Quem fez</a>
+      <a
+        href="/demo"
+        class="text-[13px] font-semibold bg-tertiary text-on-primary rounded-lg px-[18px] py-2 no-underline transition-opacity hover:opacity-90"
+      >
+        Ver demo →
+      </a>
+    </div>
+
+  </div>
+</nav>

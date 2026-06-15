@@ -1,16 +1,37 @@
 @import "tailwindcss";
+@import "./theme.css";
 
-* {
-  box-sizing: border-box;
+/* ── CossUI / shadcn aliases ──────────────────
+   Componentes copiados via `shadcn add @coss/ui`
+   esperam esses nomes. Apontam para os tokens
+   declarados em theme.css (@theme).
+   ────────────────────────────────────────────── */
+:root {
+  --background:           var(--color-surface);
+  --foreground:           var(--color-on-surface);
+  --primary:              var(--color-primary);
+  --primary-foreground:   var(--color-on-primary);
+  --secondary:            var(--color-secondary);
+  --secondary-foreground: var(--color-on-secondary);
+  --destructive:          var(--color-error);
+  --muted:                var(--color-surface-container);
+  --muted-foreground:     var(--color-on-surface-variant);
+  --accent:               var(--color-tertiary);
+  --accent-foreground:    var(--color-on-tertiary);
+  --border:               var(--color-surface-container-high);
+  --input:                var(--color-surface-container);
+  --ring:                 var(--color-primary);
+  --radius:               14px;
 }
+
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f1f5f9;
+  font-family: var(--font-sans);
+  background-color: var(--color-surface);
+  color: var(--color-on-surface);
   -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  min-height: 100svh;
-}
+#root { min-height: 100svh; }
