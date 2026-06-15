@@ -25,7 +25,7 @@ import SectionLabel from './SectionLabel.astro';
 
       <!-- Legenda de fatores -->
       <div class="border border-surface-container-high rounded-lg overflow-hidden bg-white shadow-sm">
-        <div class="bg-primary-dark text-white px-[18px] py-3 font-mono text-[11px] tracking-[0.1em] uppercase font-semibold flex justify-between">
+        <div class="bg-primary-dark text-white px-[18px] py-3 font-mono text-[12px] tracking-[0.1em] uppercase font-semibold flex justify-between">
           <span>Fatores do score</span>
         </div>
         {[
@@ -36,7 +36,7 @@ import SectionLabel from './SectionLabel.astro';
         ].map((f, i) => (
           <div class="grid gap-3.5 items-center px-[18px] py-3.5 border-b border-surface-container last:border-b-0" style="grid-template-columns: 32px 1fr">
             <span class="font-mono font-semibold text-on-primary bg-primary rounded text-center py-0.5 text-xs">{i + 1}</span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12.5px] font-semibold" style={`background:${f.bg};color:${f.color}`}>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[13px] font-semibold" style={`background:${f.bg};color:${f.color}`}>
               <span class="w-2 h-2 rounded-full inline-block shrink-0" style={`background:${f.dot}`}></span>
               {f.label}
             </span>
