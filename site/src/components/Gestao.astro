@@ -1,0 +1,113 @@
+---
+import SectionLabel from './SectionLabel.astro';
+---
+<section id="gestao" class="py-22 border-t border-surface-container">
+  <div class="max-w-[1100px] mx-auto px-6">
+    <SectionLabel number="04" label="Para a gestão" />
+    <h2 class="font-extrabold mt-3.5 mb-4 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
+      Você contrata 6.200 agentes para ir às famílias.<br />
+      <em class="not-italic text-tertiary">Agora você sabe se foram.</em>
+    </h2>
+
+    <div class="grid grid-cols-2 gap-14 items-start mt-10 max-md:grid-cols-1 max-md:gap-8">
+
+      <div class="space-y-[18px]">
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          A secretaria de saúde não deveria gerir o campo no escuro. Cada visita registrada em tempo real vira dado — e dado vira decisão.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          Gestores enxergam a cobertura de cada micro-área, identificam equipes com baixa adesão e recebem alertas antes que casos críticos passem despercebidos.
+        </p>
+        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
+          As fichas preenchidas no campo chegam prontas para os relatórios do SISAB — sem retrabalho, sem digitação dupla.
+        </p>
+
+        <!-- Conformidade — sinalização de compra pública -->
+        <div class="pt-4">
+          <p class="font-mono text-[11px] font-semibold tracking-[0.1em] uppercase text-on-surface-variant/60 mb-3">
+            Garantias para compra pública
+          </p>
+          <ul class="space-y-2.5">
+            {[
+              'Formulários baseados nas fichas oficiais do SUS',
+              'Score de risco construído sobre portarias do Ministério da Saúde',
+              'Cada visita auditável: agente, data, hora e localização',
+              'Offline-first com sincronização cifrada — conforme LGPD',
+            ].map((item) => (
+              <li class="flex items-start gap-2.5 text-[15px] text-on-surface-variant leading-[1.55]">
+                <svg class="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 11 14 15 10" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Mock painel da secretaria -->
+      <div class="bg-white border border-surface-container-high rounded-lg overflow-hidden shadow-sm">
+        <div class="bg-primary-dark text-white px-5 py-3.5 font-mono text-[12px] tracking-[0.1em] uppercase font-semibold flex items-center justify-between">
+          <span>Painel da secretaria</span>
+          <span class="text-white/50 font-normal normal-case tracking-normal text-[11px]">Atualizado agora</span>
+        </div>
+
+        <div class="divide-y divide-surface-container">
+
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[13px] font-semibold text-primary-dark">Cobertura semanal</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">micro-áreas com visita registrada</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[26px] font-semibold text-primary-dark leading-none">87%</p>
+              <p class="text-[11px] text-success-strong mt-1">↑ 12% vs. mês anterior</p>
+            </div>
+          </div>
+
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[13px] font-semibold text-primary-dark">Famílias sem visita há 21+ dias</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">requer atenção da coordenação</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[26px] font-semibold text-error leading-none">143</p>
+              <span class="inline-block text-[11px] font-semibold text-error-strong bg-error-container px-2 py-0.5 rounded mt-1">Alerta</span>
+            </div>
+          </div>
+
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[13px] font-semibold text-primary-dark">Fichas enviadas ao SISAB</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">esta semana, sem retrabalho</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[26px] font-semibold text-primary-dark leading-none">1.204</p>
+              <p class="text-[11px] text-success-strong mt-1">100% sincronizadas</p>
+            </div>
+          </div>
+
+          <div class="px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p class="text-[13px] font-semibold text-primary-dark">Agentes com sync hoje</p>
+              <p class="text-[12px] text-on-surface-variant mt-0.5">dos 102 agentes ativos</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[26px] font-semibold text-primary-dark leading-none">98</p>
+              <p class="text-[11px] text-on-surface-variant mt-1">96% de adesão</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="px-5 py-3.5 bg-surface-container border-t border-surface-container-high">
+          <p class="text-[12px] text-on-surface-variant/70 italic">
+            Dados ilustrativos. O painel real reflete sua rede em tempo real.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
