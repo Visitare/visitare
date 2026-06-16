@@ -100,6 +100,7 @@
 
   body {
     font-family: var(--font-sans);
+    font-size: 18px;
     background-color: var(--color-surface);
     color: var(--color-on-surface);
     -webkit-font-smoothing: antialiased;
