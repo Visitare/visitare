@@ -4,10 +4,10 @@
 
 const OPEN   = [[100.33, 103.94], [100.33, 3.28], [33.73, 41.74], [33.73, 142.39]] as const;
 const CLOSED = [[100.33, 100.33], [100.33, 0],    [0,     0],     [0,     100.33]] as const;
-const DUR = 300;
+const DUR = 420;
 
 function easeInOutBack(x: number): number {
-  const c1 = 1.70158, c2 = c1 * 1.525;
+  const c1 = 3.2, c2 = c1 * 1.525;
   return x < 0.5
     ? (Math.pow(2 * x, 2) * ((c2 + 1) * 2 * x - c2)) / 2
     : (Math.pow(2 * x - 2, 2) * ((c2 + 1) * (2 * x - 2) + c2) + 2) / 2;

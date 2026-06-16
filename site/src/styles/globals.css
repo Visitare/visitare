@@ -7,7 +7,7 @@
    ───────────────────────────────────────────── */
 @theme {
   /* Tipografia */
-  --font-sans:    "Prompt", system-ui, sans-serif;
+  --font-sans:    "IBM Plex Sans", system-ui, sans-serif;
   --font-heading: "Prompt", system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", monospace;
 
@@ -29,7 +29,7 @@
   --color-on-tertiary-container: #5A2616;
 
   /* Superfícies */
-  --color-surface:                #FAF9F6;
+  --color-surface:                #FFFFFF;
   --color-surface-container:      #EDF6F9;
   --color-surface-container-high: #DDEBEF;
   --color-on-surface:             #13272A;
@@ -104,9 +104,9 @@
     color: var(--color-on-surface);
     -webkit-font-smoothing: antialiased;
     line-height: 1.6;
-    background-image:
-      linear-gradient(rgba(0,109,119,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,109,119,.025) 1px, transparent 1px);
-    background-size: 28px 28px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
