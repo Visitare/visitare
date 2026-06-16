@@ -3,35 +3,31 @@ import SectionLabel from './SectionLabel.astro';
 
 const badges = ['SMS-Rio', 'Claude Impact Lab', 'Médica na equipe', 'Escuta com ACS', 'Rocinha'];
 ---
-<section id="quem-fez" class="py-22 border-t border-surface-container">
+<section id="quem-fez" class="py-10 border-t border-surface-container">
   <div class="max-w-[1100px] mx-auto px-6">
-    <SectionLabel number="06" label="Quem fez" />
-    <h2 class="font-extrabold mt-3.5 mb-8 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
-      Pilotado com a SMS-Rio.<br />Com agentes reais. Em campo.
-    </h2>
+    <SectionLabel label="Origem" />
 
-    <div class="bg-white border border-surface-container-high rounded-lg p-10 shadow-sm grid grid-cols-2 gap-12 items-center max-md:grid-cols-1 max-md:gap-8 max-md:p-6">
+    <div class="mt-5 border border-surface-container-high rounded-lg overflow-hidden bg-white shadow-sm">
+      <div class="grid grid-cols-[1fr_auto] items-center gap-8 px-8 py-7 max-md:grid-cols-1 max-md:gap-5">
 
-      <div class="space-y-4">
-        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
-          Visitare nasceu no <strong class="text-on-surface font-semibold">Claude Impact Lab Rio</strong>, em parceria com a <strong class="text-on-surface font-semibold">Secretaria Municipal de Saúde do Rio de Janeiro</strong> — com escuta direta de agentes comunitários de saúde na Rocinha.
-        </p>
-        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
-          Um time de médica, designers e engenheiros construiu, em um dia, um produto que pode ser implantado amanhã — e está disponível como software de código aberto.
-        </p>
-        <p class="text-[17px] text-on-surface-variant leading-[1.75]">
-          O contexto foi real: celulares de entrada, sinal fraco, agentes com pressa. O produto também precisa ser.
-        </p>
+        <div>
+          <p class="text-[17px] font-semibold text-primary-dark mb-1.5">
+            Pilotado com a Secretaria Municipal de Saúde do Rio de Janeiro.
+          </p>
+          <p class="text-[15px] text-on-surface-variant leading-[1.6]">
+            Construído no Claude Impact Lab Rio com escuta direta de ACS em campo na Rocinha. Um time de médica, designers e engenheiros — código aberto, pronto para implantação.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2 shrink-0 max-md:w-full">
+          {badges.map((b) => (
+            <span class="inline-flex items-center font-mono text-[12px] font-semibold px-3 py-1.5 rounded bg-surface-container text-primary-dark border border-surface-container-high tracking-[0.04em] whitespace-nowrap">
+              {b}
+            </span>
+          ))}
+        </div>
+
       </div>
-
-      <div class="flex flex-wrap gap-2.5">
-        {badges.map((b) => (
-          <span class="inline-flex items-center gap-1.5 font-mono text-[13px] font-semibold px-3.5 py-2 rounded bg-surface-container text-primary-dark border border-surface-container-high tracking-[0.04em]">
-            {b}
-          </span>
-        ))}
-      </div>
-
     </div>
   </div>
 </section>
