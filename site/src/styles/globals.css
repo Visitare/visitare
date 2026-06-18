@@ -98,6 +98,29 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
 
+  /* Skip-to-content link — visível só no foco (A-002) */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.1s;
+  }
+  .skip-link:focus { top: 1rem; }
+
+  /* Focus-visible ring — teal, nunca o azul default (A-003) */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
   body {
     font-family: var(--font-sans);
     font-size: 18px;

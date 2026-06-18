@@ -9,18 +9,23 @@ import Gestao from '../components/Gestao.astro';
 import Campo from '../components/Campo.astro';
 import QuemFez from '../components/QuemFez.astro';
 import CtaFinal from '../components/CtaFinal.astro';
+import FAQ from '../components/FAQ.astro';
 import Footer from '../components/Footer.astro';
 ---
 <Layout>
+  <a href="#conteudo-principal" class="skip-link">Ir para o conteúdo principal</a>
   <Nav />
-  <Hero />
-  <QuemFez />
-  <Problema />
-  <Solucao />
-  <Motor />
-  <Gestao />
-  <Campo />
-  <CtaFinal />
+  <main id="conteudo-principal">
+    <Hero />
+    <QuemFez />
+    <Problema />
+    <Solucao />
+    <Motor />
+    <Gestao />
+    <Campo />
+    <FAQ />
+    <CtaFinal />
+  </main>
   <Footer />
 </Layout>
 
