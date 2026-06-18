@@ -9,7 +9,7 @@
   /* Tipografia — Merriweather Sans (títulos + corpo); Prompt só na marca (PWA) */
   --font-sans:    "Merriweather Sans", system-ui, sans-serif;
   --font-heading: "Merriweather Sans", system-ui, sans-serif;
-  --font-mono:    ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono:    "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Primary — teal (ação, marca, confiança) */
   --color-primary:      #006D77;
