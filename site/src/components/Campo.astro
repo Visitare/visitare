@@ -24,10 +24,10 @@ const cards = [
   },
 ];
 ---
-<section id="campo" class="py-22 border-t border-surface-container">
+<section id="campo" aria-labelledby="h-campo" class="py-22 border-t border-surface-container">
   <div class="max-w-[1100px] mx-auto px-6">
     <SectionLabel number="05" label="Construído para o campo" />
-    <h2 class="font-semibold mt-3.5 mb-3 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
+    <h2 id="h-campo" class="font-semibold mt-3.5 mb-3 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(26px,3.2vw,38px)">
       Feito pra rua, pro sol, pro morro.
     </h2>
     <p class="text-on-surface-variant max-w-[60ch] text-[18px] mb-10 leading-[1.65]">
@@ -39,7 +39,7 @@ const cards = [
         <div class="bg-white border border-surface-container-high rounded-lg p-6 shadow-sm flex gap-[18px] items-start">
           <div class="w-10 h-10 rounded-[9px] bg-tertiary/10 text-tertiary grid place-items-center shrink-0" set:html={c.icon} />
           <div>
-            <h4 class="text-[16px] font-semibold text-primary-dark mb-1.5">{c.title}</h4>
+            <h3 class="text-[16px] font-semibold text-primary-dark mb-1.5">{c.title}</h3>
             <p class="text-[15px] text-on-surface-variant leading-[1.55]">{c.body}</p>
           </div>
         </div>
