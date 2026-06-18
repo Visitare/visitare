@@ -50,11 +50,11 @@ colors:
   info-strong: "#0369A1"        # azul-céu (mais azul, menos verde que o teal)
 
 typography:
-  # Prompt (Google Fonts) — geométrica, muitos pesos, casa com o wordmark.
-  # IBM Plex Mono p/ dados tabulares: timestamps de tempo-em-tarefa (§0.2/§10),
-  # indicadores Previne. Número que alinha pede mono.
+  # Landing/web (site/): Merriweather Sans (corpo + títulos) + DM Mono (dados).
+  # PWA/app (frontend/): Prompt (geométrica, wordmark) + IBM Plex Mono (dados).
+  # Regra comum: número tabular (timestamp, indicador) pede mono; texto narrativo, nunca.
   display:
-    fontFamily: Prompt
+    fontFamily: Merriweather Sans  # site/; Prompt no PWA
     fontSize: 44px
     fontWeight: "600"
     lineHeight: 1.15
@@ -97,7 +97,7 @@ typography:
     fontWeight: "500"
     lineHeight: 1.35
   data-md:
-    fontFamily: IBM Plex Mono
+    fontFamily: DM Mono  # site/; IBM Plex Mono no PWA
     fontSize: 14px
     fontWeight: "500"
     lineHeight: 1.4
@@ -309,20 +309,17 @@ de um alerta.
 
 ## Typography
 
-**Prompt** (Google Fonts) em toda a interface — geométrica, muitos pesos, casa
-com o wordmark Visitare. Pareada com **IBM Plex Mono** apenas para dados
-tabulares.
+Duas superfícies, duas escolhas:
 
-- **Display / Headlines:** Prompt em 600–700 estabelece voz institucional e
-  confiável; hierarquia por tamanho, não por excesso de peso.
-- **Body:** Prompt 400 a 16–18px com entrelinha generosa — legibilidade longa
-  em tela de celular, sob sol.
-- **Labels:** Prompt 500 para botões e metadados; distinto mesmo em escala
-  pequena.
-- **Data (mono):** IBM Plex Mono carrega **timestamps de tempo-em-tarefa**
-  (a métrica de 1h/dia, `architecture.md §0.2 / §10`) e números de indicadores
-  (Previne). Número que precisa alinhar em coluna pede mono; texto narrativo,
-  nunca.
+**Landing/site (`site/`):** **Merriweather Sans** (corpo + títulos) + **DM Mono** (dados). Serifa humanista sem serifa — legível em tela, credível, sem peso corporativo.
+
+**PWA/app (`frontend/`):** **Prompt** (geométrica, casa com o wordmark) + **IBM Plex Mono** (dados tabulares). A fonte do app segue o wordmark.
+
+Regra comum a ambas:
+- **Display / Headlines:** peso 600–700, hierarquia por tamanho, não peso excessivo.
+- **Body:** 16–18px, entrelinha generosa — legibilidade longa em celular, sob sol.
+- **Labels:** peso 500 para botões e metadados.
+- **Data (mono):** carrega timestamps de tempo-em-tarefa e números de indicadores. Número que precisa alinhar em coluna pede mono; texto narrativo, nunca.
 
 ## Layout
 
