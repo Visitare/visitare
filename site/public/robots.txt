@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://visitare.app/sitemap-index.xml
