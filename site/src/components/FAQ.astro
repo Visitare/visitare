@@ -1,0 +1,45 @@
+---
+const faqs = [
+  {
+    q: 'O Visitare funciona sem internet?',
+    a: 'Sim. O Visitare é offline-first: salva todos os dados no celular do agente durante a visita e sincroniza automaticamente quando o sinal volta. Nenhuma visita é perdida por falta de conexão.',
+  },
+  {
+    q: 'Como o Visitare se integra ao SISAB e ao Vitacare?',
+    a: 'As fichas preenchidas pelo agente no celular chegam prontas ao SISAB sem digitação manual na clínica. A integração com o Vitacare sincroniza o histórico familiar e o prontuário eletrônico em tempo real.',
+  },
+  {
+    q: 'Qual é o custo para uma secretaria municipal?',
+    a: 'O Visitare opera um modelo de piloto para gestores municipais e estaduais. Entre em contato via WhatsApp para discutir o plano para a sua rede — o piloto começa em 30 dias.',
+  },
+  {
+    q: 'O agente precisa de smartphone novo?',
+    a: 'Não. O Visitare foi projetado para rodar em Android de entrada, inclusive em aparelhos de baixo custo amplamente usados por ACS. Nenhuma dependência de hardware específico.',
+  },
+  {
+    q: 'O Visitare está em conformidade com a LGPD?',
+    a: 'Sim. Todas as visitas são auditáveis (agente, data, hora, localização) e a sincronização é cifrada. O sistema está alinhado às portarias do Ministério da Saúde e às exigências de conformidade para compra pública.',
+  },
+  {
+    q: 'Quem desenvolveu o Visitare?',
+    a: 'O Visitare foi construído no Claude Impact Lab Rio em parceria com a Secretaria Municipal de Saúde do Rio de Janeiro, com escuta direta de ACS da Rocinha. A equipe inclui médica, designers e engenheiros. O código é aberto.',
+  },
+];
+---
+<section id="faq" aria-labelledby="h-faq" class="py-22 border-t border-surface-container">
+  <div class="max-w-[1100px] mx-auto px-6">
+    <p class="text-[12px] tracking-[0.13em] uppercase font-semibold text-tertiary mb-5">Perguntas frequentes</p>
+    <h2 id="h-faq" class="font-semibold mb-12 leading-[1.1] tracking-[-0.02em] text-primary-dark" style="font-size: clamp(24px,2.8vw,34px)">
+      Dúvidas de gestores
+    </h2>
+
+    <dl class="divide-y divide-surface-container-high">
+      {faqs.map((f) => (
+        <div class="py-5">
+          <dt class="text-[17px] font-semibold text-primary-dark mb-2">{f.q}</dt>
+          <dd class="text-[16px] text-on-surface-variant leading-[1.65] max-w-[75ch]">{f.a}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
