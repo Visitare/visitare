@@ -9,10 +9,11 @@ interface Props {
 
 const {
   title = 'Visitare — O copiloto do Agente Comunitário de Saúde',
-  description = 'Visitare coloca a ficha clínica, a lista de visitas e o histórico do paciente direto no celular do agente comunitário de saúde. Menos papelada. Mais cuidado.',
+  description = 'Visitare digitaliza as visitas domiciliares dos ACS: lista priorizada de famílias no celular, funciona offline, envia dados ao SISAB sem retrabalho. Parceria SMS-Rio.',
   ogImage = 'https://visitare.app/og-image.png',
 } = Astro.props;
 
+const canonicalUrl = `https://visitare.app${Astro.url.pathname}`;
 const url = Astro.url.href;
 ---
 <!doctype html>
@@ -38,6 +39,55 @@ const url = Astro.url.href;
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
   <meta name="twitter:image" content={ogImage} />
+
+  <!-- Canônica (S-004) -->
+  <link rel="canonical" href={canonicalUrl} />
+
+  <!-- JSON-LD: SoftwareApplication + Organization (S-001 / GEO) -->
+  <script type="application/ld+json" set:html={JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Visitare",
+      "description": "Aplicativo mobile para Agentes Comunitários de Saúde (ACS) do SUS. Digitaliza visitas domiciliares, entrega lista priorizada de famílias no celular do agente, funciona offline e envia dados automaticamente ao SISAB. Desenvolvido com a Secretaria Municipal de Saúde do Rio de Janeiro.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Android",
+      "inLanguage": "pt-BR",
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Secretarias Municipais de Saúde, gestores de Atenção Primária à Saúde"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Claude Impact Lab Rio",
+        "url": "https://visitare.app"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Visitare",
+      "url": "https://visitare.app",
+      "description": "Ferramenta de gestão de visitas domiciliares para ACS do SUS, desenvolvida em parceria com a SMS-Rio.",
+      "foundingLocation": { "@type": "Place", "name": "Rio de Janeiro, Brasil" },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "availableLanguage": "Portuguese"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "O Visitare funciona sem internet?", "acceptedAnswer": { "@type": "Answer", "text": "Sim. O Visitare é offline-first: salva todos os dados no celular do agente durante a visita e sincroniza automaticamente quando o sinal volta." } },
+        { "@type": "Question", "name": "Como o Visitare se integra ao SISAB e ao Vitacare?", "acceptedAnswer": { "@type": "Answer", "text": "As fichas preenchidas pelo agente chegam prontas ao SISAB sem digitação manual na clínica. A integração com o Vitacare sincroniza o histórico familiar em tempo real." } },
+        { "@type": "Question", "name": "O agente precisa de smartphone novo?", "acceptedAnswer": { "@type": "Answer", "text": "Não. O Visitare roda em Android de entrada, inclusive em aparelhos de baixo custo amplamente usados por ACS." } },
+        { "@type": "Question", "name": "O Visitare está em conformidade com a LGPD?", "acceptedAnswer": { "@type": "Answer", "text": "Sim. Todas as visitas são auditáveis e a sincronização é cifrada, alinhado às portarias do Ministério da Saúde." } },
+        { "@type": "Question", "name": "Quem desenvolveu o Visitare?", "acceptedAnswer": { "@type": "Answer", "text": "Construído no Claude Impact Lab Rio com a Secretaria Municipal de Saúde do Rio de Janeiro, com escuta direta de ACS da Rocinha. Código aberto." } }
+      ]
+    }
+  ])} />
 
   <!-- Fontes: Merriweather Sans (corpo/títulos) + DM Mono (números/dados). -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
