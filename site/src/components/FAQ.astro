@@ -33,13 +33,24 @@ const faqs = [
       Dúvidas de gestores
     </h2>
 
-    <dl class="divide-y divide-surface-container-high">
+    <div class="divide-y divide-surface-container-high">
       {faqs.map((f) => (
-        <div class="py-5">
-          <dt class="text-[17px] font-semibold text-primary-dark mb-2">{f.q}</dt>
-          <dd class="text-[16px] text-on-surface-variant leading-[1.65] max-w-[75ch]">{f.a}</dd>
-        </div>
+        <details class="group">
+          <summary class="flex items-center justify-between gap-6 py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <span class="text-[17px] font-semibold text-primary-dark">{f.q}</span>
+            <svg
+              class="shrink-0 w-5 h-5 text-on-surface-variant transition-transform duration-200 group-open:rotate-180"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+            </svg>
+          </summary>
+          <p class="pb-5 text-[16px] text-on-surface-variant leading-[1.65] max-w-[75ch]">{f.a}</p>
+        </details>
       ))}
-    </dl>
+    </div>
   </div>
 </section>
