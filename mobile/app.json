@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Visitare ACS",
+    "slug": "visitare-acs",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "visitare",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.visitare.acs"
+    },
+    "android": {
+      "package": "app.visitare.acs",
+      "adaptiveIcon": {
+        "backgroundColor": "#006D77",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "$GOOGLE_MAPS_API_KEY"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single",
+      "name": "Visitare ACS",
+      "shortName": "Visitare",
+      "description": "App do Agente Comunitário de Saúde",
+      "themeColor": "#006D77",
+      "backgroundColor": "#FAF9F6"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "react-native-maps",
+        {
+          "googleMapsApiKey": "$GOOGLE_MAPS_API_KEY"
+        }
+      ]
+    ]
+  }
+}
