@@ -156,16 +156,16 @@ visitare/
 
 ---
 
-## 6. PRIO-ACS Engine (private repo: `rafaelbressan/prio-acs-engine`)  `[V1 parcial]`
+## 6. PRIO-ACS Engine (repo irmão: `Visitare/visitare-engine`, pasta `../visitare-engine`)  `[V1 parcial]`
 > v1 = scoring + ordenação da lista fixa de cada ACS. Distribuição entre ACS
 > (balanceamento, clustering geográfico, `patient_cap`, overflow) = `[ROADMAP]`
 > (microárea é fixa; motor não realoca). Ver `engine-spec.md §5`.
 
 ### Setup
-- [ ] `gh repo create rafaelbressan/prio-acs-engine --private`
-- [ ] Scaffold FastAPI project structure:
+- [x] `gh repo create Visitare/visitare-engine` — feito (repo irmão `../visitare-engine`)
+- [x] Scaffold FastAPI + fórmula PRIO-ACS v0.2 (C1–C4, L_eff dinâmico, 30 testes) — feito
 ```
-prio-acs-engine/
+visitare-engine/
 ├── main.py
 ├── engine/
 │   ├── score.py          # compute_prio_acs() — extracted from scripts/
@@ -251,7 +251,7 @@ clinic_defaults:
 - [ ] `pull_from_vitacare()` — fetch patients, visits, events → upsert Supabase
 - [ ] `push_to_vitacare()` — flush `visitas_capturadas` → Vitacare API
 - [ ] Schedule: cron every 15 min (or webhook if Vitacare supports it)
-- [ ] Can live in `prio-acs-engine/jobs/` as a separate module
+- [ ] Can live in `visitare-engine/jobs/` as a separate module
 - [ ] Remove parquet loader once Vitacare sync is live
 
 ---

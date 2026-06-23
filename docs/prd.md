@@ -40,9 +40,8 @@ Motor de priorização  ─►  Sugestões priorizadas por ACS
 
 - **Vitacare** é o sistema-fonte: `http://192.168.1.251/vitacare`
 - Acessível **apenas dentro do WiFi da clínica** (restrição de rede).
-- Para o protótipo: **dados mockados** em
-  `/Users/viniciusandrade/Documents/Projects/impact-lab/claude-impact-lab-saude/dados/`
-  (parquets anonimizados — pacientes, visitas, eventos clínicos, equipes).
+- Para o protótipo: **dados mockados** em `data/` no monorepo (parquets anonimizados —
+  pacientes, visitas, eventos clínicos, equipes). Removidos quando o Vitacare conectar.
 
 ### 4.2 Motor de priorização
 
@@ -55,8 +54,9 @@ prioridade. A prioridade combina:
 - Eventos clínicos recentes (urgência sobe; agendamento sobe).
 - Distância à unidade (para roteirização).
 
-Ver `claude-impact-lab-saude/exploration.py` — mapa de features e exemplo
-extraído de um paciente real.
+O motor (fórmula PRIO-ACS v0.2: C1–C4, L_eff dinâmico) vive no repo irmão
+`Visitare/visitare-engine` e escreve a tabela `allocations`, que o app lê. Spec
+completa em `docs/engine-spec.md`.
 
 ### 4.3 Interface do ACS
 
@@ -105,13 +105,19 @@ Implicação: a UX precisa parecer um **briefing**, não um **comando**.
 
 ## 6. Perguntas em aberto
 
-- **Segurança**: dados de saúde são sensíveis (LGPD art. 11). Como
-  transmitimos com segurança entre o app do ACS, nosso backend e o Vitacare?
-- **Conectividade**: ACS está em campo, fora do WiFi da clínica e
-  frequentemente em áreas com sinal ruim. Modo offline?
-- **Autenticação**: como o ACS faz login? Via SUS? Single sign-on do
-  município? Token gerado pelo gestor?
-- **Quem vê o quê**: ACS vê os seus; gerente vê a equipe; coordenador vê a
-  área programática. Como modelamos isso?
-- **Vitacare de volta**: (A) extensão Chrome vs. (B) API — qual é factível
-  até a demo, qual é o caminho de produção?
+> Atualizado 2026-06-23: as quatro primeiras foram resolvidas na arquitetura/grill.
+> Mantidas aqui com a resolução para rastreabilidade.
+
+- ~~**Segurança**~~ → **Resolvido.** Supabase com RLS por linha (4 níveis de role),
+  JWT com `equipe_id`, trigger de auditoria, residência BR (sa-east-1). Ver
+  `docs/supabase.md` e `architecture.md §14`.
+- ~~**Conectividade**~~ → **Resolvido.** PWA offline-first: trabalho do dia cacheado
+  em Dexie (IndexedDB), fila de submissões quando sem sinal. Ver `architecture.md §10`.
+- ~~**Autenticação**~~ → **Resolvido (v1).** JWT do Supabase com `equipe_id`; provisão
+  de acesso pelo gestor. SSO municipal/SUS fica como `[ROADMAP]`. Ver `architecture.md §5`.
+- ~~**Quem vê o quê**~~ → **Resolvido.** 4 níveis de role (ACS / gestor de clínica /
+  distrito / município) modelados via RLS. Ver `architecture.md §5`.
+- **Vitacare de volta** `[EM ABERTO]`: (A) extensão Chrome vs. (B) API. Decisão da v1 =
+  **export único** da carteira de 1 clínica (gated pela base legal/convênio SMS); sync
+  contínuo é `[ROADMAP]`. O caminho de write-back automático segue em aberto, dependente
+  de conversa com a SMS. Ver `architecture.md §0` (gates) e `prd.md §4.5`.

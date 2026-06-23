@@ -1,6 +1,8 @@
 # Arquitetura — Visitare
 
-> Versão 1.1 — 2026-06-03 (sessão de grill: cerca de escopo Piloto v1, ver §0)
+> Versão 1.2 — 2026-06-23 (tokens unificados em `shared/` consumidos ao vivo por
+> site+PWA; motor renomeado para `Visitare/visitare-engine`; mobile reframado como
+> Expo Universal). Versão 1.1 — 2026-06-03 (grill: cerca de escopo Piloto v1, ver §0)
 > Documento-fonte da arquitetura do sistema. Alimenta geração de tarefas.
 > Complementa: `TODO.md` (o quê fazer), `docs/engine-spec.md` (o motor PRIO-ACS),
 > `docs/prd.md` (produto), `docs/supabase.md` (schema atual).
@@ -129,7 +131,7 @@ PRIO-ACS está em processo de patente (INPI) e vive em repositório próprio.
                   │             │           │
    ┌──────────────┴──────┐     │   ┌────────┴──────────┐
    │  PRIO-ACS Engine    │     │   │     Vitacare      │
-   │  repo privado·FastAPI│    │   │  sistema oficial  │
+   │ visitare-engine·FastAPI│  │   │  sistema oficial  │
    │  cron por clínica   │─────┘   │  (LAN da clínica) │
    │  escreve allocations│         └───────────────────┘
    └─────────────────────┘
@@ -146,7 +148,8 @@ visitare/
 ├── site/        Astro       → visitare.app           marca Visitare (marketing + blog)
 ├── app/         React/Vite  → <muni>.app.visitare.app ACS de campo, PWA offline · white-label
 ├── dashboard/   React/Vite  → painel.visitare.app    gestor da clínica/distrito/município, online · white-label
-├── mobile/      Expo        → App Store / Play        nativo (track futuro)
+├── mobile/      Expo        → App Store / Play        Expo Universal (web+nativo) · track futuro
+├── shared/      TS          → tokens + data layer     tokens (tokens.ts→tokens.css) já consumidos por site+PWA; data layer (types/queries/schemas) é fundação do Expo Universal
 ├── db/          Supabase    migrations + funções SQL  (é o backend)
 ├── data/        parquets    dataset do hackathon (removido quando Vitacare conectar)
 ├── scripts/     loaders e utilitários
@@ -156,8 +159,14 @@ visitare/
 Dois projetos Vercel apontando para o mesmo repo via `rootDirectory`:
 `site/` → `visitare.app`; `app/` e `dashboard/` → seus subdomínios.
 
-> O **motor PRIO-ACS não está no monorepo** — vive em `rafaelbressan/prio-acs-engine`
-> (privado), por causa da patente e do ciclo de calibração próprio. Ver §11.
+> **`shared/` está vivo na v1** — `shared/tokens.ts` é a fonte canônica de cores/raios;
+> `gen-tokens-css.ts` gera `shared/tokens.css`, importado por `site/` e por `app/`
+> (PWA). Mudou um token → muda em todo o sistema. A camada de dados de `shared/`
+> (types/queries/schemas) ainda **não** é consumida pelo PWA: é fundação do Expo
+> Universal (§11), não código da v1.
+
+> O **motor PRIO-ACS não está no monorepo** — vive no repo irmão `Visitare/visitare-engine`
+> (pasta `../visitare-engine`), por causa da patente e do ciclo de calibração próprio. Ver §12.
 
 ---
 
@@ -168,7 +177,7 @@ Dois projetos Vercel apontando para o mesmo repo via `rootDirectory`:
 | **site/** | Astro + Content Collections | Marketing estático: rápido, SEO, blog em markdown. Zero JS por padrão. |
 | **app/** | React 19 + Vite 8, PWA | Offline-first com `vite-plugin-pwa`+`workbox`, cache em Dexie (IndexedDB), instalável. SSR seria pior aqui — o app roda no device da ACS, sem servidor. |
 | **dashboard/** | React 19 + Vite | **Mesma stack do app** → componentes, client Supabase, types e auth compartilhados. Ver decisão Vite-vs-Next abaixo. |
-| **mobile/** | Expo (React Native) | iOS App Store, push, features nativas. Espelha o PWA. |
+| **mobile/** | Expo Universal (RN + react-native-web) | **Um só código web+nativo.** NativeWind+Gluestack; `MapaVisitas` com split de plataforma (`.native` react-native-maps / `.web` Leaflet). Consome `shared/` (tokens + data layer). Track futuro — o PWA cobre a v1. |
 | **db/** | Supabase (Postgres) | É o backend. Funções SQL = lógica de negócio. RLS = segurança por linha. Realtime, Storage, Edge Functions inclusos. Residência BR (sa-east-1). |
 | **engine** | FastAPI (Python) | Impl de referência já em Python; calibração e futura camada de ML vivem melhor no ecossistema Python. Repo separado. |
 
@@ -540,26 +549,33 @@ Pendências em `TODO.md §4` (corrigir env Supabase, migrar para ler de `allocat
 
 ---
 
-## 11. Mobile (`mobile/`, Expo)  `[ROADMAP]`
+## 11. Mobile (`mobile/`, Expo Universal)  `[ROADMAP]`
 
 > **Fora da v1.** O PWA (§10) cobre o piloto inteiro, inclusive o "ícone do município"
-> (§7.5). Nativo só quando houver razão de App Store. `/to-prd` não gera tarefa daqui.
+> (§7.5). `/to-prd` não gera tarefa daqui. O scaffold **já existe** em `mobile/` como
+> fundação — mas não se constrói/lança na v1.
 
-Track nativo futuro. Espelha o PWA: 5 telas (Lista, Paciente, Visita, Selecionar ACS,
-Supervisor), mesmo Supabase, AsyncStorage offline, EAS Build. White-label dinâmico no
-conteúdo; ícone com a limitação de §7.5. Detalhe em `TODO.md §5`.
+**Estratégia: Expo Universal — um só código para web e nativo.** Em vez de espelhar o
+PWA num app separado, o track futuro é convergir PWA e nativo num único codebase Expo
+(React Native + react-native-web). Stack do scaffold: `expo-router`, NativeWind (mesmos
+tokens de `shared/tokens.ts`), Gluestack. `MapaVisitas` usa split de plataforma —
+`.native.tsx` (react-native-maps) e `.web.tsx` (Leaflet). Consome a camada de dados de
+`shared/` (types/queries/schemas). 5 telas (Lista, Paciente, Visita, Selecionar ACS,
+Supervisor), mesmo Supabase, offline, EAS Build. White-label dinâmico; ícone com a
+limitação de §7.5. Detalhe em `TODO.md §5`.
 
 ---
 
-## 12. Motor PRIO-ACS (repo privado)
+## 12. Motor PRIO-ACS (repo irmão `Visitare/visitare-engine`)
 
 Resumo — **spec completa em `docs/engine-spec.md`**.
 
 Serviço de **alocação em batch** (não é API por request). Roda em cron por clínica
 (config YAML), pontua todos os pacientes (fórmula PRIO-ACS 0–100), distribui entre as
 ACS com balanceamento de carga e clustering geográfico, e escreve a `allocations`. O
-app só lê. Repo: `rafaelbressan/prio-acs-engine`, FastAPI, deploy Railway. Patente no
-INPI.
+app só lê. Repo irmão: `Visitare/visitare-engine` (pasta `../visitare-engine`), FastAPI,
+deploy Railway. Já tem scaffold da fórmula PRIO-ACS v0.2 (C1–C4, L_eff dinâmico, tiers
+por quantil, 30 testes). Patente no INPI.
 
 > **Escopo v1 (decisão do grill):** o vínculo paciente→ACS é **fixo pela microárea do
 > cadastro** — a ACS é dona de uma microárea (~150 famílias) e o motor **não realoca**
