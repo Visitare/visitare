@@ -1,0 +1,69 @@
+/* =============================================================
+   VISITARE — DESIGN TOKENS (gerado automaticamente)
+   FONTE CANÔNICA: shared/tokens.ts
+   NÃO EDITE ESTE ARQUIVO DIRETAMENTE.
+   Para alterar tokens: edite tokens.ts e rode:
+     node --experimental-strip-types shared/scripts/gen-tokens-css.ts
+
+   Importado por:
+     site/src/styles/globals.css   → @import "../../../shared/tokens.css"
+     frontend/src/theme.css        → @import "../../shared/tokens.css"
+   Espelho TS em: shared/tokens.ts (para mobile/NativeWind)
+   ============================================================= */
+
+@theme {
+  /* ── Tipografia ──────────────────────────────────────────── */
+  /* site/ usa Merriweather Sans; PWA/mobile usam Prompt       */
+  --font-display:  "Merriweather Sans", system-ui, sans-serif;
+  --font-sans:     "Merriweather Sans", system-ui, sans-serif;
+  --font-heading:  "Merriweather Sans", system-ui, sans-serif;
+  --font-mono:     "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-prompt:   "Prompt", system-ui, sans-serif;
+  --font-ibm-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ── Primary — teal (ação, marca, confiança) ───── */
+  --color-primary: #006D77;
+  --color-primary-dark: #00565E;
+  --color-on-primary: #FFFEF1;
+
+  /* ── Secondary — mint (sustenta, preenche) ─────── */
+  --color-secondary: #83C5BE;
+  --color-on-secondary: #13272A;
+  --color-secondary-container: #C9E6E2;
+  --color-on-secondary-container: #13403C;
+
+  /* ── Tertiary — coral (acento, acolhimento; NÃO urgência)  */
+  --color-tertiary: #C66B4F;
+  --color-on-tertiary: #2B0F07;
+  --color-tertiary-container: #EAAFA0;
+  --color-on-tertiary-container: #5A2616;
+
+  /* ── Superfícies ───────────────────────────────── */
+  --color-surface: #FAF9F6;
+  --color-surface-container: #EDF6F9;
+  --color-surface-container-high: #DDEBEF;
+  --color-on-surface: #13272A;
+  --color-on-surface-variant: #36454F;
+
+  /* ── Urgência / erro (vermelho ≠ coral) ────────── */
+  --color-error: #C62828;
+  --color-on-error: #FFFEF1;
+  --color-error-container: #F7D6D2;
+  --color-on-error-container: #5A1410;
+  --color-error-strong: #B42318;
+
+  /* ── Contexto: subtle (fundo) + strong (texto/borda)  */
+  --color-success-subtle: #E7F4EA;
+  --color-success-strong: #1F7A33;
+  --color-warning-subtle: #FBEEDA;
+  --color-warning-strong: #8A4A09;
+  --color-info-subtle: #E4F0FB;
+  --color-info-strong: #0369A1;
+
+  /* ── Raios ───────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+}

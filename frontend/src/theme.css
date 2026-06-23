@@ -1,76 +1,60 @@
+/* Tokens de cor/raio importados de shared/tokens.css.
+   NÃO duplique valores de cor aqui — altere em shared/tokens.css. */
+@import "../../shared/tokens.css";
+
+/* Tipografia e escalas específicas do PWA (Prompt + IBM Plex Mono).
+   O site/ usa Merriweather Sans — declarado em site/src/styles/globals.css. */
 @theme {
-  --color-primary: #006d77;
-  --color-on-primary: #fffef1;
-  --color-primary-dark: #00565e;
-  --color-secondary: #83c5be;
-  --color-on-secondary: #13272a;
-  --color-secondary-container: #c9e6e2;
-  --color-on-secondary-container: #13403c;
-  --color-tertiary: #c66b4f;
-  --color-on-tertiary: #2b0f07;
-  --color-tertiary-container: #eaafa0;
-  --color-on-tertiary-container: #5a2616;
-  --color-surface: #faf9f6;
-  --color-surface-container: #edf6f9;
-  --color-surface-container-high: #ddebef;
-  --color-on-surface: #13272a;
-  --color-on-surface-variant: #36454f;
-  --color-error: #c62828;
-  --color-on-error: #fffef1;
-  --color-error-container: #f7d6d2;
-  --color-on-error-container: #5a1410;
-  --color-error-strong: #b42318;
-  --color-success-subtle: #e7f4ea;
-  --color-success-strong: #1f7a33;
-  --color-warning-subtle: #fbeeda;
-  --color-warning-strong: #8a4a09;
-  --color-info-subtle: #e4f0fb;
-  --color-info-strong: #0369a1;
-  --font-display: "Prompt";
+  /* Fontes PWA */
+  --font-sans:    "Prompt", system-ui, sans-serif;
+  --font-display: "Prompt", system-ui, sans-serif;
+  --font-heading: "Prompt", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Escala tipográfica (Material Design 3) */
   --font-headline-lg: "Prompt";
   --font-headline-md: "Prompt";
-  --font-title-lg: "Prompt";
-  --font-body-lg: "Prompt";
-  --font-body-md: "Prompt";
-  --font-label-md: "Prompt";
-  --font-label-sm: "Prompt";
-  --font-data-md: "IBM Plex Mono";
-  --text-display: 44px;
-  --text-headline-lg: 32px;
-  --text-headline-md: 24px;
-  --text-title-lg: 20px;
-  --text-body-lg: 18px;
-  --text-body-md: 16px;
-  --text-label-md: 14px;
-  --text-label-sm: 12px;
-  --text-data-md: 14px;
-  --tracking-display: 0.01em;
+  --font-title-lg:    "Prompt";
+  --font-body-lg:     "Prompt";
+  --font-body-md:     "Prompt";
+  --font-label-md:    "Prompt";
+  --font-label-sm:    "Prompt";
+  --font-data-md:     "IBM Plex Mono";
+
+  --text-display:      44px;
+  --text-headline-lg:  32px;
+  --text-headline-md:  24px;
+  --text-title-lg:     20px;
+  --text-body-lg:      18px;
+  --text-body-md:      16px;
+  --text-label-md:     14px;
+  --text-label-sm:     12px;
+  --text-data-md:      14px;
+
+  --tracking-display:     0.01em;
   --tracking-headline-lg: 0.01em;
-  --tracking-label-md: 0.01em;
-  --font-weight-display: 600;
-  --font-weight-headline-lg: 500;
-  --font-weight-headline-md: 500;
-  --font-weight-title-lg: 600;
-  --font-weight-body-lg: 400;
-  --font-weight-body-md: 400;
-  --font-weight-label-md: 500;
-  --font-weight-label-sm: 500;
-  --font-weight-data-md: 500;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-full: 9999px;
-  --spacing-base: 8px;
-  --spacing-xxs: 2px;
-  --spacing-xs: 4px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 40px;
-  --spacing-xxl: 64px;
-  --spacing-xxxl: 96px;
+  --tracking-label-md:    0.01em;
+
+  --font-weight-display:      600;
+  --font-weight-headline-lg:  500;
+  --font-weight-headline-md:  500;
+  --font-weight-title-lg:     600;
+  --font-weight-body-lg:      400;
+  --font-weight-body-md:      400;
+  --font-weight-label-md:     500;
+  --font-weight-label-sm:     500;
+  --font-weight-data-md:      500;
+
+  /* Espaçamento */
+  --spacing-base:   8px;
+  --spacing-xxs:    2px;
+  --spacing-xs:     4px;
+  --spacing-sm:     12px;
+  --spacing-md:     16px;
+  --spacing-lg:     24px;
+  --spacing-xl:     40px;
+  --spacing-xxl:    64px;
+  --spacing-xxxl:   96px;
   --spacing-gutter: 16px;
   --spacing-margin: 24px;
 }
-

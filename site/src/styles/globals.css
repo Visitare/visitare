@@ -1,70 +1,23 @@
 @import "tailwindcss";
+@import "../../../shared/tokens.css";
 
-/* ─────────────────────────────────────────────
-   DESIGN TOKENS — fonte única: /DESIGN.md
-   Usados aqui (Astro/LP) e em /frontend (PWA).
-   Altere aqui → reflete em todo o sistema.
-   ───────────────────────────────────────────── */
+/* Tokens de cor/raio importados de shared/tokens.css.
+   Fonte canônica: shared/tokens.css (espelho JS: shared/tokens.ts)
+   Descrição narrativa: DESIGN.md
+   NÃO duplique valores de cor aqui — altere em shared/tokens.css. */
+
+/* Tipografia específica do site (Astro/LP).
+   PWA e mobile usam Prompt — declarado em shared/tokens.css. */
 @theme {
-  /* Tipografia — Merriweather Sans (títulos + corpo); Prompt só na marca (PWA) */
   --font-sans:    "Merriweather Sans", system-ui, sans-serif;
   --font-heading: "Merriweather Sans", system-ui, sans-serif;
   --font-mono:    "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
-
-  /* Primary — teal (ação, marca, confiança) */
-  --color-primary:      #006D77;
-  --color-primary-dark: #00565E;
-  --color-on-primary:   #FFFEF1;
-
-  /* Secondary — mint (sustenta, preenche) */
-  --color-secondary:              #83C5BE;
-  --color-on-secondary:           #13272A;
-  --color-secondary-container:    #C9E6E2;
-  --color-on-secondary-container: #13403C;
-
-  /* Tertiary — coral (acento de marca, acolhimento) */
-  --color-tertiary:              #C66B4F;
-  --color-on-tertiary:           #2B0F07;
-  --color-tertiary-container:    #EAAFA0;
-  --color-on-tertiary-container: #5A2616;
-
-  /* Superfícies */
-  --color-surface:                #FAF9F6;
-  --color-surface-container:      #EDF6F9;
-  --color-surface-container-high: #DDEBEF;
-  --color-on-surface:             #13272A;
-  --color-on-surface-variant:     #36454F;
-
-  /* Urgência / erro (vermelho ≠ coral) */
-  --color-error:              #C62828;
-  --color-on-error:           #FFFEF1;
-  --color-error-container:    #F7D6D2;
-  --color-on-error-container: #5A1410;
-  --color-error-strong:       #B42318;
-
-  /* Contexto: subtle (fundo) + strong (texto/borda) */
-  --color-success-subtle: #E7F4EA;
-  --color-success-strong: #1F7A33;
-  --color-warning-subtle: #FBEEDA;
-  --color-warning-strong: #8A4A09;
-  --color-info-subtle:    #E4F0FB;
-  --color-info-strong:    #0369A1;
-
-  /* Raios */
-  --radius-sm:   6px;
-  --radius-md:   10px;
-  --radius-lg:   14px;
-  --radius-xl:   20px;
-  --radius-full: 9999px;
 }
 
-/* ─────────────────────────────────────────────
-   ALIASES para CossUI / shadcn CLI
-   Componentes copiados via `shadcn add @coss/ui`
-   esperam esses nomes. Apontam para os tokens acima.
-   ───────────────────────────────────────────── */
+/* ── Aliases CossUI / shadcn ─────────────────────────────────
+   Componentes copiados via `shadcn add @coss/ui` esperam esses
+   nomes. Apontam para os tokens de shared/tokens.css.          */
 :root {
-  /* Espaçamentos semânticos (como CSS vars, não como utils Tailwind) */
   --spacing-xxs:  2px;
   --spacing-xs:   4px;
   --spacing-sm:   12px;
@@ -74,7 +27,6 @@
   --spacing-xxl:  64px;
   --spacing-xxxl: 96px;
 
-  /* Aliases CossUI / shadcn */
   --background:           var(--color-surface);
   --foreground:           var(--color-on-surface);
   --primary:              var(--color-primary);
@@ -91,14 +43,11 @@
   --ring:                 var(--color-primary);
 }
 
-/* ─────────────────────────────────────────────
-   BASE GLOBAL
-   ───────────────────────────────────────────── */
+/* ── Base global ─────────────────────────────────────────── */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
 
-  /* Skip-to-content link — visível só no foco (A-002) */
   .skip-link {
     position: absolute;
     top: -100%;
@@ -114,7 +63,6 @@
   }
   .skip-link:focus { top: 1rem; }
 
-  /* Focus-visible ring — teal, nunca o azul default (A-003) */
   :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 3px;
