@@ -413,11 +413,127 @@ const { data: equipeId } = await supabase.rpc('equipe_do_profissional', {
 da Prefeitura (k-anon ≥ 5, date-shifted, ruído geográfico 100 m). RLS está
 desligado pra simplificar a demo.
 
-**Antes de qualquer paciente real (roadmap):**
-- Ligar **Row Level Security** com policies que comparam
-  `auth.jwt() -> 'equipe_id'` com a coluna `equipe_id`.
-- Trocar dropdown de ACS por **ConecteSUS Profissional** (OIDC).
-- Audit log com `pg_audit` ou trigger em todas as leituras individuais.
+**A anon key é pública por design** — ela não dá acesso irrestrito sozinha.
+O que protege os dados é o RLS no banco. Com RLS desligado (MVP), qualquer
+pessoa com a URL do projeto pode ler as tabelas; com o dataset anonimizado
+isso foi uma decisão consciente. Com pacientes reais, o RLS vira obrigatório.
+
+---
+
+## 6.1 Segurança para o piloto com pacientes reais
+
+Antes de qualquer dado real entrar no banco, ativar as três camadas abaixo
+**nesta ordem** — cada uma depende da anterior.
+
+### Camada 1 — Auth real via magic-link (WhatsApp/SMS)
+
+Trocar o dropdown de ACS por autenticação real com Supabase Auth:
+
+```ts
+// Enviar magic-link para o número do ACS (via Twilio/Zenvia/Meta)
+const { error } = await supabase.auth.signInWithOtp({
+  phone: '+5521999999999',
+})
+
+// Verificar o OTP digitado
+const { data, error } = await supabase.auth.verifyOtp({
+  phone: '+5521999999999',
+  token: '123456',
+  type: 'sms',
+})
+// data.session.access_token carrega o JWT com acs_id + equipe_id
+```
+
+O JWT gerado pelo Supabase Auth carrega as claims que o RLS usa.
+Para incluir `equipe_id` no JWT, criar uma função que popula `raw_user_meta_data`
+no momento do cadastro do ACS:
+
+```sql
+-- rodar uma vez por ACS ao cadastrar
+update auth.users
+set raw_user_meta_data = raw_user_meta_data || jsonb_build_object(
+  'acs_id',    'PROF_XXXXX',
+  'equipe_id', 'EQ_YYYYY'
+)
+where phone = '+5521999999999';
+```
+
+### Camada 2 — Row Level Security por equipe
+
+Com o `equipe_id` no JWT, ligar RLS e criar policies que isolam cada ACS
+nos dados da sua equipe:
+
+```sql
+-- Habilitar RLS nas tabelas sensíveis
+alter table pacientes          enable row level security;
+alter table visitas            enable row level security;
+alter table visitas_capturadas enable row level security;
+alter table eventos            enable row level security;
+
+-- Policy: ACS só vê pacientes da própria equipe
+create policy "acs_ve_propria_equipe" on pacientes
+  for select using (
+    equipe_id = (auth.jwt() -> 'user_metadata' ->> 'equipe_id')
+  );
+
+-- Policy: ACS só grava visitas com seu próprio profissional_id
+create policy "acs_grava_propria_visita" on visitas_capturadas
+  for insert with check (
+    profissional_id = (auth.jwt() -> 'user_metadata' ->> 'acs_id')
+  );
+
+-- Policy: ACS lê só visitas capturadas da própria equipe
+create policy "acs_le_propria_equipe_capturadas" on visitas_capturadas
+  for select using (
+    profissional_id = (auth.jwt() -> 'user_metadata' ->> 'acs_id')
+  );
+```
+
+Com essas policies ativas, a anon key continua pública — mas sem um JWT
+válido (login real), as queries não retornam nenhuma linha.
+
+### Camada 3 — Audit log de leituras individuais
+
+Para conformidade LGPD, registrar cada acesso individual a dados de paciente:
+
+```sql
+-- Tabela de audit
+create table audit_acessos (
+  id           bigserial primary key,
+  acs_id       text not null,
+  paciente_id  text not null,
+  acao         text not null,  -- 'leitura_detalhe' | 'visita_capturada'
+  acessado_em  timestamptz default now()
+);
+
+-- Trigger na função paciente_detalhe (ou na tabela, se preferir)
+create or replace function log_acesso_paciente()
+returns trigger language plpgsql security definer as $$
+begin
+  insert into audit_acessos (acs_id, paciente_id, acao)
+  values (
+    auth.jwt() -> 'user_metadata' ->> 'acs_id',
+    new.paciente_id,
+    'visita_capturada'
+  );
+  return new;
+end;
+$$;
+
+create trigger audit_visita_capturada
+  after insert on visitas_capturadas
+  for each row execute function log_acesso_paciente();
+```
+
+### Checklist antes de ir ao ar com pacientes reais
+
+- [ ] Auth real configurada (Twilio/Zenvia wired ao Supabase Auth)
+- [ ] Todos os ACS cadastrados em `auth.users` com `equipe_id` no metadata
+- [ ] RLS habilitado nas 4 tabelas sensíveis
+- [ ] Policies testadas: ACS de equipe A não vê pacientes da equipe B
+- [ ] Audit log ativo em `visitas_capturadas`
+- [ ] `service_role` key removida de qualquer código de frontend
+- [ ] Convênio SMS/base legal LGPD assinado (gate externo — ver TODO §B)
 
 ---
 
