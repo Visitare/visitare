@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Paciente } from '../types'
 import { REF_DATE, supabase } from '../lib/supabase'
-import { distribuirSemana, fetchPacientesPriorizados } from '../lib/supabaseAdapter'
+import { distribuirSemana, fetchAcsWeekList } from '../lib/supabaseAdapter'
 
 interface State {
   semana: Map<string, Paciente[]>
@@ -17,17 +17,17 @@ const EMPTY: State = {
   error: null,
 }
 
-export function usePacientesSemana(equipeId: string | null) {
-  const [state, setState] = useState<State>({ ...EMPTY, loading: !!equipeId })
+export function usePacientesSemana(acsId: string | null) {
+  const [state, setState] = useState<State>({ ...EMPTY, loading: !!acsId })
 
   const carregar = useCallback(async () => {
-    if (!equipeId) {
+    if (!acsId) {
       setState(EMPTY)
       return
     }
     setState((s) => ({ ...s, loading: true, error: null }))
     try {
-      const pacientes = await fetchPacientesPriorizados(equipeId, REF_DATE)
+      const pacientes = await fetchAcsWeekList(acsId, REF_DATE)
       setState({
         semana: distribuirSemana(pacientes),
         pacientes,
@@ -37,29 +37,24 @@ export function usePacientesSemana(equipeId: string | null) {
     } catch (e) {
       setState((s) => ({ ...s, loading: false, error: e as Error }))
     }
-  }, [equipeId])
+  }, [acsId])
 
   useEffect(() => {
     carregar()
   }, [carregar])
 
   useEffect(() => {
-    if (!equipeId) return
+    if (!acsId) return
     const channel = supabase
-      .channel(`equipe-${equipeId}`)
+      .channel(`acs-${acsId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'visitas_capturadas' },
+        { event: 'INSERT', schema: 'public', table: 'captured_visits' },
         () => carregar(),
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'eventos' },
-        () => carregar(),
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'visitas' },
+        { event: '*', schema: 'public', table: 'allocations' },
         () => carregar(),
       )
       .subscribe()
@@ -67,7 +62,7 @@ export function usePacientesSemana(equipeId: string | null) {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [equipeId, carregar])
+  }, [acsId, carregar])
 
   return { ...state, recarregar: carregar }
 }

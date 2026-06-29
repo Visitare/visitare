@@ -4,24 +4,24 @@ import { supabase } from '../lib/supabase'
 import type { RegistroVisita, SyncStatus } from '../types'
 
 // Mapeia um RegistroVisita do IndexedDB para o schema da tabela
-// `visitas_capturadas` no Supabase. O form todo vai no jsonb `payload`,
+// `captured_visits` no Supabase. O form todo vai no jsonb `payload`,
 // preservando a estrutura para auditoria e re-renderização posterior.
 function toCapturada(v: RegistroVisita) {
-  const perfil_blocos: string[] = []
-  if (v.tomaMedicacaoHipertensao !== undefined || v.valorPressao) perfil_blocos.push('hipertenso')
-  if (v.tomaMedicacaoDiabetes !== undefined || v.ultimaGlicemia) perfil_blocos.push('diabetico')
-  if (v.semanaGestacional !== undefined || v.preNatalEmDia !== undefined) perfil_blocos.push('gestante')
-  if (v.pesoCrianca || v.vacinasEmDia !== undefined) perfil_blocos.push('crianca')
-  if (v.situacaoRisco !== undefined) perfil_blocos.push('vulneravel')
-  if (perfil_blocos.length === 0) perfil_blocos.push('cadastro_familia')
+  const profileBlocks: string[] = []
+  if (v.tomaMedicacaoHipertensao !== undefined || v.valorPressao) profileBlocks.push('hipertenso')
+  if (v.tomaMedicacaoDiabetes !== undefined || v.ultimaGlicemia) profileBlocks.push('diabetico')
+  if (v.semanaGestacional !== undefined || v.preNatalEmDia !== undefined) profileBlocks.push('gestante')
+  if (v.pesoCrianca || v.vacinasEmDia !== undefined) profileBlocks.push('crianca')
+  if (v.situacaoRisco !== undefined) profileBlocks.push('vulneravel')
+  if (profileBlocks.length === 0) profileBlocks.push('cadastro_familia')
 
   // O payload é todo o registro (menos campos meta).
   const { id: _id, synced: _synced, ...payload } = v
 
   return {
-    paciente_id: v.pacienteId,
-    profissional_id: v.profissionalId,
-    perfil_blocos,
+    patient_id: v.pacienteId,
+    professional_id: v.profissionalId,
+    profile_blocks: profileBlocks,
     payload,
   }
 }
@@ -44,7 +44,7 @@ export function useSync() {
     setStatus('syncing')
     try {
       const registros = lista.map(toCapturada)
-      const { error } = await supabase.from('visitas_capturadas').insert(registros)
+      const { error } = await supabase.from('captured_visits').insert(registros)
 
       if (error) {
         // eslint-disable-next-line no-console

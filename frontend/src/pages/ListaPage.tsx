@@ -6,7 +6,7 @@ import { SyncBar } from '../components/SyncBar'
 import { MapaVisitas } from '../components/MapaVisitas'
 import { useSync } from '../hooks/useSync'
 import { usePacientesSemana } from '../hooks/usePacientesSemana'
-import { useAcsAtual } from '../hooks/useAcsAtual'
+import { useAuth } from '../hooks/useAuth'
 import { db } from '../db'
 import type { Paciente } from '../types'
 
@@ -32,36 +32,31 @@ function rangeSemanaDias(dias: string[]): string {
 
 export function ListaPage() {
   const navigate = useNavigate()
-  const { profissionalId, equipeId, loading: acsLoading } = useAcsAtual()
+  const { acsId, teamId, signOut } = useAuth()
   const { pendentes, status, isOnline, sincronizar } = useSync()
   const [visitadosSemana, setVisitadosSemana] = useState<Set<string>>(new Set())
   const [aba, setAba] = useState<'lista' | 'mapa'>('lista')
 
-  // Sem ACS escolhido → vai pro picker
-  useEffect(() => {
-    if (!acsLoading && !profissionalId) navigate('/selecionar-acs', { replace: true })
-  }, [acsLoading, profissionalId, navigate])
-
-  const { semana, loading, error } = usePacientesSemana(equipeId)
+  const { semana, loading, error } = usePacientesSemana(acsId)
   const diasOrdenados = Array.from(semana.keys()).sort()
   const todosPacientes = diasOrdenados.flatMap((d) => semana.get(d) ?? [])
   const totalSemana = todosPacientes.length
   const visitadosTotal = todosPacientes.filter((p) => visitadosSemana.has(p.id)).length
 
   useEffect(() => {
-    if (!profissionalId || diasOrdenados.length === 0) return
+    if (!acsId || diasOrdenados.length === 0) return
     const inicio = diasOrdenados[0]
     const fim = diasOrdenados[diasOrdenados.length - 1]
     db.visitas
       .where('profissionalId')
-      .equals(profissionalId)
+      .equals(acsId)
       .and((v) => v.dataVisita >= inicio && v.dataVisita <= fim)
       .toArray()
       .then((visitas) => setVisitadosSemana(new Set(visitas.map((v) => v.pacienteId))))
-  }, [profissionalId, diasOrdenados[0], diasOrdenados[diasOrdenados.length - 1]])
+  }, [acsId, diasOrdenados[0], diasOrdenados[diasOrdenados.length - 1]])
 
-  const nomeAcs = profissionalId ? `Profissional ${profissionalId.slice(-5)}` : 'ACS'
-  const labelEquipe = equipeId ? `Equipe ${equipeId.slice(0, 8)}…` : 'Sem equipe'
+  const nomeAcs = acsId ? `ACS ${acsId.slice(-5)}` : 'ACS'
+  const labelEquipe = teamId ? `Equipe ${teamId.slice(0, 8)}…` : 'Sem equipe'
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
@@ -87,10 +82,10 @@ export function ListaPage() {
             <span className="opacity-70">›</span>
           </button>
           <button
-            onClick={() => navigate('/selecionar-acs')}
+            onClick={() => signOut()}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-full border border-blue-500/40"
           >
-            🔄 Trocar ACS
+            🚪 Sair
           </button>
         </div>
         {/* Progress */}

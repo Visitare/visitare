@@ -5,7 +5,7 @@ import { PrioridadeBadge } from '../components/PrioridadeBadge'
 import { salvarVisita } from '../db'
 import { googleMapsUrl } from '../lib/supabaseAdapter'
 import { usePacienteDetalhe } from '../hooks/usePacienteDetalhe'
-import { useAcsAtual } from '../hooks/useAcsAtual'
+import { useAuth } from '../hooks/useAuth'
 import type {
   RegistroVisita, RacaCor,
   RespostaSN, Frequencia5pt, MudancaEstiloVida,
@@ -56,7 +56,7 @@ export function VisitaPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { paciente, loading, error } = usePacienteDetalhe(id)
-  const { profissionalId } = useAcsAtual()
+  const { acsId } = useAuth()
 
   const [estavaCasa, setEstavaCasa] = useState<boolean | null>(null)
   const [recusouVisita, setRecusouVisita] = useState(false)
@@ -99,14 +99,14 @@ export function VisitaPage() {
       ? Math.floor((Date.now() - new Date((form.dum as string) + 'T12:00:00').getTime()) / (7 * 24 * 3600 * 1000))
       : (form.semanaGestacional as number | undefined)
 
-    if (!profissionalId) {
+    if (!acsId) {
       setSalvando(false)
-      return navigate('/selecionar-acs')
+      return navigate('/login')
     }
 
     const registro: Omit<RegistroVisita, 'id'> = {
       pacienteId: paciente.id,
-      profissionalId,
+      profissionalId: acsId,
       dataVisita: agora.toISOString().split('T')[0],
       hora: agora.toTimeString().slice(0, 5),
       synced: false,
