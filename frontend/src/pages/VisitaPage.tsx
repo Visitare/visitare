@@ -5,7 +5,7 @@ import { PrioridadeBadge } from '../components/PrioridadeBadge'
 import { salvarVisita } from '../db'
 import { googleMapsUrl } from '../lib/supabaseAdapter'
 import { usePacienteDetalhe } from '../hooks/usePacienteDetalhe'
-import { useAcsAtual } from '../hooks/useAcsAtual'
+import { useAuth } from '../hooks/useAuth'
 import type {
   RegistroVisita, RacaCor,
   RespostaSN, Frequencia5pt, MudancaEstiloVida,
@@ -56,7 +56,7 @@ export function VisitaPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { paciente, loading, error } = usePacienteDetalhe(id)
-  const { profissionalId } = useAcsAtual()
+  const { acsId } = useAuth()
 
   const [estavaCasa, setEstavaCasa] = useState<boolean | null>(null)
   const [recusouVisita, setRecusouVisita] = useState(false)
@@ -99,14 +99,14 @@ export function VisitaPage() {
       ? Math.floor((Date.now() - new Date((form.dum as string) + 'T12:00:00').getTime()) / (7 * 24 * 3600 * 1000))
       : (form.semanaGestacional as number | undefined)
 
-    if (!profissionalId) {
+    if (!acsId) {
       setSalvando(false)
-      return navigate('/selecionar-acs')
+      return navigate('/login')
     }
 
     const registro: Omit<RegistroVisita, 'id'> = {
       pacienteId: paciente.id,
-      profissionalId,
+      profissionalId: acsId,
       dataVisita: agora.toISOString().split('T')[0],
       hora: agora.toTimeString().slice(0, 5),
       synced: false,
@@ -226,7 +226,7 @@ export function VisitaPage() {
 
       {/* Botão salvar */}
       {estavaCasa !== null && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 max-w-md mx-auto space-y-3">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 max-w-[28rem] mx-auto space-y-3">
           {camposFaltando.length > 0 && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
               <p className="text-xs font-semibold text-amber-700 mb-1">Preencha antes de salvar:</p>
@@ -253,7 +253,7 @@ export function VisitaPage() {
       {/* Modal encaminhamento */}
       {mostrarEncaminhamento && (
         <div className="fixed inset-0 bg-black/50 flex items-end z-50">
-          <div className="bg-white rounded-t-3xl w-full p-6 space-y-4 max-w-md mx-auto">
+          <div className="bg-white rounded-t-3xl w-full p-6 space-y-4 max-w-[28rem] mx-auto">
             <div className="text-center">
               <div className="text-3xl mb-2">📋</div>
               <h2 className="text-lg font-bold text-slate-800">Indicar consulta necessária</h2>

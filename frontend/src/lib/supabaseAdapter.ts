@@ -1,51 +1,42 @@
-// Adapter entre o schema do Supabase (snake_case, raw) e o tipo Paciente
-// que o resto do app já consome. Mantém a interface estável; só a fonte
-// de dados muda — de realData.ts (estático) para Supabase ao vivo.
+// Adapter entre o schema do Supabase (inglês, vindo do engine via `allocations`)
+// e o tipo `Paciente` que o resto do app já consome. Mantém a interface estável;
+// só a fonte muda — agora é a lista semanal do ACS (engine SSOT, ADR 0001).
 
 import type { Condicao, FaixaEtaria, Paciente, Prioridade, RacaCor } from '../types'
-import { DEMO_EQUIPE_ID, REF_DATE, supabase } from './supabase'
+import { REF_DATE, supabase } from './supabase'
 
 // --------------------------------------------------------------------------
-// Shape que vem das RPCs do Supabase
+// Shape vindo da RPC acs_week_list (allocations JOIN patients) — inglês
 // --------------------------------------------------------------------------
 
-interface RpcPaciente {
-  paciente_id: string
-  equipe_id: string
-  nome_display: string
-  faixa_etaria: string
-  sexo: string
-  raca_cor: string | null
-  hipertenso: boolean
-  diabetico: boolean
-  gestacao: boolean
-  situacao_vulnerabilidade: boolean
-  endereco_latitude: number
-  endereco_longitude: number
+interface AcsWeekRow {
+  patient_id: string
+  team_id: string
+  age_band: string
+  sex: string
+  race_color: string | null
+  social_vulnerability: boolean
+  latitude: number
+  longitude: number
+  hypertensive: boolean
+  diabetic: boolean
+  pregnant: boolean
+  priority_order: number
   score: number
   score_icsap: number
   score_life_stage: number
   score_care_gap: number
   score_social: number
-  tier: 'alto' | 'medio' | 'habitual'
-  cadencia_oficial: string
-  linha_de_cuidado: string
-  ultima_visita: string | null
-  dias_gap: number
-  gap_limite: number
-  gap_vencido: boolean
-  evento_recente_60d: boolean
-  ultimo_evento_tipo: string | null
-  ultimo_evento_data: string | null
-  motivo_curto: string
+  tier: 'high' | 'medium' | 'routine'
+  reason: string
+  status: string
+  last_visit: string | null
 }
 
 // --------------------------------------------------------------------------
 // Mapeamentos
 // --------------------------------------------------------------------------
 
-// Nome de exibição determinístico a partir do hash do paciente.
-// O dataset é anonimizado; usamos uma persona estável pra demo soar humana.
 const NOMES = [
   'Maria', 'Ana', 'Camila', 'Luciana', 'Carla', 'Patricia', 'Fernanda', 'Juliana',
   'Beatriz', 'Sandra', 'Daniel', 'Pedro', 'Thiago', 'Antonio', 'Rafael', 'Lucas',
@@ -53,31 +44,30 @@ const NOMES = [
 ]
 const SOBRENOMES = 'ABCDEFGHIJKLMNOPRSTV'
 
-function nomeDeterministico(pacienteId: string, sexo: string): string {
-  // hash simples: soma de char codes
+function nomeDeterministico(patientId: string, sex: string): string {
   let h = 0
-  for (let i = 0; i < pacienteId.length; i++) h = (h * 31 + pacienteId.charCodeAt(i)) >>> 0
+  for (let i = 0; i < patientId.length; i++) h = (h * 31 + patientId.charCodeAt(i)) >>> 0
   const femininos = NOMES.slice(0, 10)
   const masculinos = NOMES.slice(10)
-  const pool = sexo === 'Feminino' ? femininos : masculinos
+  const pool = sex === 'Feminino' ? femininos : masculinos
   const primeiro = pool[h % pool.length]
   const sobrenome = SOBRENOMES[(h >>> 5) % SOBRENOMES.length]
   return `${primeiro} ${sobrenome}.`
 }
 
-function tierParaPrioridade(score: number, tier: RpcPaciente['tier']): Prioridade {
-  if (tier === 'alto') return score >= 75 ? 'critica' : 'alta'
-  if (tier === 'medio') return 'media'
+function tierParaPrioridade(score: number, tier: AcsWeekRow['tier']): Prioridade {
+  if (tier === 'high') return score >= 75 ? 'critica' : 'alta'
+  if (tier === 'medium') return 'media'
   return 'baixa'
 }
 
-function condicoesDeFlags(p: RpcPaciente): Condicao[] {
+function condicoesDeFlags(p: AcsWeekRow): Condicao[] {
   const c: Condicao[] = []
-  if (p.gestacao) c.push('gestante')
-  if (p.diabetico) c.push('diabetico')
-  if (p.hipertenso) c.push('hipertenso')
-  if (p.situacao_vulnerabilidade) c.push('vulneravel')
-  if (p.faixa_etaria === '0-6') c.push('crianca')
+  if (p.pregnant) c.push('gestante')
+  if (p.diabetic) c.push('diabetico')
+  if (p.hypertensive) c.push('hipertenso')
+  if (p.social_vulnerability) c.push('vulneravel')
+  if (p.age_band === '0-6') c.push('crianca')
   return c
 }
 
@@ -103,34 +93,34 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
-function mapRow(p: RpcPaciente, equipeLat: number, equipeLng: number): Paciente {
-  const distanciaKm = haversineKm(equipeLat, equipeLng, p.endereco_latitude, p.endereco_longitude)
+function mapRow(p: AcsWeekRow, teamLat: number, teamLng: number): Paciente {
+  const distanciaKm = haversineKm(teamLat, teamLng, p.latitude, p.longitude)
   return {
-    id: p.paciente_id,
-    nome: nomeDeterministico(p.paciente_id, p.sexo),
-    equipeId: p.equipe_id,
-    unidadeId: p.equipe_id.slice(0, 8), // placeholder; RPC não traz unidade_id
-    faixaEtaria: faixaEtaria(p.faixa_etaria),
-    sexo: p.sexo === 'Feminino' ? 'Feminino' : 'Masculino',
-    racaCor: racaCor(p.raca_cor),
-    situacaoVulnerabilidade: p.situacao_vulnerabilidade,
-    lat: p.endereco_latitude,
-    lng: p.endereco_longitude,
+    id: p.patient_id,
+    nome: nomeDeterministico(p.patient_id, p.sex),
+    equipeId: p.team_id,
+    unidadeId: p.team_id.slice(0, 8),
+    faixaEtaria: faixaEtaria(p.age_band),
+    sexo: p.sex === 'Feminino' ? 'Feminino' : 'Masculino',
+    racaCor: racaCor(p.race_color),
+    situacaoVulnerabilidade: p.social_vulnerability,
+    lat: p.latitude,
+    lng: p.longitude,
     distanciaKm: Math.round(distanciaKm * 10) / 10,
-    hipertenso: p.hipertenso,
-    diabetico: p.diabetico,
-    gestante: p.gestacao,
+    hipertenso: p.hypertensive,
+    diabetico: p.diabetic,
+    gestante: p.pregnant,
     condicoes: condicoesDeFlags(p),
     prioridade: tierParaPrioridade(p.score, p.tier),
     prioScore: p.score,
-    motivoPrioridade: p.motivo_curto.replace(/\.$/, ''),
-    ultimaVisita: p.ultima_visita,
+    motivoPrioridade: (p.reason ?? '').replace(/\.$/, ''),
+    ultimaVisita: p.last_visit,
     enderecoDescricao: `${(Math.round(distanciaKm * 10) / 10).toString().replace('.', ',')} km da unidade`,
   }
 }
 
 // --------------------------------------------------------------------------
-// Fetch público — o que ListaPage / SupervisorPage chama
+// Geo da equipe (clínica)
 // --------------------------------------------------------------------------
 
 export interface GeoEquipe {
@@ -138,53 +128,82 @@ export interface GeoEquipe {
   lng: number
 }
 
-export async function fetchEquipeGeo(equipeId = DEMO_EQUIPE_ID): Promise<GeoEquipe> {
+export async function fetchTeamGeo(teamId: string): Promise<GeoEquipe> {
   const { data, error } = await supabase
-    .from('equipes')
-    .select('endereco_latitude, endereco_longitude')
-    .eq('equipe_id', equipeId)
+    .from('teams')
+    .select('latitude, longitude')
+    .eq('team_id', teamId)
     .single()
   if (error || !data) throw error ?? new Error('equipe não encontrada')
-  return { lat: data.endereco_latitude, lng: data.endereco_longitude }
+  return { lat: data.latitude, lng: data.longitude }
 }
 
 export function googleMapsUrl(p: Pick<Paciente, 'lat' | 'lng'>): string {
   return `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`
 }
 
-export async function fetchPacienteDetalhe(
-  pacienteId: string,
-  refDate = REF_DATE,
-): Promise<Paciente | null> {
-  const { data, error } = await supabase.rpc('paciente_detalhe', {
-    p_paciente_id: pacienteId,
-    p_ref_date: refDate,
+// --------------------------------------------------------------------------
+// Lista da semana do ACS — engine SSOT via acs_week_list
+// --------------------------------------------------------------------------
+
+// O acs_id vem do JWT (RPC SECURITY DEFINER, migration 013) — não é parâmetro.
+export async function fetchAcsWeekList(refDate = REF_DATE): Promise<Paciente[]> {
+  const { data, error } = await supabase.rpc('acs_week_list', {
+    p_period_start: refDate,
   })
   if (error) throw error
-  if (!data || !data.paciente) return null
+  const rows = (data as AcsWeekRow[]) ?? []
+  if (rows.length === 0) return []
 
-  const equipeId = data.paciente.equipe_id as string
-  const geo = await fetchEquipeGeo(equipeId)
-  return mapRow(data.paciente as RpcPaciente, geo.lat, geo.lng)
+  const geo = await fetchTeamGeo(rows[0].team_id)
+  return rows.map((r) => mapRow(r, geo.lat, geo.lng))
 }
 
-export async function fetchPacientesPriorizados(
-  equipeId = DEMO_EQUIPE_ID,
-  refDate = REF_DATE,
-  limit = 25,
-): Promise<Paciente[]> {
-  const { data, error } = await supabase
-    .rpc('priorizacao_pacientes', { p_equipe_id: equipeId, p_ref_date: refDate })
-    .order('score', { ascending: false })
-    .limit(limit)
-  if (error) throw error
+// --------------------------------------------------------------------------
+// Detalhe do paciente — patient_detail
+// --------------------------------------------------------------------------
 
-  const geo = await fetchEquipeGeo(equipeId)
-  return (data as RpcPaciente[]).map((r) => mapRow(r, geo.lat, geo.lng))
+export async function fetchPacienteDetalhe(
+  patientId: string,
+  refDate = REF_DATE,
+): Promise<Paciente | null> {
+  const { data, error } = await supabase.rpc('patient_detail', {
+    p_patient_id: patientId,
+    p_period_start: refDate,
+  })
+  if (error) throw error
+  if (!data || !data.patient) return null
+
+  const p = data.patient as Partial<AcsWeekRow> & { team_id: string }
+  const geo = await fetchTeamGeo(p.team_id)
+  // patient_detail pode não ter priority_order/last_visit; preenche defaults.
+  const row: AcsWeekRow = {
+    patient_id: p.patient_id as string,
+    team_id: p.team_id,
+    age_band: (p.age_band as string) ?? '19-45',
+    sex: (p.sex as string) ?? 'Feminino',
+    race_color: (p.race_color as string) ?? null,
+    social_vulnerability: !!p.social_vulnerability,
+    latitude: p.latitude as number,
+    longitude: p.longitude as number,
+    hypertensive: !!p.hypertensive,
+    diabetic: !!p.diabetic,
+    pregnant: !!p.pregnant,
+    priority_order: p.priority_order ?? 0,
+    score: p.score ?? 0,
+    score_icsap: p.score_icsap ?? 0,
+    score_life_stage: p.score_life_stage ?? 0,
+    score_care_gap: p.score_care_gap ?? 0,
+    score_social: p.score_social ?? 0,
+    tier: (p.tier as AcsWeekRow['tier']) ?? 'routine',
+    reason: (p.reason as string) ?? '',
+    status: (p.status as string) ?? 'pending',
+    last_visit: null,
+  }
+  return mapRow(row, geo.lat, geo.lng)
 }
 
 // Distribui em 5 dias úteis (seg a sex da semana atual), até 5 por dia.
-// Mantém compatibilidade com getPacientesSemana() do realData.
 export function distribuirSemana(pacientes: Paciente[]): Map<string, Paciente[]> {
   const hoje = new Date()
   const diaSemana = hoje.getDay()
@@ -200,14 +219,9 @@ export function distribuirSemana(pacientes: Paciente[]): Map<string, Paciente[]>
   const mapa = new Map<string, Paciente[]>()
   dias.forEach((d) => mapa.set(d, []))
 
-  const ordem: Record<Prioridade, number> = { critica: 0, alta: 1, media: 2, baixa: 3 }
-  const ordenados = [...pacientes].sort((a, b) => {
-    const diff = ordem[a.prioridade] - ordem[b.prioridade]
-    return diff !== 0 ? diff : b.prioScore - a.prioScore
-  })
-
+  // Mantém a ordem do engine (priority_order já vem da RPC, com rota otimizada).
   let diaIdx = 0
-  for (const p of ordenados) {
+  for (const p of pacientes) {
     while (diaIdx < dias.length) {
       const lista = mapa.get(dias[diaIdx])!
       if (lista.length < 5) {
