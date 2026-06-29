@@ -146,12 +146,9 @@ export function googleMapsUrl(p: Pick<Paciente, 'lat' | 'lng'>): string {
 // Lista da semana do ACS — engine SSOT via acs_week_list
 // --------------------------------------------------------------------------
 
-export async function fetchAcsWeekList(
-  acsId: string,
-  refDate = REF_DATE,
-): Promise<Paciente[]> {
+// O acs_id vem do JWT (RPC SECURITY DEFINER, migration 013) — não é parâmetro.
+export async function fetchAcsWeekList(refDate = REF_DATE): Promise<Paciente[]> {
   const { data, error } = await supabase.rpc('acs_week_list', {
-    p_acs_id: acsId,
     p_period_start: refDate,
   })
   if (error) throw error
@@ -222,14 +219,9 @@ export function distribuirSemana(pacientes: Paciente[]): Map<string, Paciente[]>
   const mapa = new Map<string, Paciente[]>()
   dias.forEach((d) => mapa.set(d, []))
 
-  const ordem: Record<Prioridade, number> = { critica: 0, alta: 1, media: 2, baixa: 3 }
-  const ordenados = [...pacientes].sort((a, b) => {
-    const diff = ordem[a.prioridade] - ordem[b.prioridade]
-    return diff !== 0 ? diff : b.prioScore - a.prioScore
-  })
-
+  // Mantém a ordem do engine (priority_order já vem da RPC, com rota otimizada).
   let diaIdx = 0
-  for (const p of ordenados) {
+  for (const p of pacientes) {
     while (diaIdx < dias.length) {
       const lista = mapa.get(dias[diaIdx])!
       if (lista.length < 5) {

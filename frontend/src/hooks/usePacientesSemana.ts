@@ -27,7 +27,7 @@ export function usePacientesSemana(acsId: string | null) {
     }
     setState((s) => ({ ...s, loading: true, error: null }))
     try {
-      const pacientes = await fetchAcsWeekList(acsId, REF_DATE)
+      const pacientes = await fetchAcsWeekList(REF_DATE)
       setState({
         semana: distribuirSemana(pacientes),
         pacientes,
@@ -49,12 +49,12 @@ export function usePacientesSemana(acsId: string | null) {
       .channel(`acs-${acsId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'captured_visits' },
+        { event: 'INSERT', schema: 'public', table: 'captured_visits', filter: `professional_id=eq.${acsId}` },
         () => carregar(),
       )
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'allocations' },
+        { event: '*', schema: 'public', table: 'allocations', filter: `acs_id=eq.${acsId}` },
         () => carregar(),
       )
       .subscribe()
