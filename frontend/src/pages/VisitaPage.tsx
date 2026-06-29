@@ -226,7 +226,7 @@ export function VisitaPage() {
 
       {/* Botão salvar */}
       {estavaCasa !== null && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 max-w-md mx-auto space-y-3">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 max-w-[28rem] mx-auto space-y-3">
           {camposFaltando.length > 0 && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
               <p className="text-xs font-semibold text-amber-700 mb-1">Preencha antes de salvar:</p>
@@ -253,7 +253,7 @@ export function VisitaPage() {
       {/* Modal encaminhamento */}
       {mostrarEncaminhamento && (
         <div className="fixed inset-0 bg-black/50 flex items-end z-50">
-          <div className="bg-white rounded-t-3xl w-full p-6 space-y-4 max-w-md mx-auto">
+          <div className="bg-white rounded-t-3xl w-full p-6 space-y-4 max-w-[28rem] mx-auto">
             <div className="text-center">
               <div className="text-3xl mb-2">📋</div>
               <h2 className="text-lg font-bold text-slate-800">Indicar consulta necessária</h2>

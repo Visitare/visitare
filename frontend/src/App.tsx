@@ -23,7 +23,7 @@ function RequireAuth({ children }: { children: ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="max-w-md mx-auto min-h-screen">
+      <div className="max-w-[28rem] mx-auto min-h-screen">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<RequireAuth><ListaPage /></RequireAuth>} />
