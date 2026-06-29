@@ -58,9 +58,11 @@ BEGIN
     LIMIT 1;
 
     IF FOUND THEN
-        claims := jsonb_set(claims, '{acs_id}',  to_jsonb(prof.acs_id));
-        claims := jsonb_set(claims, '{team_id}', to_jsonb(prof.team_id));
-        claims := jsonb_set(claims, '{role}',    to_jsonb(prof.role));
+        claims := jsonb_set(claims, '{acs_id}',    to_jsonb(prof.acs_id));
+        claims := jsonb_set(claims, '{team_id}',   to_jsonb(prof.team_id));
+        -- NÃO use o claim reservado `role` (PostgREST faz SET ROLE com ele);
+        -- o papel da aplicação vai em `user_role`.
+        claims := jsonb_set(claims, '{user_role}', to_jsonb(prof.role));
     END IF;
 
     RETURN jsonb_set(event, '{claims}', claims);

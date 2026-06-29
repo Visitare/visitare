@@ -32,7 +32,8 @@ export function readClaims(accessToken: string | undefined): AcsClaims | null {
       atob(accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')),
     )
     if (!payload.acs_id) return null
-    return { acs_id: payload.acs_id, team_id: payload.team_id, role: payload.role ?? 'acs' }
+    // `role` é reservado (PostgREST); o papel da app vem em `user_role`.
+    return { acs_id: payload.acs_id, team_id: payload.team_id, role: payload.user_role ?? 'acs' }
   } catch {
     return null
   }
