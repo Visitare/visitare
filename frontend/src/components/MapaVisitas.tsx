@@ -4,17 +4,23 @@ import L from 'leaflet'
 import type { Paciente, Prioridade } from '../types'
 import { EQUIPE_LAT, EQUIPE_LNG } from '../mockData'
 
+// Referencia as CSS custom properties emitidas pelo @theme do Tailwind v4
+// (shared/tokens.css). Nada de hex literal aqui — token muda, mapa acompanha.
+// Rampa de alarme decrescente; o coral de marca fica fora dela de propósito
+// (DESIGN.md: urgência é vermelho, coral nunca é alerta).
 const CORES: Record<Prioridade, string> = {
-  critica: '#dc2626',
-  alta: '#ea580c',
-  media: '#ca8a04',
-  baixa: '#16a34a',
+  critica: 'var(--color-error)',
+  alta:    'var(--color-warning-strong)',
+  media:   'var(--color-secondary)',
+  baixa:   'var(--color-on-surface-variant)',
 }
 
+const COR_VISITADO = 'var(--color-success-strong)'
+
 function pinPaciente(prioridade: Prioridade, visitado: boolean) {
-  const cor = visitado ? '#94a3b8' : CORES[prioridade]
+  const cor = visitado ? COR_VISITADO : CORES[prioridade]
   return L.divIcon({
-    html: `<div style="width:22px;height:22px;border-radius:50%;background:${cor};border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5)"></div>`,
+    html: `<div style="width:22px;height:22px;border-radius:50%;background:${cor};border:3px solid var(--color-surface-bright);box-shadow:0 2px 6px rgba(19,39,42,.45)"></div>`,
     className: 'leaflet-div-icon-paciente',
     iconSize: [22, 22],
     iconAnchor: [11, 11],
@@ -23,7 +29,7 @@ function pinPaciente(prioridade: Prioridade, visitado: boolean) {
 }
 
 const PIN_UNIDADE = L.divIcon({
-  html: `<div style="width:28px;height:28px;border-radius:50%;background:#1d4ed8;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:14px">🏥</div>`,
+  html: `<div style="width:28px;height:28px;border-radius:50%;background:var(--color-primary);border:3px solid var(--color-surface-bright);box-shadow:0 2px 6px rgba(19,39,42,.45);display:flex;align-items:center;justify-content:center;font-size:14px">🏥</div>`,
   className: 'leaflet-div-icon-unidade',
   iconSize: [28, 28],
   iconAnchor: [14, 14],
@@ -53,18 +59,18 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
 
     L.marker([EQUIPE_LAT, EQUIPE_LNG], { icon: PIN_UNIDADE })
       .addTo(map)
-      .bindPopup('<b>Clínica da Família</b><br><span style="font-size:11px;color:#64748b">Ponto de partida</span>')
+      .bindPopup('<b>Clínica da Família</b><br><span style="font-size:11px;color:var(--color-on-surface-variant)">Ponto de partida</span>')
 
     for (const p of pacientes) {
       const visitado = visitados.has(p.id)
       const htmlPopup = `
         <div style="min-width:180px;padding:2px 0">
           <div style="font-weight:700;font-size:14px;margin-bottom:3px">${p.nome}</div>
-          <div style="font-size:12px;color:#64748b;margin-bottom:2px">${p.faixaEtaria}a · ${p.distanciaKm.toFixed(1).replace('.', ',')} km da unidade</div>
-          <div style="font-size:11px;color:#64748b;margin-bottom:8px;line-height:1.4">${p.motivoPrioridade}</div>
+          <div style="font-size:12px;color:var(--color-on-surface-variant);margin-bottom:2px">${p.faixaEtaria}a · ${p.distanciaKm.toFixed(1).replace('.', ',')} km da unidade</div>
+          <div style="font-size:11px;color:var(--color-on-surface-variant);margin-bottom:8px;line-height:1.4">${p.motivoPrioridade}</div>
           ${visitado
-            ? '<span style="font-size:12px;color:#16a34a;font-weight:700">✓ Visitado</span>'
-            : `<button data-pid="${p.id}" style="background:#1d4ed8;color:white;border:none;border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;touch-action:manipulation">Ver paciente →</button>`
+            ? '<span style="font-size:12px;color:var(--color-success-strong);font-weight:700">✓ Visitado</span>'
+            : `<button data-pid="${p.id}" style="background:var(--color-primary);color:var(--color-on-primary);border:none;border-radius:var(--radius-md);padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;width:100%;touch-action:manipulation">Ver paciente →</button>`
           }
         </div>
       `
@@ -96,7 +102,7 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
   return (
     <div className="flex flex-col h-full">
       {/* Legenda */}
-      <div className="flex gap-3 px-4 py-2 bg-white border-b border-slate-100 text-xs text-slate-500 flex-wrap">
+      <div className="flex gap-3 px-4 py-2 bg-surface-bright border-b border-surface-container-high text-xs text-on-surface-variant flex-wrap">
         {(['critica', 'alta', 'media', 'baixa'] as Prioridade[]).map((p) => (
           <span key={p} className="flex items-center gap-1">
             <span style={{ background: CORES[p] }} className="inline-block w-3 h-3 rounded-full" />
@@ -104,7 +110,7 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
           </span>
         ))}
         <span className="flex items-center gap-1">
-          <span style={{ background: '#94a3b8' }} className="inline-block w-3 h-3 rounded-full" />
+          <span style={{ background: COR_VISITADO }} className="inline-block w-3 h-3 rounded-full" />
           Visitado
         </span>
       </div>

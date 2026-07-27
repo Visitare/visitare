@@ -15,25 +15,37 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
+      includeAssets: [
+        'favicon.svg',
+        'apple-touch-icon.png',
+        'pwa-192x192.png',
+        'pwa-512x512.png',
+        'pwa-maskable-512x512.png',
+      ],
+      // Cores da marca (shared/tokens.ts): teal de ação, ivory de papel.
+      // background_color é a tela de splash — ivory, não teal, para não dar
+      // um flash escuro antes do app pintar.
       manifest: {
-        name: 'ACS Digital',
-        short_name: 'ACS Digital',
-        description: 'Inteligência no território para o Agente Comunitário de Saúde do Rio de Janeiro',
-        theme_color: '#1d4ed8',
-        background_color: '#1d4ed8',
+        name: 'Visitare ACS',
+        short_name: 'Visitare',
+        description: 'A lista da semana da Agente Comunitária de Saúde — priorizada e disponível offline.',
+        lang: 'pt-BR',
+        theme_color: '#006D77',
+        background_color: '#FAF9F6',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
         scope: '/',
         icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        // woff2 entra no precache: a ACS abre o app offline em campo, e sem isso
+        // a Prompt não carrega e o app cai no system-ui — a marca some justo ali.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\./,

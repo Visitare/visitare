@@ -11,12 +11,12 @@ export function SyncBar({ pendentes, status, isOnline, onSync }: Props) {
   if (status === 'synced' && isOnline) return null
 
   const bgColor = !isOnline
-    ? 'bg-slate-700'
+    ? 'bg-on-surface'
     : status === 'error'
-      ? 'bg-red-600'
+      ? 'bg-error'
       : status === 'syncing'
-        ? 'bg-blue-600'
-        : 'bg-amber-500'
+        ? 'bg-primary'
+        : 'bg-warning-strong'
 
   const label = !isOnline
     ? `Sem conexão — ${pendentes} registro${pendentes !== 1 ? 's' : ''} salvo${pendentes !== 1 ? 's' : ''} offline`
@@ -30,7 +30,7 @@ export function SyncBar({ pendentes, status, isOnline, onSync }: Props) {
     <button
       onClick={onSync}
       disabled={!isOnline || status === 'syncing'}
-      className={`w-full py-2 px-4 text-sm font-medium text-white flex items-center justify-center gap-2 ${bgColor} disabled:opacity-70`}
+      className={`w-full py-2 px-4 text-sm font-medium text-on-primary flex items-center justify-center gap-2 ${bgColor} disabled:opacity-70`}
     >
       {status === 'syncing' ? (
         <span className="animate-spin text-base">⟳</span>

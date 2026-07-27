@@ -59,23 +59,23 @@ export function ListaPage() {
   const labelEquipe = teamId ? `Equipe ${teamId.slice(0, 8)}…` : 'Sem equipe'
 
   return (
-    <div className="h-screen bg-slate-50 flex flex-col overflow-hidden">
+    <div className="h-screen bg-surface flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-blue-700 text-white px-4 pt-10 pb-4">
+      <div className="bg-primary text-on-primary px-4 pt-10 pb-4">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold">Olá, {nomeAcs} 👋</h1>
-            <p className="text-blue-200 text-sm mt-0.5">{labelEquipe}</p>
+            <p className="text-on-primary/70 text-sm mt-0.5">{labelEquipe}</p>
           </div>
           <div className="text-right">
             <div className="text-3xl font-bold">{visitadosTotal}</div>
-            <div className="text-blue-200 text-xs">de {totalSemana} visitas</div>
+            <div className="text-on-primary/70 text-xs">de {totalSemana} visitas</div>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             onClick={() => navigate('/supervisor')}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-full border border-blue-500/40"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-on-primary/85 bg-primary-dark/60 px-3 py-1.5 rounded-full border border-on-primary/30"
           >
             <span>📊</span>
             Painel de gestão
@@ -83,28 +83,28 @@ export function ListaPage() {
           </button>
           <button
             onClick={() => signOut()}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-100 bg-blue-800/60 px-3 py-1.5 rounded-full border border-blue-500/40"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-on-primary/85 bg-primary-dark/60 px-3 py-1.5 rounded-full border border-on-primary/30"
           >
             🚪 Sair
           </button>
         </div>
         {/* Progress */}
         <div className="mt-3 mb-4">
-          <div className="h-1.5 bg-blue-900 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-primary-dark rounded-full overflow-hidden">
             <div
-              className="h-full bg-white rounded-full transition-all"
+              className="h-full bg-surface-bright rounded-full transition-all"
               style={{ width: `${totalSemana > 0 ? (visitadosTotal / totalSemana) * 100 : 0}%` }}
             />
           </div>
         </div>
         {/* Toggle Lista / Mapa */}
-        <div className="flex bg-blue-800 rounded-xl p-1 gap-1">
+        <div className="flex bg-primary-dark rounded-xl p-1 gap-1">
           {(['lista', 'mapa'] as const).map((a) => (
             <button
               key={a}
               onClick={() => setAba(a)}
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                aba === a ? 'bg-white text-blue-700' : 'text-blue-200'
+                aba === a ? 'bg-surface-bright text-primary' : 'text-on-primary/70'
               }`}
             >
               {a === 'lista' ? '☰ Lista' : '🗺 Mapa'}
@@ -128,28 +128,28 @@ export function ListaPage() {
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {/* Range da semana */}
           <div className="flex items-baseline justify-between">
-            <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+            <h2 className="text-sm font-semibold text-on-surface-variant uppercase tracking-wide">
               {rangeSemanaDias(diasOrdenados)}
             </h2>
-            <span className="text-xs text-slate-400">{totalSemana} visitas</span>
+            <span className="text-xs text-on-surface-variant/70">{totalSemana} visitas</span>
           </div>
 
           {loading && (
-            <div className="text-center py-12 text-slate-400 text-sm">
+            <div className="text-center py-12 text-on-surface-variant/70 text-sm">
               Calculando prioridades…
             </div>
           )}
 
           {error && !loading && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+            <div className="rounded-lg bg-error-container border border-error-strong/30 px-4 py-3 text-sm text-on-error-container">
               Não consegui falar com o servidor de prioridades.
               <br />
-              <span className="text-red-500 text-xs">{error.message}</span>
+              <span className="text-error-strong text-xs">{error.message}</span>
             </div>
           )}
 
           {!loading && !error && todosPacientes.length === 0 && (
-            <div className="text-center py-12 text-slate-400 text-sm">
+            <div className="text-center py-12 text-on-surface-variant/70 text-sm">
               Nenhuma visita planejada para esta semana.
             </div>
           )}
@@ -180,18 +180,18 @@ function PacienteCard({ paciente, ordem, visitado, onClick }: CardProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white rounded-2xl shadow-sm border border-slate-200 p-4 active:scale-[0.98] transition-transform"
+      className="w-full text-left bg-surface-bright rounded-2xl shadow-sm border border-surface-container-high p-4 active:scale-[0.98] transition-transform"
     >
       <div className="flex items-start gap-3">
         <div
           className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
             visitado
-              ? 'bg-green-100 text-green-600'
+              ? 'bg-success-subtle text-success-strong'
               : paciente.prioridade === 'critica'
-                ? 'bg-red-100 text-red-600'
+                ? 'bg-error-container text-error-strong'
                 : paciente.prioridade === 'alta'
-                  ? 'bg-orange-100 text-orange-600'
-                  : 'bg-slate-100 text-slate-500'
+                  ? 'bg-warning-subtle text-warning-strong'
+                  : 'bg-surface-container text-on-surface-variant'
           }`}
         >
           {visitado ? '✓' : ordem}
@@ -199,12 +199,12 @@ function PacienteCard({ paciente, ordem, visitado, onClick }: CardProps) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`font-semibold text-base ${visitado ? 'text-slate-400' : 'text-slate-800'}`}>
+            <span className={`font-semibold text-base ${visitado ? 'text-on-surface-variant/70' : 'text-on-surface'}`}>
               {paciente.nome}
             </span>
             {!visitado && <PrioridadeBadge prioridade={paciente.prioridade} />}
             {visitado && (
-              <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-success-strong font-medium bg-success-subtle px-2 py-0.5 rounded-full">
                 Visitado
               </span>
             )}
@@ -217,17 +217,17 @@ function PacienteCard({ paciente, ordem, visitado, onClick }: CardProps) {
           </div>
 
           {!visitado && (
-            <p className="text-xs text-slate-500 mt-1.5 leading-snug">{paciente.motivoPrioridade}</p>
+            <p className="text-xs text-on-surface-variant mt-1.5 leading-snug">{paciente.motivoPrioridade}</p>
           )}
 
-          <div className="flex items-center gap-3 mt-2 text-xs text-slate-400">
+          <div className="flex items-center gap-3 mt-2 text-xs text-on-surface-variant/70">
             <span>📍 {paciente.distanciaKm.toFixed(1).replace('.', ',')} km</span>
             <span>·</span>
             <span>{paciente.sexo[0]} · {paciente.faixaEtaria} anos</span>
           </div>
         </div>
 
-        <span className="text-slate-300 text-lg flex-shrink-0">›</span>
+        <span className="text-on-surface-variant/40 text-lg flex-shrink-0">›</span>
       </div>
     </button>
   )

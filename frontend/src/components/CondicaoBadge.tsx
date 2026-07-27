@@ -1,17 +1,20 @@
 import type { Condicao } from '../types'
 
-const config: Record<Condicao, { label: string; emoji: string; className: string }> = {
-  gestante: { label: 'Gestante', emoji: '🤰', className: 'bg-pink-100 text-pink-700' },
-  diabetico: { label: 'Diabético', emoji: '💉', className: 'bg-purple-100 text-purple-700' },
-  hipertenso: { label: 'Hipertenso', emoji: '❤️', className: 'bg-blue-100 text-blue-700' },
-  vulneravel: { label: 'Vulnerável', emoji: '🛡️', className: 'bg-amber-100 text-amber-700' },
-  crianca: { label: 'Criança', emoji: '👶', className: 'bg-green-100 text-green-700' },
+// Chips de categoria — mint uniforme (DESIGN.md: "mint sustenta … chips de
+// categoria"). A distinção entre condições fica no emoji + rótulo, não na cor:
+// cor aqui é reservada para PRIORIDADE, que é o que a ACS lê primeiro no card.
+const config: Record<Condicao, { label: string; emoji: string }> = {
+  gestante:   { label: 'Gestante',   emoji: '🤰' },
+  diabetico:  { label: 'Diabético',  emoji: '💉' },
+  hipertenso: { label: 'Hipertenso', emoji: '❤️' },
+  vulneravel: { label: 'Vulnerável', emoji: '🛡️' },
+  crianca:    { label: 'Criança',    emoji: '👶' },
 }
 
 export function CondicaoBadge({ condicao }: { condicao: Condicao }) {
-  const { label, emoji, className } = config[condicao]
+  const { label, emoji } = config[condicao]
   return (
-    <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 ${className}`}>
+    <span className="text-xs font-medium px-2 py-0.5 rounded-full flex items-center gap-1 bg-secondary-container text-on-secondary-container">
       <span>{emoji}</span>
       {label}
     </span>

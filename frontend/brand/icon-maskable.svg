@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Ícone maskable — full-bleed, símbolo dentro da zona segura (círculo de
+       80% do lado), porque o Android recorta a moldura como bem entender. -->
+  <rect width="512" height="512" fill="#006D77"/>
+  <g transform="translate(174.85 140.8) scale(1.6181)">
+    <polygon fill="#83C5BE"
+      points="20.73,41.74 20.73,34.23 27.23,30.48 80.02,0 0,0 0,100.33 20.73,100.33 20.73,41.74"/>
+    <polygon fill="#FFFEF1"
+      points="100.33,103.94 100.33,3.28 33.73,41.74 33.73,142.39"/>
+  </g>
+</svg>
