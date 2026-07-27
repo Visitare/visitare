@@ -1,26 +1,41 @@
 -- ============================================================================
 -- 014 — Lockdown: RLS nas 4 tabelas que nunca tiveram + poda das policies órfãs
 -- ----------------------------------------------------------------------------
--- CONTEXTO — o que a 013 deixou aberto (auditoria 2026-07-27):
+-- CONTEXTO — auditoria 2026-07-27, VERIFICADA CONTRA O BANCO AO VIVO
+-- (projeto gyutcqmrbbtftrowcyhv, via `supabase db query --linked`). Onde o
+-- estado real divergiu das migrations, vale o real — está anotado abaixo.
 --
---   1. A 013 revogou apenas SELECT de `anon` em patients/visits/events/teams.
---      Essas quatro tabelas NUNCA receberam `ENABLE ROW LEVEL SECURITY` (grep
---      de "ROW LEVEL SECURITY" em db/ só acha allocations, professionals e
---      captured_visits). Como o Supabase concede ALL por default a `anon` nas
---      tabelas criadas em `public`, sobrou INSERT/UPDATE/DELETE anônimo sobre
---      base de saúde — sem RLS e sem policy para barrar.
+--   1. [CONFIRMADO AO VIVO, E PIOR] A 013 revogou apenas SELECT de `anon` em
+--      patients/visits/events/teams, e essas quatro nunca receberam
+--      `ENABLE ROW LEVEL SECURITY`. Os grants reais do `anon` hoje:
+--          patients, visits, events, teams
+--            → DELETE, INSERT, UPDATE, TRUNCATE, REFERENCES, TRIGGER
+--      Ou seja: escrita e destruição anônimas sobre base de saúde, com a chave
+--      pública que está no bundle. E `TRUNCATE` **não é sujeito a RLS** no
+--      Postgres — então `anon` também esvazia `allocations`, `captured_visits`
+--      e `professionals`, que TÊM RLS ligada. Nenhuma tabela do schema escapa.
+--      É por isso que aqui o REVOKE é em bloco, e não privilégio por privilégio
+--      como na 013 — foi exatamente a enumeração que deixou o buraco.
 --
---   2. As policies da 006 em `allocations` foram escritas SEM cláusula `TO`,
---      então valem para PUBLIC, e a 013 só substituiu `acs_read_own_allocations`.
---      Sobreviveram: acs_update_own_status, acs_insert_own_allocation e as três
---      de gestor. Combinadas com o `GRANT SELECT, INSERT, UPDATE ON allocations
---      TO authenticated` da 006:111, um ACS logado insere uma alocação para
---      QUALQUER patient_id da cidade e depois lê o PHI daquele paciente pela
---      `acs_week_list` — que autoriza justamente a partir de `allocations`.
---      A RPC é SECURITY DEFINER, mas confia numa tabela que o próprio chamador
---      escreve. Essa é a cadeia mais séria do banco hoje.
+--   2. [REFUTADO PELO ESTADO REAL] A leitura estática apontava uma escalada via
+--      as policies sem cláusula `TO` da 006 (acs_insert_own_allocation + as de
+--      gestor), que permitiria a um ACS puxar qualquer paciente para a própria
+--      carteira e lê-lo pela `acs_week_list`. No banco real essas policies NÃO
+--      existem: `allocations` tem exatamente uma, `acs_read_own_allocations`
+--      (SELECT, authenticated). Com RLS ligada e sem policy de INSERT, o GRANT
+--      de INSERT é inerte. Os DROP POLICY abaixo ficam como no-op idempotente,
+--      para que um banco recriado do zero pelas migrations não herde o furo.
 --
---   3. `patient_detail` autoriza por `team_id` (~1.000–2.000 pacientes) em vez
+--   3. [NOVO — só aparece ao vivo] Existe `public.allocations_baseline`, 25
+--      linhas, mesma forma de `allocations`, que NÃO está em nenhuma migration.
+--      RLS desligada e `anon` com SELECT — é hoje o único caminho de LEITURA
+--      anônima de PHI que restou (patient_id + score + tier + reason).
+--
+--   4. [CONFIRMADO AO VIVO] `authenticated` tem ALL em todas as tabelas. Como
+--      patients/visits/events/teams não têm RLS, qualquer conta logada lê os
+--      97.938 pacientes direto pelo PostgREST, sem passar pelas RPCs.
+--
+--   5. `patient_detail` autoriza por `team_id` (~1.000–2.000 pacientes) em vez
 --      da carteira de 25, e devolve o `payload` das capturas de TODOS os ACS —
 --      furando a policy `acs_read_own_capture` criada na mesma migration.
 --
@@ -61,6 +76,12 @@ ALTER TABLE patients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visits   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teams    ENABLE ROW LEVEL SECURITY;
+
+-- allocations_baseline: artefato de trabalho do engine que não está em nenhuma
+-- migration e hoje é o único SELECT anônimo sobre PHI. Fecha aqui; a decisão de
+-- DROPAR fica para quem sabe se ainda serve de baseline (ver rodapé).
+ALTER TABLE IF EXISTS allocations_baseline ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON allocations_baseline FROM anon, authenticated;
 
 -- Efeito colateral desejado: `visits` e `events` estão na publication
 -- supabase_realtime com REPLICA IDENTITY FULL (002_realtime.sql:28,34). O
@@ -189,6 +210,16 @@ GRANT EXECUTE ON FUNCTION patient_detail(text, date) TO authenticated;
 -- search_path = public sozinho não neutraliza objetos temporários).
 ALTER FUNCTION acs_week_list(date) SET search_path = public, pg_temp;
 
+-- ----------------------------------------------------------------------------
+-- 7. Hook de JWT com search_path fixo (Advisor: function_search_path_mutable)
+-- ----------------------------------------------------------------------------
+-- A 012 define custom_access_token_hook sem cláusula SET. Ele roda como
+-- `supabase_auth_admin` a cada emissão de token e é o que injeta acs_id/team_id
+-- nos claims — ou seja, é o que toda policy acima usa para autorizar.
+-- Todas as referências dentro dele já são schema-qualified (public.professionals),
+-- então fixar o search_path não muda comportamento.
+ALTER FUNCTION public.custom_access_token_hook(jsonb) SET search_path = public, pg_temp;
+
 COMMIT;
 
 -- ============================================================================
@@ -201,4 +232,11 @@ COMMIT;
 --  - Postura de signup do projeto Supabase não está fixada em código. Se estiver
 --    no default (aberto), `authenticated` == qualquer pessoa com um e-mail, e
 --    toda policy acima que exige apenas `authenticated` vale bem menos.
+--  - `allocations_baseline`: esta migration fecha o acesso, mas a tabela segue
+--    existindo fora do versionamento, com 25 pacientes reais. Se era rascunho
+--    de baseline do engine, `DROP TABLE allocations_baseline` é o certo. Se
+--    serve para comparar antes/depois da alocação, precisa virar migration.
+--  - Advisor também acusa `auth_leaked_password_protection` desligado
+--    (checagem contra HaveIBeenPwned). É toggle de painel, não SQL — e importa
+--    porque a conta de demo tem senha dita em voz alta em evento.
 -- ============================================================================
