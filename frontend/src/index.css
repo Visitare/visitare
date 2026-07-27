@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @import "./theme.css";
 
+/* ── Fontes da marca, self-hosted ─────────────────
+   Prompt (texto) + IBM Plex Mono (dados tabulares),
+   conforme DESIGN.md §Typography. Self-hosted via
+   @fontsource — e NÃO via CDN do Google — porque a
+   ACS trabalha offline em campo: assim o Workbox
+   pré-cacheia os .woff2 junto com o resto do app.
+   Subset latin basta para PT-BR (ã, õ, ç, á…).
+   ────────────────────────────────────────────────── */
+@import "@fontsource/prompt/latin-400.css";
+@import "@fontsource/prompt/latin-500.css";
+@import "@fontsource/prompt/latin-600.css";
+@import "@fontsource/prompt/latin-700.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+
 /* ── CossUI / shadcn aliases ──────────────────
    Componentes copiados via `shadcn add @coss/ui`
    esperam esses nomes. Apontam para os tokens
@@ -35,3 +49,26 @@ body {
 }
 
 #root { min-height: 100svh; }
+
+/* Anel de foco SEMPRE teal (DESIGN.md §Components) — o azul default vem do
+   user-agent e precisa ser sobrescrito explicitamente, ou a marca vaza. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Número que alinha em coluna pede mono (DESIGN.md §Typography). */
+.data-timestamp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Popup do Leaflet herda papel e tipografia da marca — o mapa é parte do app,
+   não um widget de terceiro colado por cima. */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: var(--color-surface-bright);
+  color: var(--color-on-surface);
+  font-family: var(--font-sans);
+}
+.leaflet-popup-content-wrapper { border-radius: var(--radius-lg); }

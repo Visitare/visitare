@@ -119,25 +119,25 @@ export function corCobertura(pct: number): {
 } {
   if (pct >= 85)
     return {
-      bar: 'bg-green-500',
-      text: 'text-green-700',
-      bg: 'bg-green-50',
-      border: 'border-green-200',
+      bar: 'bg-success-strong',
+      text: 'text-success-strong',
+      bg: 'bg-success-subtle',
+      border: 'border-success-strong/30',
       label: 'Em meta',
     }
   if (pct >= 65)
     return {
-      bar: 'bg-amber-500',
-      text: 'text-amber-700',
-      bg: 'bg-amber-50',
-      border: 'border-amber-200',
+      bar: 'bg-warning-strong',
+      text: 'text-warning-strong',
+      bg: 'bg-warning-subtle',
+      border: 'border-warning-strong/30',
       label: 'Atenção',
     }
   return {
-    bar: 'bg-red-500',
-    text: 'text-red-700',
-    bg: 'bg-red-50',
-    border: 'border-red-200',
+    bar: 'bg-error',
+    text: 'text-on-error-container',
+    bg: 'bg-error-container',
+    border: 'border-error-strong/30',
     label: 'Crítico',
   }
 }
