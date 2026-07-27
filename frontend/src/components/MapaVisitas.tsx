@@ -8,11 +8,14 @@ import { EQUIPE_LAT, EQUIPE_LNG } from '../mockData'
 // (shared/tokens.css). Nada de hex literal aqui — token muda, mapa acompanha.
 // Rampa de alarme decrescente; o coral de marca fica fora dela de propósito
 // (DESIGN.md: urgência é vermelho, coral nunca é alerta).
+// A rampa tem que DESescalar de forma monotônica: quanto menor a prioridade,
+// mais leve o pin. Charcoal em "baixa" pesava mais que o mint de "média" e
+// invertia a leitura no fim da escala.
 const CORES: Record<Prioridade, string> = {
   critica: 'var(--color-error)',
   alta:    'var(--color-warning-strong)',
   media:   'var(--color-secondary)',
-  baixa:   'var(--color-on-surface-variant)',
+  baixa:   'var(--color-secondary-container)',
 }
 
 const COR_VISITADO = 'var(--color-success-strong)'
