@@ -70,4 +70,86 @@ export const borderRadius = {
   full: '9999px',
 } as const
 
+/**
+ * Escala tipográfica do DESIGN.md §Typography.
+ *
+ * Os TAMANHOS são compartilhados por todas as superfícies; só a FAMÍLIA muda
+ * (site/ em Merriweather Sans, PWA e mobile em Prompt). Por isso a escala mora
+ * aqui e as famílias ficam em cada superfície: `text-body-md` tem que querer
+ * dizer 16px tanto no Tailwind do PWA quanto no NativeWind do Expo.
+ */
+export const fontSize = {
+  'display':     '44px',
+  'headline-lg': '32px',
+  'headline-md': '24px',
+  'title-lg':    '20px',
+  'body-lg':     '18px',
+  'body-md':     '16px',
+  'label-md':    '14px',
+  'label-sm':    '12px',
+  'data-md':     '14px',
+} as const
+
+export const fontWeight = {
+  'display':     '600',
+  'headline-lg': '500',
+  'headline-md': '500',
+  'title-lg':    '600',
+  'body-lg':     '400',
+  'body-md':     '400',
+  'label-md':    '500',
+  'label-sm':    '500',
+  'data-md':     '500',
+} as const
+
+export const letterSpacing = {
+  'display':     '0.01em',
+  'headline-lg': '0.01em',
+  'label-md':    '0.01em',
+} as const
+
+/** Ritmo de 8px com meio-passo de 4px (DESIGN.md §Layout). */
+export const spacing = {
+  xxs:    '2px',
+  xs:     '4px',
+  base:   '8px',
+  sm:     '12px',
+  md:     '16px',
+  lg:     '24px',
+  xl:     '40px',
+  xxl:    '64px',
+  xxxl:   '96px',
+  gutter: '16px',
+  margin: '24px',
+} as const
+
+/**
+ * Motion. O DESIGN.md pede profundidade por camadas tonais e nada de
+ * decoração — então o vocabulário de movimento é curto de propósito.
+ * `instant` é o feedback de toque (a mão está em movimento, na rua);
+ * `enter`/`exit` são transições de tela; `deliberate` é para o que a ACS
+ * precisa VER acontecer (sync concluído, visita salva).
+ *
+ * Web consome como CSS transition; native como Reanimated withTiming.
+ * Mesmos nomes nos dois lados — é isso que impede a divergência.
+ */
+export const duration = {
+  instant:    '80ms',
+  enter:      '200ms',
+  exit:       '160ms',
+  deliberate: '320ms',
+} as const
+
+export const easing = {
+  // Padrão: desacelera na chegada. Serve para quase tudo.
+  standard: 'cubic-bezier(0.2, 0, 0, 1)',
+  // Saída: acelera na partida, não precisa ser vista até o fim.
+  exit:     'cubic-bezier(0.4, 0, 1, 1)',
+  // Entrada de elemento que aparece do nada.
+  enter:    'cubic-bezier(0, 0, 0, 1)',
+} as const
+
 export type ColorToken = keyof typeof colors
+export type FontSizeToken = keyof typeof fontSize
+export type SpacingToken = keyof typeof spacing
+export type DurationToken = keyof typeof duration

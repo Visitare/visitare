@@ -9,7 +9,16 @@
 import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { join, dirname } from 'node:path'
-import { colors, borderRadius } from '../tokens.ts'
+import {
+  colors,
+  borderRadius,
+  fontSize,
+  fontWeight,
+  letterSpacing,
+  spacing,
+  duration,
+  easing,
+} from '../tokens.ts'
 
 const __dir = dirname(fileURLToPath(import.meta.url))
 const outPath = join(__dir, '..', 'tokens.css')
@@ -85,6 +94,32 @@ lines.push('  /* ── Raios ────────────────�
 for (const [k, v] of entries(borderRadius)) {
   lines.push(`  --radius-${k}: ${v};`)
 }
+lines.push('')
+
+// A escala abaixo é COMPARTILHADA por site/, frontend/ e mobile/. Ela mora em
+// tokens.ts justamente para que `text-body-md` e `p-lg` queiram dizer a mesma
+// coisa no Tailwind do web e no NativeWind do Expo. As FAMÍLIAS de fonte não
+// entram aqui — cada superfície declara a sua (Merriweather no site, Prompt no
+// app), e é a única diferença tipográfica legítima entre elas.
+const scales: { label: string; prefix: string; obj: Record<string, string> }[] = [
+  { label: 'Escala tipográfica (tamanhos)', prefix: 'text', obj: fontSize },
+  { label: 'Pesos', prefix: 'font-weight', obj: fontWeight },
+  { label: 'Tracking', prefix: 'tracking', obj: letterSpacing },
+  { label: 'Espaçamento (ritmo de 8px, meio-passo de 4px)', prefix: 'spacing', obj: spacing },
+  { label: 'Motion — durações', prefix: 'duration', obj: duration },
+  { label: 'Motion — easings', prefix: 'ease', obj: easing },
+]
+
+for (const { label, prefix, obj } of scales) {
+  let header = `  /* ── ${label} `
+  if (label.length < 44) header += '─'.repeat(44 - label.length)
+  lines.push(header + ' */')
+  for (const [k, v] of entries(obj)) {
+    lines.push(`  --${prefix}-${k}: ${v};`)
+  }
+  lines.push('')
+}
+
 lines.push('}', '')
 
 writeFileSync(outPath, lines.join('\n'), 'utf8')
