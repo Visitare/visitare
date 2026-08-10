@@ -6,7 +6,7 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import type { Paciente } from '../../../shared/types'
-import { TIER_CORES } from '../../../shared/constants'
+import { PRIORIDADE } from '../../../shared/recipes'
 
 interface Props {
   pacientes: Paciente[]
@@ -31,14 +31,16 @@ export function MapaVisitas({ pacientes, centerLat, centerLng, onPacientePress }
         showsMyLocationButton
       >
         {pacientes.map((p) => {
-          const tier = p.prioScore >= 61 ? 'alto' : p.prioScore >= 31 ? 'medio' : 'habitual'
+          // `p.prioridade` já é a banda derivada do tier do banco. Antes este
+          // arquivo refazia a derivação com thresholds próprios (61/31) que não
+          // batiam com os do adapter (75) — terceira versão da mesma regra.
           return (
             <Marker
               key={p.id}
               coordinate={{ latitude: p.lat, longitude: p.lng }}
               title={p.nome}
               description={p.motivoPrioridade}
-              pinColor={TIER_CORES[tier].dot}
+              pinColor={PRIORIDADE[p.prioridade].dot}
               onPress={() => onPacientePress?.(p)}
             />
           )

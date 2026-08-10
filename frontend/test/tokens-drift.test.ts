@@ -30,6 +30,7 @@ import {
   duration,
   easing,
 } from '../../shared/tokens.ts'
+import { PRIORIDADE, PRIORIDADE_ORDEM, COR_VISITADO } from '../../shared/recipes.ts'
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 const tokensCss = readFileSync(join(repoRoot, 'shared', 'tokens.css'), 'utf8')
@@ -72,6 +73,70 @@ describe('tokens: shared/tokens.ts ⇄ shared/tokens.css', () => {
   }
 })
 
+describe('prioridade: a rampa do pin não inverte a leitura', () => {
+  /*
+   * O bug que o 88a5129 consertou A OLHO: charcoal em `baixa` pesava mais que o
+   * mint de `media` e invertia a leitura no fim da escala.
+   *
+   * A primeira versão deste teste exigia luminância monotonicamente crescente de
+   * `critica` a `baixa` — e FALHOU, corretamente: #8A4A09 (âmbar) é mais escuro
+   * que #C62828 (vermelho). O modelo estava errado, não a paleta. No topo da
+   * escala quem carrega urgência é o MATIZ (vermelho = perigo, e o DESIGN.md
+   * separa vermelho de coral justamente para isso); só na parte calma da escala
+   * a leitura é por peso.
+   *
+   * Então o invariante real, e o que o 88a5129 de fato consertou, é: o par de
+   * ALARME (critica, alta) tem que ser inequivocamente mais pesado que o par
+   * CALMO (media, baixa), e dentro do par calmo o peso tem que cair. É isso que
+   * fica travado aqui.
+   */
+  function luminancia(hex: string): number {
+    const canal = (c: number) => {
+      const s = c / 255
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+    }
+    const n = parseInt(hex.replace('#', ''), 16)
+    const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+    return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b)
+  }
+
+  const lum = (nivel: keyof typeof PRIORIDADE) => luminancia(PRIORIDADE[nivel].dot)
+
+  it('o par de alarme é mais pesado que o par calmo', () => {
+    const alarmeMaisLeve = Math.max(lum('critica'), lum('alta'))
+    const calmoMaisPesado = Math.min(lum('media'), lum('baixa'))
+
+    expect(
+      alarmeMaisLeve,
+      `critica (${PRIORIDADE.critica.dot}) e alta (${PRIORIDADE.alta.dot}) têm que ser ` +
+        `mais pesados que media (${PRIORIDADE.media.dot}) e baixa (${PRIORIDADE.baixa.dot})`,
+    ).toBeLessThan(calmoMaisPesado)
+  })
+
+  it('dentro do par calmo, o peso cai de media para baixa', () => {
+    expect(
+      lum('baixa'),
+      `baixa (${PRIORIDADE.baixa.dot}) tem que ser mais leve que media (${PRIORIDADE.media.dot}) ` +
+        '— era exatamente isso que o charcoal invertia',
+    ).toBeGreaterThan(lum('media'))
+  })
+
+  it('critica e alta são distinguíveis entre si', () => {
+    expect(PRIORIDADE.critica.dot).not.toBe(PRIORIDADE.alta.dot)
+  })
+
+  it('todo nível de Prioridade tem exatamente uma receita', () => {
+    // Se alguém adiciona um nível no type e esquece a receita, o badge cai em
+    // undefined e renderiza sem cor nenhuma.
+    expect(Object.keys(PRIORIDADE).sort()).toEqual([...PRIORIDADE_ORDEM].sort())
+  })
+
+  it('visitado sai da escala de urgência', () => {
+    const dots = PRIORIDADE_ORDEM.map((n) => PRIORIDADE[n].dot)
+    expect(dots).not.toContain(COR_VISITADO)
+  })
+})
+
 describe('tokens: vocabulário de classes do Expo', () => {
   // O failure mode real: alguém adiciona um grupo em tokens.ts, o gerador passa
   // a emitir no CSS (o web ganha as classes), e o config do NativeWind não é
@@ -94,5 +159,27 @@ describe('tokens: vocabulário de classes do Expo', () => {
   it('motion chega no native como transitionDuration/transitionTimingFunction', () => {
     expect(mobileConfig).toContain('transitionDuration')
     expect(mobileConfig).toContain('transitionTimingFunction')
+  })
+})
+
+describe('receitas: os dois stacks escaneiam shared/', () => {
+  /*
+   * A pegadinha que custou uma rodada: `shared/recipes.ts` fica FORA da raiz dos
+   * dois projetos, e nenhum dos dois olhava para lá. As classes existiam na
+   * string, o token existia no tema, e ainda assim nada era gerado — o badge
+   * renderizou com padding 0 e fonte 16px em vez de 12px, sem um único erro.
+   * Falha silenciosa, dos dois lados, pelo mesmo motivo.
+   */
+  const indexCss = readFileSync(
+    join(repoRoot, 'frontend', 'src', 'index.css'),
+    'utf8',
+  )
+
+  it('o PWA declara @source para shared/', () => {
+    expect(indexCss).toMatch(/@source\s+["'][^"']*shared/)
+  })
+
+  it('o Expo inclui shared/ no content', () => {
+    expect(mobileConfig).toMatch(/content:[\s\S]*shared/)
   })
 })

@@ -4,7 +4,7 @@
 
 import React, { useEffect, useRef } from 'react'
 import type { Paciente } from '../../../shared/types'
-import { TIER_CORES } from '../../../shared/constants'
+import { PRIORIDADE } from '../../../shared/recipes'
 
 interface Props {
   pacientes: Paciente[]
@@ -35,8 +35,8 @@ export function MapaVisitas({ pacientes, centerLat, centerLng, onPacientePress }
       }).addTo(map)
 
       pacientes.forEach((p) => {
-        const tier = p.prioScore >= 61 ? 'alto' : p.prioScore >= 31 ? 'medio' : 'habitual'
-        const color = TIER_CORES[tier].dot
+        // Mesma fonte do PWA e do native: shared/recipes.ts.
+        const color = PRIORIDADE[p.prioridade].dot
         const icon = L.divIcon({
           className: '',
           html: `<div style="width:12px;height:12px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.4)"></div>`,

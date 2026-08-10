@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "./theme.css";
 
+/* As receitas de componente moram em shared/recipes.ts, FORA da raiz do Vite —
+   e a detecção automática de conteúdo do Tailwind v4 não sai daqui. Sem este
+   @source, toda classe que só aparece numa receita simplesmente não é gerada:
+   o badge renderiza sem padding e sem tamanho, silenciosamente. O equivalente
+   no Expo é o `content` de mobile/tailwind.config.ts, e o teste de drift
+   verifica os dois. */
+@source "../../shared";
+
 /* ── Fontes da marca, self-hosted ─────────────────
    Prompt (texto) + IBM Plex Mono (dados tabulares),
    conforme DESIGN.md §Typography. Self-hosted via

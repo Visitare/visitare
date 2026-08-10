@@ -37,18 +37,15 @@ export const GAP_LIMITES = {
   geral: 180,
 } as const
 
-// Cores semânticas dos tiers (usadas em badges e mapa)
-export const TIER_CORES = {
-  alto: { bg: 'bg-error-container', text: 'text-error-strong', dot: '#C62828' },
-  medio: { bg: 'bg-warning-subtle', text: 'text-warning-strong', dot: '#8A4A09' },
-  habitual: { bg: 'bg-surface-container', text: 'text-on-surface-variant', dot: '#36454F' },
-} as const
-
-// Cores das condições clínicas nos badges
-export const CONDICAO_CORES = {
-  gestante: { bg: 'bg-secondary-container', text: 'text-on-secondary-container' },
-  diabetico: { bg: 'bg-info-subtle', text: 'text-info-strong' },
-  hipertenso: { bg: 'bg-warning-subtle', text: 'text-warning-strong' },
-  vulneravel: { bg: 'bg-error-container', text: 'text-error-strong' },
-  crianca: { bg: 'bg-success-subtle', text: 'text-success-strong' },
-} as const
+// TIER_CORES e CONDICAO_CORES viviam aqui e foram removidos: contradiziam o
+// DESIGN.md e ninguém mais os consome.
+//
+// TIER_CORES pintava o `habitual` de charcoal (#36454F) — exatamente a inversão
+// de rampa que o 88a5129 consertou no PWA e que nunca chegou aqui, então o mapa
+// do Expo ainda ia renderizar o bug. Cor de prioridade agora sai de
+// shared/recipes.ts (PRIORIDADE), fonte única para badge e pin nos dois stacks.
+//
+// CONDICAO_CORES dava uma cor por condição clínica. O DESIGN.md define UM
+// `chip-category` só, mint uniforme, e é de propósito: cor é reservada para
+// prioridade, que é o que a ACS lê primeiro. A distinção entre condições fica no
+// emoji e no rótulo. Ver `chipCategory` em shared/recipes.ts.

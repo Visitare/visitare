@@ -27,6 +27,11 @@ const config: Config = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
+    // As receitas moram fora deste diretório. Sem esta linha, as classes que só
+    // aparecem em shared/recipes.ts não são geradas e o componente renderiza
+    // sem padding/tamanho, sem erro nenhum. O equivalente no PWA é o @source de
+    // frontend/src/index.css.
+    '../shared/**/*.{ts,tsx}',
   ],
   presets: [require('nativewind/preset')],
   theme: {

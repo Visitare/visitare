@@ -3,25 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import type { Paciente, Prioridade } from '../types'
 import { EQUIPE_LAT, EQUIPE_LNG } from '../mockData'
+import { PRIORIDADE, PRIORIDADE_ORDEM, COR_VISITADO } from '../../../shared/recipes'
 
-// Referencia as CSS custom properties emitidas pelo @theme do Tailwind v4
-// (shared/tokens.css). Nada de hex literal aqui — token muda, mapa acompanha.
-// Rampa de alarme decrescente; o coral de marca fica fora dela de propósito
-// (DESIGN.md: urgência é vermelho, coral nunca é alerta).
-// A rampa tem que DESescalar de forma monotônica: quanto menor a prioridade,
-// mais leve o pin. Charcoal em "baixa" pesava mais que o mint de "média" e
-// invertia a leitura no fim da escala.
-const CORES: Record<Prioridade, string> = {
-  critica: 'var(--color-error)',
-  alta:    'var(--color-warning-strong)',
-  media:   'var(--color-secondary)',
-  baixa:   'var(--color-secondary-container)',
-}
-
-const COR_VISITADO = 'var(--color-success-strong)'
-
+// A cor do pin vem de shared/recipes.ts — a MESMA fonte do badge de prioridade
+// e do mapa do Expo. Este arquivo tinha a sua própria tabela e discordava do
+// badge: `media` era mint aqui e pêssego lá, na mesma tela. O invariante da
+// rampa (par de alarme mais pesado que o par calmo) está travado em
+// frontend/test/tokens-drift.test.ts.
 function pinPaciente(prioridade: Prioridade, visitado: boolean) {
-  const cor = visitado ? COR_VISITADO : CORES[prioridade]
+  const cor = visitado ? COR_VISITADO : PRIORIDADE[prioridade].dot
   return L.divIcon({
     html: `<div style="width:22px;height:22px;border-radius:50%;background:${cor};border:3px solid var(--color-surface-bright);box-shadow:0 2px 6px rgba(19,39,42,.45)"></div>`,
     className: 'leaflet-div-icon-paciente',
@@ -106,10 +96,13 @@ export function MapaVisitas({ pacientes, visitados }: Props) {
     <div className="flex flex-col h-full">
       {/* Legenda */}
       <div className="flex gap-3 px-4 py-2 bg-surface-bright border-b border-surface-container-high text-xs text-on-surface-variant flex-wrap">
-        {(['critica', 'alta', 'media', 'baixa'] as Prioridade[]).map((p) => (
+        {PRIORIDADE_ORDEM.map((p) => (
           <span key={p} className="flex items-center gap-1">
-            <span style={{ background: CORES[p] }} className="inline-block w-3 h-3 rounded-full" />
-            {p === 'critica' ? 'Crítica' : p === 'alta' ? 'Alta' : p === 'media' ? 'Média' : 'Baixa'}
+            <span
+              style={{ background: PRIORIDADE[p].dot }}
+              className="inline-block w-3 h-3 rounded-full"
+            />
+            {PRIORIDADE[p].label}
           </span>
         ))}
         <span className="flex items-center gap-1">
