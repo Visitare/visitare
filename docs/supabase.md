@@ -576,10 +576,27 @@ O schema (tabelas, RLS, RPCs, Realtime) é versionado via **Supabase CLI** em
 supabase link --project-ref <ref-do-staging>
 supabase db reset
 
-# Projeto existente (produção) — só aplica o que falta
+# Produção (gyutcqmrbbtftrowcyhv) — NUNCA usou o Supabase CLI antes desta
+# adoção. `supabase_migrations.schema_migrations` está vazia lá, então
+# `db push` sem passo prévio acha as 5 migrations pendentes e tenta rodar
+# a 000_base_schema.sql (CREATE TABLE sem IF NOT EXISTS) contra tabelas que
+# já existem → erro `relation "teams" already exists`. Rode nesta ordem:
 supabase link --project-ref gyutcqmrbbtftrowcyhv
+
+# 1) Baseline — ONE-SHOT. Marca as 5 versões como já aplicadas (elas já
+#    estão refletidas no banco vivo; a 014 desde 27/07). Não roda nenhum SQL,
+#    só grava linhas em supabase_migrations.schema_migrations. Depois desta
+#    vez, nunca mais repita este comando — daqui pra frente é só `db push`.
+supabase migration repair --status applied \
+  20260524000000 20260628224258 20260628230031 20260628235051 20260727173707
+
+# 2) Só agora `db push` aplica exclusivamente migrations futuras (as que
+#    ainda não tiverem `repair`/push registrados).
 supabase db push
 ```
+
+Rodar `db push` **antes** do `repair` acima falha em produção com a tabela de
+controle vazia — não pule o passo 1 na primeira vez.
 
 `scripts/setup_supabase.py` faz **só carga de dados** (reload dos 4 parquets
 anonimizados) — pressupõe que o schema já existe via migrations. **Não roda
