@@ -16,10 +16,7 @@ export function usePacienteDetalhe(pacienteId: string | undefined) {
   })
 
   useEffect(() => {
-    if (!pacienteId) {
-      setState({ paciente: null, loading: false, error: null })
-      return
-    }
+    if (!pacienteId) return
     let cancelled = false
     fetchPacienteDetalhe(pacienteId)
       .then((p) => {
@@ -33,5 +30,8 @@ export function usePacienteDetalhe(pacienteId: string | undefined) {
     }
   }, [pacienteId])
 
+  if (!pacienteId) {
+    return { paciente: null, loading: false, error: null }
+  }
   return state
 }

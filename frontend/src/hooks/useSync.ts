@@ -16,7 +16,9 @@ function toCapturada(v: RegistroVisita) {
   if (profileBlocks.length === 0) profileBlocks.push('cadastro_familia')
 
   // O payload é todo o registro (menos campos meta).
-  const { id: _id, synced: _synced, ...payload } = v
+  const payload: Record<string, unknown> = { ...v }
+  delete payload.id
+  delete payload.synced
 
   return {
     patient_id: v.pacienteId,
@@ -47,7 +49,6 @@ export function useSync() {
       const { error } = await supabase.from('captured_visits').insert(registros)
 
       if (error) {
-        // eslint-disable-next-line no-console
         console.error('[useSync] erro do Supabase:', error)
         setStatus('error')
         return
@@ -59,14 +60,15 @@ export function useSync() {
       setStatus('synced')
     } catch (e) {
       // offline ou backend indisponível — não é erro, é esperado
-      // eslint-disable-next-line no-console
       console.warn('[useSync] sync adiada:', e)
       setStatus('pending')
     }
   }, [])
 
   useEffect(() => {
-    atualizarPendentes()
+    void (async () => {
+      await atualizarPendentes()
+    })()
 
     const onOnline = () => {
       setIsOnline(true)

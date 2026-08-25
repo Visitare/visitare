@@ -43,17 +43,18 @@ export function ListaPage() {
   const totalSemana = todosPacientes.length
   const visitadosTotal = todosPacientes.filter((p) => visitadosSemana.has(p.id)).length
 
+  const inicioSemana = diasOrdenados[0]
+  const fimSemana = diasOrdenados[diasOrdenados.length - 1]
+
   useEffect(() => {
-    if (!acsId || diasOrdenados.length === 0) return
-    const inicio = diasOrdenados[0]
-    const fim = diasOrdenados[diasOrdenados.length - 1]
+    if (!acsId || !inicioSemana || !fimSemana) return
     db.visitas
       .where('profissionalId')
       .equals(acsId)
-      .and((v) => v.dataVisita >= inicio && v.dataVisita <= fim)
+      .and((v) => v.dataVisita >= inicioSemana && v.dataVisita <= fimSemana)
       .toArray()
       .then((visitas) => setVisitadosSemana(new Set(visitas.map((v) => v.pacienteId))))
-  }, [acsId, diasOrdenados[0], diasOrdenados[diasOrdenados.length - 1]])
+  }, [acsId, inicioSemana, fimSemana])
 
   const nomeAcs = acsId ? `ACS ${acsId.slice(-5)}` : 'ACS'
   const labelEquipe = teamId ? `Equipe ${teamId.slice(0, 8)}…` : 'Sem equipe'

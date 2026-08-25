@@ -58,6 +58,7 @@ export function VisitaPage() {
   const { paciente, loading, error } = usePacienteDetalhe(id)
   const { acsId } = useAuth()
 
+  const [renderizadoEm] = useState(() => Date.now())
   const [estavaCasa, setEstavaCasa] = useState<boolean | null>(null)
   const [recusouVisita, setRecusouVisita] = useState(false)
   const [salvando, setSalvando] = useState(false)
@@ -129,7 +130,7 @@ export function VisitaPage() {
 
   const foiAtendido = estavaCasa && !recusouVisita
   const semanaGest = form.dum
-    ? Math.floor((Date.now() - new Date((form.dum as string) + 'T12:00:00').getTime()) / (7 * 24 * 3600 * 1000))
+    ? Math.floor((renderizadoEm - new Date((form.dum as string) + 'T12:00:00').getTime()) / (7 * 24 * 3600 * 1000))
     : undefined
   const camposFaltando = getCamposFaltando(form, paciente, semanaGest, foiAtendido ?? false)
 
