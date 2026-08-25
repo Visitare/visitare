@@ -566,24 +566,29 @@ Se precisarmos derrubar mais, dá pra adicionar materialized view ou
 
 ---
 
-## 9. Recarregar / resetar dados
+## 9. Migrations e recarga de dados (Supabase CLI — ver VISI-11)
 
-O script de carga vive em `scripts/setup_supabase.py` (drop+recreate das 5
-tabelas + reload dos 4 parquets). **Não rode em produção** — só em ambiente
-de dev/demo.
+O schema (tabelas, RLS, RPCs, Realtime) é versionado via **Supabase CLI** em
+`supabase/migrations/`, não mais colado à mão no SQL Editor.
+
+```bash
+# Projeto novo (staging) — reconstrói o schema do zero
+supabase link --project-ref <ref-do-staging>
+supabase db reset
+
+# Projeto existente (produção) — só aplica o que falta
+supabase link --project-ref gyutcqmrbbtftrowcyhv
+supabase db push
+```
+
+`scripts/setup_supabase.py` faz **só carga de dados** (reload dos 4 parquets
+anonimizados) — pressupõe que o schema já existe via migrations. **Não roda
+em produção**, só em dev/demo:
 
 ```bash
 pip install 'psycopg[binary]' duckdb pandas
-export SUPABASE_DB_URL='postgresql://postgres.gyutcqmrbbtftrowcyhv:<senha>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres'
+export SUPABASE_DB_URL='postgresql://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres'
 python scripts/setup_supabase.py
-```
-
-As migrations das funções RPC e Realtime estão em `db/migrations/`:
-
-```bash
-# Aplicar tudo
-psql "$SUPABASE_DB_URL" -f db/migrations/001_priorization.sql
-psql "$SUPABASE_DB_URL" -f db/migrations/002_realtime.sql
 ```
 
 ---
