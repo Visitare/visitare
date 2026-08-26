@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Como o Visitare prioriza as visitas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#006D77; --primary-dark:#00565E; --on-primary:#FFFEF1;
+    --mint:#83C5BE; --mint-container:#C9E6E2; --on-mint:#13403C;
+    --coral:#C66B4F;
+    --surface:#FAF9F6; --container:#EDF6F9; --container-high:#DDEBEF;
+    --ink:#13272A; --ink-soft:#36454F;
+    --sans:"Merriweather Sans",system-ui,sans-serif;
+    --mono:"DM Mono",ui-monospace,Menlo,monospace;
+  }
+  @page{ size:A4; margin:11mm 15mm; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    font-family:var(--sans); color:var(--ink); background:#fff;
+    font-size:11.8px; line-height:1.5; font-weight:400;
+  }
+  .mono{ font-family:var(--mono); }
+  h1,h2,h3{ font-family:var(--sans); text-wrap:balance; }
+
+  /* ── Header ─────────────────────────────────────────── */
+  header{ display:flex; align-items:center; gap:15px; padding-bottom:11px; border-bottom:2.5px solid var(--primary); }
+  header svg{ display:block; flex:0 0 auto; }
+  .h-txt h1{ font-size:20px; font-weight:800; color:var(--primary-dark); letter-spacing:-.4px; line-height:1.1; white-space:nowrap; }
+  .h-txt .sub{ font-size:12.5px; color:var(--ink-soft); margin-top:3px; }
+  .badge{ margin-left:auto; font-family:var(--mono); font-size:10.2px; font-weight:500; color:var(--primary);
+          background:var(--mint-container); border-radius:9999px; padding:6px 14px; white-space:nowrap; }
+
+  /* ── Section scaffolding ────────────────────────────── */
+  section{ margin-top:12px; }
+  .lbl{ display:flex; align-items:center; gap:9px; margin-bottom:8px; }
+  .lbl .n{ font-family:var(--mono); font-size:11px; font-weight:500; color:var(--on-primary);
+           background:var(--primary); width:22px; height:22px; border-radius:6px;
+           display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .lbl h2{ font-size:16px; font-weight:700; color:var(--primary-dark); }
+
+  p{ margin:0 0 5px; }
+  b,strong{ font-weight:700; color:var(--ink); }
+  .muted{ color:var(--ink-soft); }
+
+  /* ── Data section ───────────────────────────────────── */
+  .source{ background:var(--container); border:1px solid var(--container-high); border-radius:12px;
+           padding:11px 15px; margin-bottom:10px; }
+  .cols{ display:grid; grid-template-columns:1fr 1fr; gap:9px 22px; }
+  .col-row{ display:flex; gap:9px; align-items:baseline; padding:3px 0; }
+  .tbl{ font-family:var(--mono); font-size:10.6px; font-weight:500; color:var(--primary-dark);
+        background:var(--mint-container); border-radius:6px; padding:2px 8px; white-space:nowrap; flex:0 0 auto; }
+  .col-row .d{ color:var(--ink-soft); }
+
+  /* ── Scoring formula ────────────────────────────────── */
+  .eq{ text-align:center; font-family:var(--mono); font-size:15px; font-weight:500; color:var(--primary-dark);
+       background:var(--surface); border:1.5px dashed var(--mint); border-radius:11px; padding:11px; margin-bottom:9px; }
+  .eq b{ color:var(--primary); }
+  .comps{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .comp{ border:1px solid var(--container-high); border-radius:12px; padding:12px 15px; background:#fff; }
+  .comp .top{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:5px; }
+  .comp .name{ font-size:13px; font-weight:700; color:var(--primary-dark); }
+  .comp .rng{ font-family:var(--mono); font-size:10.4px; font-weight:500; color:var(--on-mint);
+              background:var(--mint-container); border-radius:9999px; padding:3px 10px; white-space:nowrap; }
+  .comp .body{ color:var(--ink-soft); font-size:11.8px; line-height:1.54; }
+  .comp .body em{ font-style:normal; color:var(--coral); font-weight:600; }
+  .comp .k{ font-family:var(--mono); color:var(--primary); font-weight:500; }
+
+  .tiers{ margin-top:8px; background:var(--primary); color:var(--on-primary); border-radius:12px;
+          padding:9px 16px; display:flex; align-items:center; gap:13px; }
+  .tiers .t{ font-weight:800; font-size:13px; letter-spacing:.2px; white-space:nowrap; }
+  .tiers .desc{ font-size:11.6px; opacity:.93; }
+  .tiers .chip{ font-family:var(--mono); font-size:10.4px; background:rgba(255,254,241,.16);
+                border-radius:9999px; padding:2px 9px; margin:0 3px; }
+
+  /* ── Reasoning ──────────────────────────────────────── */
+  .why{ display:grid; grid-template-columns:1fr 1fr; gap:7px 22px; }
+  .why .row{ display:flex; gap:9px; align-items:baseline; }
+  .why .dot{ flex:0 0 auto; width:6px; height:6px; border-radius:50%; background:var(--mint); margin-top:6px; }
+  .why .row b{ color:var(--primary-dark); }
+
+  a.src{ color:var(--primary); font-weight:700; text-decoration:underline; text-decoration-color:var(--mint); text-underline-offset:2px; }
+  .tabelas{ display:inline-block; margin-top:3px; }
+  .s3-notes{ margin-bottom:0; }
+  figure.chart{ margin:10px 0 0; break-inside:avoid; }
+  figure.chart figcaption{ font-size:11px; font-weight:700; color:var(--primary-dark); margin-bottom:6px; }
+  figure.chart svg{ display:block; width:100%; height:auto; }
+  figure.chart .note{ font-size:9.6px; color:var(--ink-soft); margin-top:6px; line-height:1.45; }
+
+  footer{ margin-top:9px; padding-top:8px; border-top:1px solid var(--container-high);
+          display:flex; justify-content:space-between; font-size:10.2px; color:var(--ink-soft); }
+  footer .mono{ color:var(--primary); }
+
+  /* ── Página 2 — regras em detalhe ─────────────────────── */
+  .page2{ break-before:page; display:flex; flex-direction:column; min-height:258mm; }
+  .page2 footer{ margin-top:auto; }
+  .p2-head{ display:flex; align-items:baseline; gap:12px; padding-bottom:11px;
+            border-bottom:2.5px solid var(--primary); margin-bottom:16px; }
+  .p2-head h2{ font-size:19px; font-weight:800; color:var(--primary-dark); letter-spacing:-.3px; }
+  .p2-head .sub{ font-size:11.5px; color:var(--ink-soft); }
+  .p2-head .pg{ margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--primary);
+                background:var(--mint-container); border-radius:9999px; padding:4px 11px; white-space:nowrap; }
+  .rule{ border:1px solid var(--container-high); border-radius:12px; padding:16px 19px;
+         margin-bottom:18px; background:#fff; break-inside:avoid; }
+  .rule h3{ font-size:13.5px; font-weight:700; color:var(--primary-dark);
+            margin-bottom:9px; display:flex; align-items:center; gap:10px; }
+  .rule h3 .tag{ font-family:var(--mono); font-size:9.6px; font-weight:500; color:var(--on-mint);
+                 background:var(--mint-container); border-radius:9999px; padding:3px 10px; }
+  .rule p{ font-size:11.6px; color:var(--ink-soft); line-height:1.6; margin:0 0 7px; }
+  .rule p:last-child{ margin-bottom:0; }
+  .rule b{ color:var(--ink); font-weight:700; }
+  .rule .k{ font-family:var(--mono); color:var(--primary); font-weight:500; }
+  .fx{ font-family:var(--mono); font-size:11.5px; color:var(--primary-dark); background:var(--surface);
+       border:1px solid var(--container-high); border-radius:8px; padding:8px 12px; margin:7px 0; }
+</style>
+</head>
+<body>
+
+  <header>
+    <svg viewBox="0 0 100.33 142.39" width="33" height="47" aria-hidden="true">
+      <polygon fill="#83C5BE" points="20.73,41.74 20.73,34.23 27.23,30.48 80.02,0 0,0 0,100.33 20.73,100.33 20.73,41.74"/>
+      <polygon fill="#006D77" points="100.33,103.94 100.33,3.28 33.73,41.74 33.73,142.39"/>
+    </svg>
+    <div class="h-txt">
+      <h1>Como o Visitare prioriza as visitas</h1>
+      <div class="sub">Motor <b>PRIO-ACS</b> — determinístico, auditável, sem IA na decisão clínica.</div>
+    </div>
+    <div class="badge">score por paciente · 0–100</div>
+  </header>
+
+  <!-- 1 · DADOS -->
+  <section>
+    <div class="lbl"><span class="n">1</span><h2>Os dados disponíveis</h2></div>
+    <div class="source">
+      <p><b>Fonte:</b> <a class="src" href="https://github.com/prefeitura-rio/claude-impact-lab-saude#-acesso-r%C3%A1pido-aos-dados">base anonimizada da SMS-Rio</a> (Prefeitura do Rio) — ~98 mil pacientes em 49 equipes.<br><span class="tabelas">Tabelas: <span class="mono">pacientes · visitas · eventos_clinicos · equipes</span>.</span></p>
+    </div>
+    <p class="muted" style="margin-bottom:5px;">Destas, o motor lê <b>apenas as colunas necessárias</b> para pontuar:</p>
+    <div class="cols">
+      <div class="col-row"><span class="tbl">pacientes</span><span class="d">hipertenso · diabetico · gestacao · situacao_vulnerabilidade · faixa_etaria · endereco_lat/long</span></div>
+      <div class="col-row"><span class="tbl">eventos_clinicos</span><span class="d">tipo (≠ agendamento) · data_referencia → eventos não-eletivos em 90 d</span></div>
+      <div class="col-row"><span class="tbl">visitas</span><span class="d">registrados_em → tempo desde a última visita (gap)</span></div>
+      <div class="col-row"><span class="tbl">equipes</span><span class="d">endereco_latitude · endereco_longitude → distância ao posto</span></div>
+    </div>
+  </section>
+
+  <!-- 2 · CÁLCULO -->
+  <section>
+    <div class="lbl"><span class="n">2</span><h2>Como o cálculo funciona</h2></div>
+    <div class="eq">PRIO-ACS = <b>C₁</b> + <b>C₂</b> + <b>C₃</b> + <b>C₄</b> &nbsp;∈&nbsp; [ 0 , 100 ]</div>
+    <div class="comps">
+      <div class="comp">
+        <div class="top"><span class="name">C₁ · Carga de condição crônica</span><span class="rng">0–35</span></div>
+        <div class="body">Conta <em>quantas</em> condições crônicas (hipertensão, diabetes, gestação) o paciente tem. Os valores são acumulados: a 1ª condição soma <span class="k">+15</span>, a 2ª <span class="k">+12</span>, a 3ª <span class="k">+8</span>. <em>Total: 1→15 · 2→27 · 3→35.</em></div>
+      </div>
+      <div class="comp">
+        <div class="top"><span class="name">C₂ · Fase da vida vulnerável</span><span class="rng">0–25</span></div>
+        <div class="body">Selecionamos o <em>maior valor</em> entre gestante (<span class="k">25</span>), criança 0–6 anos (<span class="k">20</span>) e idoso 66+ com crônica (<span class="k">15</span>) — usa só o maior, nunca soma.</div>
+      </div>
+      <div class="comp">
+        <div class="top"><span class="name">C₃ · Lacuna de cuidado / urgência</span><span class="rng">0–25</span></div>
+        <div class="body"><em>Quem precisa de visita agora.</em> Soma duas parcelas: <span class="k">emergência recente</span> (UPA/internação em 90 d) vale <em>até 15</em>; <span class="k">atraso na visita</span>, além do prazo esperado do caso, vale <em>até 10</em>. Quanto mais recente ou mais atrasado, mais perto do máximo.</div>
+      </div>
+      <div class="comp">
+        <div class="top"><span class="name">C₄ · Vulnerabilidade social</span><span class="rng">0–15</span></div>
+        <div class="body"><span class="k">Marcador sim/não</span> na base: paciente sinalizado como vulnerável soma <em>15</em>; senão, <em>0</em>. Entra como <em>critério de desempate</em> entre perfis clínicos parecidos.</div>
+      </div>
+    </div>
+    <figure class="chart">
+      <figcaption>Distribuição do score na base atual · 97.938 pacientes (corte dez/2025)</figcaption>
+<svg viewBox="0 0 800 172" width="100%" role="img" aria-label="Distribuição do score PRIO-ACS na base atual, 97.938 pacientes" xmlns="http://www.w3.org/2000/svg">
+<rect x="232.8" y="3" width="12" height="12" rx="2" fill="#83C5BE"/>
+<text x="250.8" y="13" font-size="13" fill="#13272A" font-family="Merriweather Sans,sans-serif">Habitual · 74%</text>
+<rect x="371.2" y="3" width="12" height="12" rx="2" fill="#006D77"/>
+<text x="389.2" y="13" font-size="13" fill="#13272A" font-family="Merriweather Sans,sans-serif">Médio · 23%</text>
+<rect x="489.8" y="3" width="12" height="12" rx="2" fill="#C66B4F"/>
+<text x="507.8" y="13" font-size="13" fill="#13272A" font-family="Merriweather Sans,sans-serif">Alto · 3%</text>
+<line x1="52" y1="142.0" x2="752" y2="142.0" stroke="#DDEBEF" stroke-width="1"/>
+<text x="45" y="145.0" text-anchor="end" font-size="11" fill="#36454F" font-family="DM Mono,monospace">0%</text>
+<line x1="52" y1="116.4" x2="752" y2="116.4" stroke="#DDEBEF" stroke-width="1"/>
+<text x="45" y="119.4" text-anchor="end" font-size="11" fill="#36454F" font-family="DM Mono,monospace">10%</text>
+<line x1="52" y1="90.9" x2="752" y2="90.9" stroke="#DDEBEF" stroke-width="1"/>
+<text x="45" y="93.9" text-anchor="end" font-size="11" fill="#36454F" font-family="DM Mono,monospace">20%</text>
+<line x1="52" y1="65.3" x2="752" y2="65.3" stroke="#DDEBEF" stroke-width="1"/>
+<text x="45" y="68.3" text-anchor="end" font-size="11" fill="#36454F" font-family="DM Mono,monospace">30%</text>
+<line x1="52" y1="39.8" x2="752" y2="39.8" stroke="#DDEBEF" stroke-width="1"/>
+<text x="45" y="42.8" text-anchor="end" font-size="11" fill="#36454F" font-family="DM Mono,monospace">40%</text>
+<line x1="246.4" y1="23" x2="246.4" y2="142" stroke="#83C5BE" stroke-width="1" stroke-dasharray="3 3"/>
+<line x1="440.9" y1="23" x2="440.9" y2="142" stroke="#83C5BE" stroke-width="1" stroke-dasharray="3 3"/>
+<rect x="57.4" y="96.1" width="28.0" height="45.9" rx="2" fill="#83C5BE"/>
+<rect x="96.3" y="132.2" width="28.0" height="9.8" rx="2" fill="#83C5BE"/>
+<rect x="135.2" y="32.9" width="28.0" height="109.1" rx="2" fill="#83C5BE"/>
+<rect x="174.1" y="122.8" width="28.0" height="19.2" rx="2" fill="#83C5BE"/>
+<rect x="213.0" y="135.8" width="28.0" height="6.2" rx="2" fill="#83C5BE"/>
+<rect x="251.9" y="121.0" width="28.0" height="21.0" rx="2" fill="#006D77"/>
+<rect x="290.8" y="129.5" width="28.0" height="12.5" rx="2" fill="#006D77"/>
+<rect x="329.7" y="136.9" width="28.0" height="5.1" rx="2" fill="#006D77"/>
+<rect x="368.6" y="124.9" width="28.0" height="17.1" rx="2" fill="#006D77"/>
+<rect x="407.4" y="139.4" width="28.0" height="2.6" rx="2" fill="#006D77"/>
+<rect x="446.3" y="136.3" width="28.0" height="5.7" rx="2" fill="#C66B4F"/>
+<rect x="485.2" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="524.1" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="563.0" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="601.9" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="640.8" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="679.7" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<rect x="718.6" y="141.0" width="28.0" height="1.0" rx="2" fill="#C66B4F"/>
+<text x="149.2" y="28.9" text-anchor="middle" font-size="12" font-weight="700" fill="#00565E" font-family="Merriweather Sans,sans-serif">43%</text>
+<text x="71.4" y="92.1" text-anchor="middle" font-size="12" font-weight="700" fill="#00565E" font-family="Merriweather Sans,sans-serif">18%</text>
+<line x1="52" y1="142" x2="752" y2="142" stroke="#36454F" stroke-width="1.5"/>
+<text x="71.4" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">0</text>
+<text x="149.2" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">10</text>
+<text x="227.0" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">20</text>
+<text x="304.8" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">30</text>
+<text x="382.6" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">40</text>
+<text x="460.3" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">50</text>
+<text x="538.1" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">60</text>
+<text x="615.9" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">70</text>
+<text x="693.7" y="157" text-anchor="middle" font-size="11" fill="#36454F" font-family="DM Mono,monospace">80</text>
+<text x="400" y="170" text-anchor="middle" font-size="11" fill="#36454F" font-family="Merriweather Sans,sans-serif">score PRIO-ACS (0–100) · barras de 5 pontos</text>
+</svg>
+      <div class="note">Cauda curta de prioridade: ~3% Alto e ~23% Médio concentram o esforço, ~74% Habitual. Os cortes de faixa são derivados por equipe a cada rodada.</div>
+    </figure>
+  </section>
+
+  <!-- 3 · RACIOCÍNIO -->
+  <section>
+    <div class="lbl"><span class="n">3</span><h2>Decisões de modelagem</h2></div>
+    <div class="why s3-notes">
+      <div class="row"><span class="dot"></span><div><b>Condições vêm de fonte oficial.</b> Lista ICSAP (Portaria SAS/MS 221/2008) e normas do ACS. Pesos são calibração.</div></div>
+      <div class="row"><span class="dot"></span><div><b>Determinístico, sem LLM em runtime.</b> Mesma entrada → mesma saída; regra inspecionável em SQL/Python. Requisito de auditabilidade clínica.</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span></span>
+  </footer>
+
+  <script>
+    (function(){
+      var d = new Date();
+      var s = d.toLocaleDateString('pt-BR') + ' ' +
+              d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      document.querySelectorAll('.gen').forEach(function(el){ el.textContent = s; });
+    })();
+  </script>
+
+</body>
+</html>

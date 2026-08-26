@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Regras — Motor PRIO-ACS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#006D77; --primary-dark:#00565E; --on-primary:#FFFEF1;
+    --mint:#83C5BE; --mint-container:#C9E6E2; --on-mint:#13403C;
+    --coral:#C66B4F; --coral-container:#F6E2DA; --on-coral:#6B2E19;
+    --amber:#B07D2B; --amber-container:#F5E7CB;
+    --surface:#FAF9F6; --container:#EDF6F9; --container-high:#DDEBEF;
+    --ink:#13272A; --ink-soft:#36454F; --ink-faint:#6B7A80;
+    --sans:"Merriweather Sans",system-ui,sans-serif;
+    --mono:"DM Mono",ui-monospace,Menlo,monospace;
+  }
+  @page{ size:A4; margin:11mm 14mm; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    font-family:var(--sans); color:var(--ink); background:#fff;
+    font-size:9.9px; line-height:1.44; font-weight:400;
+  }
+  .mono{ font-family:var(--mono); }
+  h1,h2,h3{ font-family:var(--sans); text-wrap:balance; }
+
+  /* ── Page scaffolding ───────────────────────────────── */
+  .page{ display:flex; flex-direction:column; min-height:271mm; break-after:page; }
+  .page:last-of-type{ break-after:auto; }
+  .page > footer{ margin-top:auto; }
+
+  header{ display:flex; align-items:center; gap:14px; padding-bottom:10px;
+          border-bottom:2.5px solid var(--primary); margin-bottom:13px; }
+  .h-txt h1{ font-size:19px; font-weight:800; color:var(--primary-dark); letter-spacing:-.4px; line-height:1.1; }
+  .h-txt .sub{ font-size:11.4px; color:var(--ink-soft); margin-top:3px; }
+  .badge{ margin-left:auto; font-family:var(--mono); font-size:9.8px; font-weight:500; color:var(--primary);
+          background:var(--mint-container); border-radius:9999px; padding:6px 13px; white-space:nowrap; text-align:center; }
+
+  .p-head{ display:flex; align-items:baseline; gap:11px; padding-bottom:9px;
+           border-bottom:2.5px solid var(--primary); margin-bottom:10px; }
+  .p-head h2{ font-size:17px; font-weight:800; color:var(--primary-dark); letter-spacing:-.3px; white-space:nowrap; }
+  .p-head .sub{ font-size:10.8px; color:var(--ink-soft); }
+  .p-head .pg{ margin-left:auto; font-family:var(--mono); font-size:9.4px; color:var(--primary);
+               background:var(--mint-container); border-radius:9999px; padding:4px 10px; white-space:nowrap; }
+
+  p{ margin:0 0 5px; }
+  b,strong{ font-weight:700; color:var(--ink); }
+  .k{ font-family:var(--mono); color:var(--primary); font-weight:500; }
+
+  /* ── Rule cards ─────────────────────────────────────── */
+  .rule{ border:1px solid var(--container-high); border-radius:12px; padding:11px 14px;
+         margin-bottom:7px; background:#fff; break-inside:avoid; }
+  .rule > h3{ font-size:13px; font-weight:700; color:var(--primary-dark);
+              margin-bottom:7px; display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+  .rule > h3 .tag{ font-family:var(--mono); font-size:9.2px; font-weight:500; color:var(--on-mint);
+                   background:var(--mint-container); border-radius:9999px; padding:3px 9px; }
+  .rule p{ font-size:9.9px; color:var(--ink-soft); line-height:1.47; }
+  .rule p:last-child{ margin-bottom:0; }
+  .rule b{ color:var(--ink); }
+
+  .fx{ font-family:var(--mono); font-size:10.3px; color:var(--primary-dark); background:var(--surface);
+       border:1px solid var(--container-high); border-radius:8px; padding:7px 11px; margin:5px 0 7px; }
+
+  /* ── Evidence-class chips ───────────────────────────── */
+  .cls{ font-family:var(--mono); font-size:8.4px; font-weight:500; border-radius:4px;
+        padding:2px 6px; white-space:nowrap; letter-spacing:.2px; }
+  .norma{ background:var(--mint-container); color:var(--on-mint); }
+  .deriv{ background:var(--amber-container); color:var(--amber); }
+  .calib{ background:var(--coral-container); color:var(--on-coral); }
+
+  /* ── Parameter table ────────────────────────────────── */
+  table.params{ width:100%; border-collapse:collapse; margin:4px 0 4px; font-size:9.7px; }
+  table.params th{ text-align:left; font-weight:700; color:var(--primary-dark); font-size:9.2px;
+                   text-transform:uppercase; letter-spacing:.4px; padding:0 7px 4px 0;
+                   border-bottom:1px solid var(--container-high); }
+  table.params td{ padding:3px 6px 3px 0; vertical-align:top; color:var(--ink-soft);
+                   border-bottom:1px solid #F0F4F5; }
+  table.params tr:last-child td{ border-bottom:none; }
+  table.params td.p{ font-family:var(--mono); color:var(--primary); font-weight:500; white-space:nowrap; }
+  table.params td.c{ white-space:nowrap; }
+
+  /* ── Source quote block ─────────────────────────────── */
+  .src{ background:var(--container); border-left:3px solid var(--mint); border-radius:0 8px 8px 0;
+        padding:7px 11px; margin:3px 0; break-inside:avoid; }
+  .src .q{ font-size:9.8px; color:var(--ink); line-height:1.5; font-style:italic; }
+  .src .q em{ font-style:normal; font-weight:700; background:#D7EDE9; padding:0 2px; border-radius:2px; }
+  .src .cite{ font-family:var(--mono); font-size:8.8px; color:var(--primary); margin-top:5px; font-style:normal; }
+  .src ul{ margin:3px 0 0 15px; }
+  .src li{ font-size:9.8px; color:var(--ink); line-height:1.45; }
+
+  /* ── Legend ─────────────────────────────────────────── */
+  .legend{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:9px; }
+  .legend .box{ border:1px solid var(--container-high); border-radius:10px; padding:8px 10px; background:var(--surface); }
+  .legend .box .t{ display:block; margin-bottom:4px; }
+  .legend .box p{ font-size:9.8px; color:var(--ink-soft); line-height:1.45; margin:0; }
+
+  .note{ background:var(--surface); border:1px dashed var(--mint); border-radius:9px;
+         padding:7px 11px; margin:4px 0 0; font-size:9.8px; color:var(--ink-soft); }
+  .note b{ color:var(--primary-dark); }
+
+  .warn{ background:var(--coral-container); border:1px solid #E8C3B3; border-radius:9px;
+         padding:7px 11px; margin:4px 0 0; font-size:9.8px; color:var(--on-coral); }
+  .warn b{ color:var(--on-coral); }
+
+  footer{ margin-top:10px; padding-top:7px; border-top:1px solid var(--container-high);
+          display:flex; justify-content:space-between; font-size:9.4px; color:var(--ink-faint); }
+  footer .mono{ color:var(--primary); }
+
+  ol.srclist{ margin:0 0 0 16px; }
+  ol.srclist li{ font-size:9.8px; color:var(--ink-soft); margin-bottom:5px; line-height:1.45; }
+  ol.srclist li b{ color:var(--ink); }
+  ol.srclist li .u{ font-family:var(--mono); font-size:8.8px; color:var(--primary); word-break:break-all; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ PÁGINA 1 ══════════════════ -->
+<div class="page">
+  <header>
+    <div class="h-txt">
+      <h1>As regras em detalhe</h1>
+      <div class="sub">Cada parâmetro do score, o porquê e o trecho literal da fonte que o sustenta.</div>
+    </div>
+    <span class="badge">Motor PRIO-ACS v0.2<br>folha de auditoria</span>
+  </header>
+
+  <div class="rule" style="margin-bottom:8px;">
+    <h3>Como ler esta folha <span class="tag">classificação da evidência</span></h3>
+    <p>O score é <b>PRIO-ACS = C₁ + C₂ + C₃ + C₄</b>, de 0 a 100, por paciente. Cada constante recebe uma
+    classe de evidência, que diz <b>de onde vem o número</b> — e, quando não vem de norma, diz isso com todas
+    as letras.</p>
+    <div class="legend">
+      <div class="box">
+        <span class="cls norma t">NORMA</span>
+        <p>O valor ou a regra está fixado em norma oficial. O trecho literal é reproduzido nesta folha.</p>
+      </div>
+      <div class="box">
+        <span class="cls deriv t">DERIVADO</span>
+        <p>Conversão aritmética direta de um trecho de norma (ex.: “Trimestral” → 90 dias). A conta é mostrada.</p>
+      </div>
+      <div class="box">
+        <span class="cls calib t">CALIBRAÇÃO</span>
+        <p>Escolha de engenharia. Nenhuma norma fixa o valor. O critério usado é declarado e o número deve ser
+        validado no piloto.</p>
+      </div>
+    </div>
+    <p style="margin-bottom:0;"><b>Fonte da verdade:</b> <span class="k">engine/scoring.py</span> e
+    <span class="k">config/rio-de-janeiro.yaml</span> (<span class="k">Visitare/visitare-engine</span>) — todo
+    número desta folha foi conferido contra os dois. Páginas citadas como
+    <span class="k">PDF p.N (impressa p.M)</span>.</p>
+  </div>
+
+  <div class="rule">
+    <h3>C₁ · Carga de condição crônica sensível <span class="tag">0 a 35</span>
+      <span class="tag">no código: c1_icsap</span></h3>
+    <p>Conta quantas das três condições crônicas o paciente tem — hipertensão, diabetes, gestação — e soma
+    pesos <b>decrescentes</b>, na ordem em que aparecem.</p>
+    <div class="fx">n = hipertenso + diabético + gestação &nbsp;·&nbsp; C₁ = soma dos n primeiros pesos de [15, 12, 8]
+      &nbsp;→&nbsp; n=0→0 · 1→15 · 2→27 · 3→35</div>
+
+    <table class="params">
+      <tr><th style="width:29%">Parâmetro</th><th style="width:11%">Valor</th><th style="width:15%">Classe</th><th>Por quê</th></tr>
+      <tr>
+        <td class="p">geram prioridade de visita</td><td class="p">HAS · DM · gestação</td>
+        <td class="c"><span class="cls norma">NORMA</span></td>
+        <td>As três são nomeadas nas normas de visita do ACS como motivo de acompanhamento periódico ou de
+        <b>maior frequência</b>. É isto — e só isto — que as habilita a pontuar numa lista de visita.</td>
+      </tr>
+      <tr>
+        <td class="p">por que estas três</td><td class="p">critério de seleção</td>
+        <td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>A Lista Brasileira de ICSAP (grupos 9, 13 e 19) é o filtro que separa condições cuja
+        descompensação resulta em internação evitável pela APS. Define <b>quais</b> condições entram —
+        <b>não</b> quanto o paciente pontua.</td>
+      </tr>
+      <tr>
+        <td class="p">pesos [15, 12, 8]</td><td class="p">decrescente</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Critério: manter a função monotônica (acrescentar comorbidade nunca reduz o score) e fazer a
+        3ª condição fechar exatamente no teto de 35, sem <span class="k">cap</span> artificial. Nenhuma norma
+        fixa esses pesos.</td>
+      </tr>
+      <tr>
+        <td class="p">teto 35</td><td class="p">35</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Orçamento do score: 35 + 25 + 25 + 15 = 100. A divisão entre os quatro componentes é decisão de
+        modelagem, não de norma.</td>
+      </tr>
+    </table>
+
+    <div class="src">
+      <div class="q">
+      <ul>
+        <li>“<em>Trimestral</em>: hipertensos, diabéticos (…)” — cadência mínima de visita do ACS.</li>
+        <li>“Maior atenção e frequência de visitas domiciliares (…): <em>Diabetes e/ou hipertensão sem
+        acompanhamento</em>;”</li>
+        <li>“Alguns exemplos de situação de risco: (…) <em>Gestantes com diabetes e/ou pressão alta</em>;”</li>
+      </ul>
+      </div>
+      <div class="cite">Carteira de Serviços APS — SMS-Rio, 2021, PDF p.47 (impressa p.46) [F2] · Guia Prático
+      para o ACS, PDF p.177 (impressa p.175) [F3] · Manual do ACS, PDF p.29 (impressa p.27) [F6]</div>
+    </div>
+
+    <div class="src">
+      <div class="q">“Lista Brasileira de Internações por Condições Sensíveis à Atenção Primária”<br>
+      <span class="mono" style="font-style:normal;">GRUPO 9 — <em>Hipertensão</em> — I10, I11<br>
+      GRUPO 13 — <em>Diabetes melitus</em> — E10.0, E10.1 (…) E14.9<br>
+      GRUPO 19 — <em>Doenças relacionadas ao Pré-natal e Parto</em> — O23, A50 e P35.0</span></div>
+      <div class="cite">Portaria SAS/MS nº 221, de 17 de abril de 2008 — Anexo, 19 grupos CID-10. [F1]</div>
+    </div>
+
+    <div class="warn">
+      <b>ICSAP classifica internações, não pessoas — por isso ele seleciona, mas não pontua.</b> A Lista
+      Brasileira é indicador de desempenho do sistema, apurado <b>retrospectivamente</b> sobre internações que
+      já ocorreram. <b>Ter hipertensão não faz de alguém um caso ICSAP; ser internado por crise hipertensiva
+      faz daquela internação uma ICSAP.</b> A Portaria fixa que o grupo 9 se chama “Hipertensão” — não fixa que
+      um hipertenso valha 15 pontos numa lista de visita. Soma-se a isso que o grupo 19 é “doenças
+      <b>relacionadas ao</b> pré-natal e parto” (O23, A50, P35.0): <b>gestação em si não está na lista</b>.
+    </div>
+
+    <div class="note">
+      <b>Nome no código diverge desta folha.</b> No motor este componente ainda se chama
+      <span class="k">c1_icsap</span> e é gravado como <span class="k">score_icsap</span> na tabela
+      <span class="k">allocations</span>. A renomeação está <b>pendente</b> — quem cruzar esta folha com o banco
+      deve ler <span class="k">score_icsap</span> como carga de condição crônica, e <b>não</b> tentar validá-lo
+      contra taxas reais de ICSAP: ele não mede isso.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.1</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 2 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>C₂ · Fase da vida vulnerável</h2>
+    <span class="sub">Gestante, criança, idoso com crônica</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>C₂ · Fase da vida vulnerável <span class="tag">0 a 25</span> <span class="tag">usa o maior, nunca soma</span></h3>
+    <p>Três fases marcadas como prioritárias. O componente pega <b>o maior valor aplicável</b> — não soma.</p>
+    <div class="fx">C₂ = máx( 25 se gestante ; 20 se criança 0–6 ; 15 se idoso 66+ com HAS ou DM ; 0 )</div>
+
+    <table class="params">
+      <tr><th style="width:31%">Parâmetro</th><th style="width:11%">Valor</th><th style="width:16%">Classe</th><th>Por quê</th></tr>
+      <tr>
+        <td class="p">quais fases</td><td class="p">gestante · criança · idoso c/ crônica</td>
+        <td class="c"><span class="cls norma">NORMA</span></td>
+        <td>A lei do ACS lista gestante e criança como alvos de visita <b>regular e periódica</b>; o Guia
+        Prático do MS define explicitamente o idoso com crônica sem acompanhamento como caso de
+        <b>maior frequência</b> de visita.</td>
+      </tr>
+      <tr>
+        <td class="p">ordem 25 &gt; 20 &gt; 15</td><td class="p">ordenação</td>
+        <td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>Segue a cadência mínima que a Carteira de Serviços impõe a cada grupo: gestante <b>mensal</b>
+        (semanal se alto risco) → criança <b>mensal a semestral</b> conforme a idade → idoso ≥ 60
+        <b>semestral</b>. Cadência mais curta na norma ⇒ peso maior no score.</td>
+      </tr>
+      <tr>
+        <td class="p">magnitudes 25/20/15</td><td class="p">25 · 20 · 15</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>A <b>ordem</b> é derivada da norma; os <b>valores</b> não. Nenhuma norma diz que gestante vale
+        25 e criança 20.</td>
+      </tr>
+      <tr>
+        <td class="p">máx() em vez de soma</td><td class="p">máx()</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Cada peso já representa o impacto total daquela fase; somar distorceria o orçamento (uma
+        gestante idosa marcaria 40 em um componente de teto 25).</td>
+      </tr>
+    </table>
+
+    <div class="src">
+      <div class="q">“IV – a realização de <em>visitas domiciliares regulares e periódicas</em> para acolhimento
+      e acompanhamento: a) da <em>gestante</em>, no pré-natal, no parto e no puerpério; b) da lactante, nos seis
+      meses seguintes ao parto; c) da <em>criança</em>, verificando seu estado vacinal e a evolução de seu peso e
+      de sua altura; (…)”</div>
+      <div class="cite">Lei nº 11.350/2006, art. 3º, §3º, IV — redação dada pela Lei nº 13.595/2018. [F4]</div>
+    </div>
+
+    <div class="src">
+      <div class="q">“<em>Maior atenção e frequência de visitas domiciliares</em> devem ser feitas para os(as)
+      idosos(as) que apresentarem os seguintes dados:”
+      <ul>
+        <li>“Queda ou internação nos últimos seis meses;”</li>
+        <li>“<em>Diabetes e/ou hipertensão sem acompanhamento</em>;”</li>
+        <li>“Paciente que não faz acompanhamento regular de saúde;”</li>
+        <li>“Idoso que fica sozinho e que tem várias doenças crônicas (…);”</li>
+        <li>“Acamados ou com dificuldade de se locomover até a UBS.”</li>
+      </ul>
+      <div style="margin-top:4px;">“Esses casos devem ser priorizados pelo fato de implicarem
+      maior risco de incapacidades e mortalidade.”</div>
+      </div>
+      <div class="cite">Guia Prático para o ACS — Ministério da Saúde, PDF p.177 (impressa p.175). [F3]</div>
+    </div>
+
+    <div class="warn">
+      <b>Ponto de corte etário não bate com nenhuma fonte.</b> O motor usa <span class="k">66+</span> porque é
+      o que a faixa etária do dataset da SMS-Rio oferece. A Carteira de Serviços fala em <b>idosos (≥ 60 anos)</b>
+      e a ERF-CS pontua <b>maior de 70 anos</b>. Nenhuma das duas é 66. É uma limitação do dado de entrada,
+      não uma escolha clínica — e desloca uma faixa de 6 anos (60–65) para fora do C₂.
+    </div>
+
+    <div class="warn">
+      <b>Gestação pontua duas vezes — questão em aberto.</b> Uma gestante recebe <b>15 em C₁</b> (carga
+      crônica) e <b>25 em C₂</b> (fase da vida): <b>40 dos 100 pontos</b> antes de qualquer lacuna de cuidado
+      ou vulnerabilidade social. São eixos distintos e a soma é <b>intencional</b>, mas nenhuma norma fixa 40.
+      O efeito prático é que
+      <b>toda gestante entra pelo menos em Médio</b> (garantido por teste:
+      <span class="k">test_gestante_at_least_medio</span>). Se a SMS considerar 40 alto demais, o ajuste
+      natural é reduzir a parcela de C₁ — não a de C₂, que é a que carrega a prioridade zero de mortalidade
+      materna.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.2</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 3 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>C₄ · Vulnerabilidade social</h2>
+    <span class="sub">Desempate entre perfis clínicos parecidos</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>C₄ · Vulnerabilidade social <span class="tag">0 ou 15</span> <span class="tag">desempate</span></h3>
+    <p>Marcador sim/não já existente na base. Entra como critério de desempate entre perfis clínicos parecidos.</p>
+    <div class="fx">C₄ = 15 se situacao_vulnerabilidade ; senão 0</div>
+
+    <table class="params">
+      <tr><th style="width:31%">Parâmetro</th><th style="width:11%">Valor</th><th style="width:16%">Classe</th><th>Por quê</th></tr>
+      <tr>
+        <td class="p">existir o componente</td><td class="p">sim</td>
+        <td class="c"><span class="cls norma">NORMA</span></td>
+        <td>A PNAB manda priorizar por vulnerabilidade; a lei do ACS manda acompanhar grupos de risco com
+        maior vulnerabilidade social; a Carteira do Rio manda dar atenção especial a CFC/Auxílio Brasil.</td>
+      </tr>
+      <tr>
+        <td class="p">peso 15</td><td class="p">15</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Menor peso dos quatro componentes, deliberadamente: determinante social prediz risco de
+        <b>longo prazo</b>, não urgência do dia.</td>
+      </tr>
+      <tr>
+        <td class="p">binário</td><td class="p">0 ou 15</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Limitação do dado: a base traz um sim/não. Substituição prevista pelo IDS-Rio (contínuo) quando
+        o índice estiver disponível por setor censitário.</td>
+      </tr>
+    </table>
+
+    <div class="src">
+      <div class="q">“a atividade do ACS deve se dar pela lógica do planejamento do processo de trabalho a
+      partir das necessidades do território, com <em>priorização para população com maior grau de
+      vulnerabilidade e de risco epidemiológico</em>;”</div>
+      <div class="cite">PNAB — Portaria GM/MS nº 2.436/2017, Anexo, item 3.4. [F5]</div>
+    </div>
+
+    <div class="src">
+      <div class="q">“ATENÇÃO: paciente que possui o <em>Cartão Família Carioca (CFC) e Auxílio Brasil</em>, devido
+      a um <em>maior risco social</em>, deve receber atenção especial sempre que procurar a unidade.”</div>
+      <div class="cite">Carteira de Serviços da APS — SMS-Rio, 2021, PDF p.88 (impressa p.87). [F2]</div>
+    </div>
+
+    <div class="warn">
+      <b>Inversão de peso em relação à escala nacional — ponto de atenção para auditoria.</b> Na ERF-CS os
+      marcadores <b>sociais pesam mais que os clínicos</b>: baixas condições de saneamento = 3, desemprego = 2,
+      analfabetismo = 1, contra HAS = 1 e DM = 1. No PRIO-ACS a relação se inverte: o social vale no máximo 15
+      e o clínico até 35. É uma escolha de produto (a lista do dia é de urgência clínica, e o social entra
+      como desempate) — mas <b>contraria a proporção da escala nacional</b> e deve ser decidida
+      explicitamente pela SMS antes do piloto.
+    </div>
+  </div>
+
+  <div class="rule">
+    <h3>Por que o motor existe <span class="tag">o problema, nas palavras da fonte</span></h3>
+    <div class="src">
+      <div class="q">“A <em>necessidade de priorizar VD em equipes com grande número de usuários</em>, somada à
+      <em>ausência de critérios objetivos disponíveis para esta priorização</em> são os grandes responsáveis pela
+      ampla utilização da ERF-SC no nível nacional.”</div>
+      <div class="cite">ERF-CS — JMPHC, 2012, p.2. [F7]</div>
+    </div>
+    <div class="src">
+      <div class="q">“III – Realizar visitas domiciliares com periodicidade estabelecida no planejamento da
+      equipe e conforme as necessidades de saúde da população, para o monitoramento da situação das famílias e
+      indivíduos do território, com <em>especial atenção às pessoas com agravos e condições que necessitem de
+      maior número de visitas domiciliares</em>;”</div>
+      <div class="cite">PNAB — Portaria GM/MS nº 2.436/2017, Anexo — atribuições do ACS. [F5]</div>
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.3</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 3 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>C₃ · Lacuna de cuidado</h2>
+    <span class="sub">Dois canais que se somam, limitados ao teto de 25</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>Canal A · Emergência recente <span class="tag">0 a 15</span></h3>
+    <p>Conta idas não-eletivas à UPA e internações na janela (n). <b>Satura</b>: o 1º episódio pesa mais que
+    os seguintes.</p>
+    <div class="fx">pontos = 15 × (1 − e^(−0,92·n)) &nbsp;→&nbsp; n=1 → 9,0 · 2 → 12,6 · 3 → 14,1 · 5 → 14,8</div>
+
+    <table class="params">
+      <tr><th style="width:31%">Parâmetro</th><th style="width:11%">Valor</th><th style="width:16%">Classe</th><th>Por quê</th></tr>
+      <tr>
+        <td class="p">contar internação/urgência</td><td class="p">sim</td>
+        <td class="c"><span class="cls norma">NORMA</span></td>
+        <td>O Guia Prático do MS manda aumentar a frequência de visita após internação — é o gatilho
+        explícito de reforço de acompanhamento.</td>
+      </tr>
+      <tr>
+        <td class="p">janela</td><td class="p">90 dias</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Ancorada na cadência <b>trimestral</b> dos crônicos na Carteira: a janela cobre um ciclo completo
+        de acompanhamento. <b>Não é o que a fonte do gatilho diz</b> — ver ressalva abaixo.</td>
+      </tr>
+      <tr>
+        <td class="p">teto do canal</td><td class="p">15</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Evento já ocorrido pesa mais que atraso (risco de). Por isso 15 contra 10 do canal B.</td>
+      </tr>
+      <tr>
+        <td class="p">K (saturação)</td><td class="p">0,92</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Critério declarado: 1 evento já entrega ~60% do canal (9,0 de 15) e o efeito satura no 3º
+        (14,1). Reconhece a “porta giratória” sem deixar que 5 idas à UPA dominem o perfil clínico.
+        <b>Nenhuma norma ou estudo fixa 0,92</b> — é ajuste de curva.</td>
+      </tr>
+    </table>
+
+    <div class="src">
+      <div class="q">“Maior atenção e frequência de visitas domiciliares devem ser feitas para os(as)
+      idosos(as) que apresentarem os seguintes dados: <em>Queda ou internação nos últimos seis meses</em>;”</div>
+      <div class="cite">Guia Prático para o ACS — Ministério da Saúde, PDF p.177 (impressa p.175). [F3]</div>
+    </div>
+
+    <div class="warn">
+      <b>A janela do motor não é a janela da fonte.</b> A fonte acima diz <b>seis meses</b>, e diz isso
+      <b>para idosos</b>. O motor aplica <b>90 dias para toda a população</b>. Os 90 dias são calibração
+      (ciclo trimestral do crônico), não transcrição da norma. Duas consequências para a auditoria: (i) um
+      idoso internado há 4 meses <b>não</b> pontua neste canal, embora a fonte mande priorizá-lo; (ii) a
+      janela única ignora que a fonte diferencia por faixa. Correção prevista: janela por perfil.
+    </div>
+  </div>
+
+  <div class="rule">
+    <h3>Canal B · Atraso na visita <span class="tag">0 a 10</span></h3>
+    <p>Quanto o tempo sem visita passou do <b>prazo de visita</b> daquele paciente (página 5). Pontua
+    proporcional, com teto quando o paciente <b>dobra</b> o prazo.</p>
+    <div class="fx">atraso = dias sem visita − prazo &nbsp;·&nbsp; pontos = 10 × mín( atraso ÷ prazo ; 1 )</div>
+    <p>Ex. crônico (prazo 90 d): em dia → <span class="k">0</span> · 135 d → <span class="k">5</span> ·
+    ≥ 180 d → <span class="k">10</span>. Paciente <b>nunca visitado</b> entra com atraso máximo →
+    <span class="k">10</span>.</p>
+
+    <table class="params">
+      <tr><th style="width:31%">Parâmetro</th><th style="width:11%">Valor</th><th style="width:16%">Classe</th><th>Por quê</th></tr>
+      <tr>
+        <td class="p">punir atraso</td><td class="p">sim</td>
+        <td class="c"><span class="cls norma">NORMA</span></td>
+        <td>A Carteira fixa <b>frequência mínima</b> por linha de cuidado; passar do prazo é
+        descumprimento de cadência, não preferência do agente.</td>
+      </tr>
+      <tr>
+        <td class="p">rampa linear</td><td class="p">proporcional</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Substitui o degrau binário da v0.1. Critério: evitar que o paciente troque de faixa a cada
+        ressincronização do Vitacare (<i>flapping</i>) por variação de um dia.</td>
+      </tr>
+      <tr>
+        <td class="p">teto em 2× o prazo</td><td class="p">2×</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Quem dobrou o prazo já é prioridade máxima do canal; além disso a diferença deixa de ser
+        acionável para o ACS.</td>
+      </tr>
+      <tr>
+        <td class="p">soma dos canais</td><td class="p">mín(25, A+B)</td>
+        <td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Evento + prazo vencido juntos representam a pior falha de cuidado, por isso somam; o teto
+        de 25 preserva o orçamento do componente.</td>
+      </tr>
+    </table>
+
+    <div class="note">
+      <b>Por que “atraso” e não “tempo sem visita”.</b> O score não olha o gap absoluto — olha o gap
+      <b>relativo ao prazo daquele paciente</b>. 100 dias sem visita é atraso grave para uma gestante
+      (prazo 30 d) e está em dia para um paciente geral (prazo 180 d). É o que torna o componente
+      comparável entre linhas de cuidado.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.4</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 4 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>Prazo de visita</h2>
+    <span class="sub">Define o “atraso” do C₃ — peça central do motor · no código: <span class="k">l_eff</span></span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>Base pela linha de cuidado <span class="tag">usa o mais curto que se aplica</span></h3>
+    <p>Cada paciente tem um prazo próprio até a próxima visita. A base vem da linha de cuidado:
+    gestante <span class="k">30 d</span> · criança 0–6 <span class="k">45 d</span> ·
+    crônico HAS/DM <span class="k">90 d</span> · geral <span class="k">180 d</span>.</p>
+
+    <div class="src">
+      <div class="q">“Portanto, os ACS devem realizar visita domiciliar com periodicidade baseada na avaliação
+      de risco e na vulnerabilidade, com <em>frequência mínima</em>:”
+      <ul>
+        <li>“<em>Diária</em>: tuberculose e hanseníase;”</li>
+        <li>“<em>Semanal</em>: gestantes de alto risco, crianças até 30 dias;”</li>
+        <li>“<em>Mensal</em>: gestantes de risco habitual, crianças de 1 mês a 1 ano, acamados, Cartão Família Carioca (CFC);”</li>
+        <li>“<em>Trimestral</em>: hipertensos, diabéticos, crianças de 1 a 2 anos;”</li>
+        <li>“<em>Semestral</em>: crianças de 2 a 6 anos, idosos (≥ 60 anos) e Auxílio Brasil.”</li>
+      </ul>
+      </div>
+      <div class="cite">Carteira de Serviços da APS — SMS-Rio, 2021, PDF p.47 (impressa p.46); repetida em PDF p.88 (impressa p.87). [F2]</div>
+    </div>
+
+    <table class="params">
+      <tr><th style="width:24%">Parâmetro</th><th style="width:14%">Valor</th><th style="width:15%">Classe</th><th>Por quê / a conta</th></tr>
+      <tr><td class="p">gestante</td><td class="p">30 d</td><td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>“Mensal: gestantes de risco habitual” → 30 dias.</td></tr>
+      <tr><td class="p">crônico HAS/DM</td><td class="p">90 d</td><td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>“Trimestral: hipertensos, diabéticos” → 90 dias.</td></tr>
+      <tr><td class="p">geral</td><td class="p">180 d</td><td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>“Semestral: (…) idosos (≥ 60 anos)” → 180 dias, aplicado como piso geral da população.</td></tr>
+      <tr><td class="p">criança 0–6</td><td class="p">45 d</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td><b>Elo mais fraco desta folha.</b> A Carteira parte 0–6 em três cadências (mensal 1m–1a;
+        trimestral 1–2a; semestral 2–6a) e o dataset só traz a faixa “0–6”. 45 d é um meio-termo puxado para
+        a criança mais nova. Correção: idade em dias.</td></tr>
+      <tr><td class="p">piso (l_min)</td><td class="p">7 d</td><td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>Linha “<b>Semanal</b>” da tabela → 7 dias. É a cadência mais curta que o motor consegue produzir
+        hoje, já que TB e hanseníase (linha “Diária”) <b>não têm flag no dataset</b>.</td></tr>
+      <tr><td class="p">combinar linhas</td><td class="p">mín()</td><td class="c"><span class="cls deriv">DERIVADO</span></td>
+        <td>A norma diz “frequência <b>mínima</b>”. Logo, em sobreposição vale a mais curta: gestante
+        diabética → mín(30, 90) = 30 d, e não 90.</td></tr>
+    </table>
+  </div>
+
+  <div class="rule">
+    <h3>Exemplo trabalhado <span class="tag">conferido contra o motor</span></h3>
+    <p><b>Gestante diabética, a mais distante da equipe.</b> Duas linhas de cuidado se aplicam (gestante e
+    crônico) e ela tem duas condições clínicas (gestação + diabetes).</p>
+    <div class="fx">base = mín(30 ; 90) = 30 &nbsp;·&nbsp; dist = 1 → ×0,60 &nbsp;·&nbsp; extra = 1 → ×0,85<br>
+      prazo = máx( 7 ; 30 × 0,60 × 0,85 ) = <b>15,3 dias</b></div>
+    <p>O prazo dela cai de 30 para <b>15,3 dias</b>. Aos 30 dias sem visita, o atraso é de 14,7 d — <b>96% do
+    prazo</b> — e o canal B entrega 9,6, que o motor arredonda para <span class="k">C₃ = 10</span>, o teto do
+    canal. Uma gestante diabética <b>perto</b> do posto, no mesmo dia, teria prazo de 25,5 d, atraso de 4,5 d
+    e <span class="k">C₃ = 2</span>.</p>
+    <div class="note" style="margin-top:5px;">
+      <b>Leitura para auditoria.</b> Repare que <b>nenhum dos dois fatores sozinho</b> produz esse prazo: é a
+      combinação de linha de cuidado, carga clínica e acesso geográfico em um único número. É por isso que
+      o prazo é gravado paciente a paciente na saída do motor (campo <span class="k">l_eff</span>) — sem ele,
+      o “atraso” do C₃ não é auditável.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.5</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 6 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>O que encurta o prazo</h2>
+    <span class="sub">Distância ao posto e carga clínica</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>O prazo encurta para quem precisa de mais atenção <span class="tag">distância e fragilidade</span></h3>
+    <div class="fx">prazo = máx( 7 ; base × (1 − 0,40·dist) × (1 − mín(0,15·extra ; 0,45)) )</div>
+    <p><span class="k">dist</span> = ranking de distância ao posto dentro da própria equipe (0 = mais perto,
+    1 = mais longe) · <span class="k">extra</span> = nº de condições crônicas além da 1ª.</p>
+
+    <table class="params">
+      <tr><th style="width:24%">Parâmetro</th><th style="width:14%">Valor</th><th style="width:15%">Classe</th><th>Por quê</th></tr>
+      <tr><td class="p">encurtar por risco</td><td class="p">sim</td><td class="c"><span class="cls norma">NORMA</span></td>
+        <td>É a regra-mãe do motor: risco identificado ⇒ visitas mais frequentes.</td></tr>
+      <tr><td class="p">distância (gamma)</td><td class="p">até −40%</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>O <b>fator</b> é norma (barreira geográfica agrava risco de acesso); a <b>magnitude</b> de 40% não é.
+        O ranking é por quantil dentro da equipe, então “longe” se recalibra sozinho entre favela e área plana.</td></tr>
+      <tr><td class="p">condição extra (delta)</td><td class="p">−15% cada</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>O <b>fator</b> é norma (multimorbidade entra na estratificação); a <b>magnitude</b> não é.</td></tr>
+      <tr><td class="p">teto (delta_cap)</td><td class="p">−45%</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Impede que o encurtamento por comorbidade zere o prazo sozinho.</td></tr>
+    </table>
+
+    <div class="src">
+      <div class="q">“Pode ser que seja identificada uma <em>situação de risco</em> e isso demandará a realização de
+      <em>outras visitas com maior frequência</em>.”</div>
+      <div class="cite">Manual do ACS — Ministério da Saúde, PDF p.50 (impressa p.48). [F6]</div>
+    </div>
+
+    <div class="src">
+      <div class="q">“A situação de risco pode ser agravada por obstáculos ou fatores que dificultam ou impedem
+      as pessoas de terem acesso às unidades de saúde, como: • <em>Localização do serviço com barreiras
+      geográficas ou distante da comunidade</em>;”</div>
+      <div class="cite">Manual do ACS — Ministério da Saúde, PDF p.30 (impressa p.28). [F6]</div>
+    </div>
+
+    <div class="src">
+      <div class="q">“(…) pela avaliação da estratificação de risco e vulnerabilidade clínica (ex.: idade,
+      cuidados paliativos, <em>multimorbidade</em>, polifarmácia, mobilidade, dependência funcional, dentre
+      outros).”</div>
+      <div class="cite">Carteira de Serviços da APS — SMS-Rio, 2021, PDF p.47 (impressa p.46). [F2]</div>
+    </div>
+
+    <div class="note">
+      <b>Por que a distância entra no prazo e não no score.</b> Distância não torna o paciente mais doente —
+      torna a unidade menos alcançável, então ele depende mais da visita. Entrando no <b>prazo</b>, ela
+      antecipa a visita sem inflar artificialmente a gravidade clínica do caso.
+    </div>
+  </div>
+
+  <div class="rule">
+    <h3>O que o motor deliberadamente não usa <span class="tag">verificável no código</span></h3>
+    <p>Tão importante quanto o que entra no score é o que fica de fora. Estes pontos são
+    <b>estruturais</b> — não são configuração, estão na forma do código e são cobertos por teste.</p>
+    <table class="params">
+      <tr><th style="width:30%">Não entra</th><th style="width:26%">Garantia</th><th>Por quê</th></tr>
+      <tr><td class="p">sexo · raça/cor</td><td class="c">ausentes de <span class="k">PatientFeatures</span></td>
+        <td>Existem na base da SMS-Rio, mas <b>não são lidos pelo motor</b>. Nenhum campo demográfico além de
+        faixa etária alimenta o score — barreira contra discriminação algorítmica.</td></tr>
+      <tr><td class="p">identidade da ACS</td><td class="c"><span class="k">test_acs_identity_not_in_features</span></td>
+        <td>O score do paciente não muda conforme quem vai visitá-lo. Priorização e alocação são etapas
+        separadas.</td></tr>
+      <tr><td class="p">rota e vizinhança</td><td class="c"><span class="k">test_scoring_does_not_import_allocation</span></td>
+        <td>O módulo de score não importa nada da alocação. Conveniência logística nunca altera prioridade
+        clínica — só a ordem de percurso <b>dentro</b> da mesma faixa.</td></tr>
+      <tr><td class="p">qualquer LLM</td><td class="c">função pura, sem I/O</td>
+        <td>Mesma entrada, mesma saída (<span class="k">test_same_input_same_output</span>). A decisão é
+        inspecionável em SQL/Python — requisito de auditabilidade clínica.</td></tr>
+    </table>
+    <div class="note">
+      <b>Onde a IA entra, então.</b> Fora da decisão de prioridade: em texto de apoio ao ACS e em resumo de
+      caso. <b>Nenhum modelo de linguagem participa do cálculo do score ou da ordenação da lista.</b>
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.6</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 5 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>Faixas Alto / Médio / Habitual</h2>
+    <span class="sub">Cortes por equipe, recalculados a cada rodada</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>Três faixas, e por que são três <span class="tag">estrutura</span></h3>
+    <p>O score vira uma de três faixas: <b>Alto</b>, <b>Médio</b>, <b>Habitual</b>. A estrutura de três
+    estratos não é invenção do motor — é a da escala nacional de risco familiar usada na Atenção Primária
+    brasileira, e a mesma que a SMS-Rio adota na Escala de Risco Familiar da Ficha A.</p>
+    <div class="src">
+      <div class="q"><span class="mono" style="font-style:normal;">Escore total 5 e 6 → <em>R1 - risco menor</em><br>
+      Escore total 7 e 8 → <em>R2 - risco médio</em><br>
+      Escore total acima de 9 → <em>R3 - risco máximo</em></span></div>
+      <div class="cite">Escala de Risco Familiar de Coelho-Savassi (ERF-CS), Quadro 2 — JMPHC, 2012, p.2. [F7]</div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <h3>Modo quantil <span class="tag">padrão</span></h3>
+    <p>A cada rodada, <b>por equipe</b>, os cortes saem da distribuição real daquela população:
+    topo <span class="k">3%</span> → <b>Alto</b> · <span class="k">17%</span> seguintes → <b>Médio</b> ·
+    resto → <b>Habitual</b>. Por isso não são valores fixos — acompanham a equipe.</p>
+
+    <div class="src">
+      <div class="q">“Áreas onde as famílias apresentem escore familiar final muito elevado, como por exemplo,
+      zona rural precária, ou aglomerados não urbanizados: <em>recomenda-se elevar o ponto de corte para a
+      priorização das famílias</em>, e considerar aquela microárea (ou área) como de risco.”<br><br>
+      “Permanecem atuais os questionamentos acerca <em>pontos de corte mais flexíveis</em>, áreas de risco e
+      inclusão de novas sentinelas.”</div>
+      <div class="cite">ERF-CS — JMPHC, 2012, p.6. [F7]</div>
+    </div>
+
+    <p style="margin-top:7px;">Este é o fundamento do modo quantil: a própria escala nacional reconhece que
+    <b>corte fixo não funciona em território de alta prevalência</b> e recomenda elevá-lo. O motor faz isso
+    automaticamente, por equipe, a cada rodada — em vez de exigir recalibração manual por microárea.</p>
+
+    <table class="params">
+      <tr><th style="width:24%">Parâmetro</th><th style="width:14%">Valor</th><th style="width:15%">Classe</th><th>Por quê</th></tr>
+      <tr><td class="p">corte móvel por equipe</td><td class="p">quantil</td><td class="c"><span class="cls norma">NORMA</span></td>
+        <td>Recomendação expressa da escala nacional (trecho acima).</td></tr>
+      <tr><td class="p">fração Alto</td><td class="p">3%</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Critério <b>operacional</b>, verificável: a PNAB limita a microárea a <b>750 pessoas por ACS</b> e a
+        capacidade configurada é de <b>25 visitas/ACS/semana</b>. 3% de 750 ≈ <b>22 pacientes</b> — cabe em uma
+        semana de trabalho. Ou seja: a faixa Alto é dimensionada para ser <b>inteiramente visitável toda semana</b>.</td></tr>
+      <tr><td class="p">fração Médio</td><td class="p">17%</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Fecha 20% de população priorizada. Não há norma nem conta de capacidade que fixe 17% —
+        é o parâmetro mais discricionário do motor.</td></tr>
+      <tr><td class="p">modo absoluto</td><td class="p">≥61 · 31–60 · ≤30</td><td class="c"><span class="cls calib">CALIBRAÇÃO</span></td>
+        <td>Fallback herdado da v0.1, usado quando a distribuição é degenerada (todos com o mesmo score).</td></tr>
+    </table>
+
+    <div class="src">
+      <div class="q">“cada ACS deve realizar as ações previstas nas regulamentações vigentes e nesta portaria
+      e ter uma microárea sob sua responsabilidade, cuja população <em>não ultrapasse 750 pessoas</em>;”</div>
+      <div class="cite">PNAB — Portaria GM/MS nº 2.436/2017, Anexo, item 3.4. [F5]</div>
+    </div>
+
+    <div class="note">
+      <b>Efeito colateral do quantil, declarado.</b> Com corte por quantil, <b>toda equipe sempre terá ~3% em
+      Alto</b> — mesmo uma equipe inteira saudável. A faixa é <b>relativa à população da equipe</b>, não uma
+      afirmação clínica absoluta. Para leitura epidemiológica entre equipes, usar o <b>score bruto</b>, nunca a
+      faixa. É o preço da recomendação de corte flexível da ERF-CS.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.7</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 6 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>Divergências conhecidas</h2>
+    <span class="sub">O que o motor faz diferente da norma</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>Divergências declaradas <span class="tag">para decisão da SMS</span></h3>
+    <table class="params">
+      <tr><th style="width:22%">Tema</th><th style="width:30%">O que a norma diz</th><th style="width:26%">O que o motor faz</th><th>Encaminhamento</th></tr>
+      <tr>
+        <td class="p">Janela de evento</td>
+        <td>Guia ACS: “queda ou internação nos <b>últimos seis meses</b>”, para <b>idosos</b>.</td>
+        <td><b>90 dias</b>, para <b>toda</b> a população.</td>
+        <td>Janela por perfil clínico; testar 180 d para 66+.</td>
+      </tr>
+      <tr>
+        <td class="p">Peso das crônicas</td>
+        <td>ERF-CS pontua <b>HAS = 1</b> e <b>DM = 1</b> — iguais e puramente aditivos.</td>
+        <td>Pesos desiguais e decrescentes <b>[15, 12, 8]</b>.</td>
+        <td>Deliberado (2ª comorbidade agrega menos risco marginal), mas sem validação empírica.</td>
+      </tr>
+      <tr>
+        <td class="p">Peso do social</td>
+        <td>ERF-CS: saneamento 3, desemprego 2 &gt; HAS 1, DM 1.</td>
+        <td>Social ≤ 15; clínico ≤ 35 (relação invertida).</td>
+        <td><b>Decisão de política da SMS</b>, não de engenharia.</td>
+      </tr>
+      <tr>
+        <td class="p">Criança 0–6</td>
+        <td>Carteira: três cadências (30 / 90 / 180 d) dentro da faixa.</td>
+        <td>Um único prazo de <b>45 d</b>.</td>
+        <td>Exige idade em dias na base; hoje é limitação de dado.</td>
+      </tr>
+      <tr>
+        <td class="p">Corte de idoso</td>
+        <td>Carteira: <b>≥ 60</b>. ERF-CS: <b>&gt; 70</b>.</td>
+        <td><b>66+</b> (faixa etária do dataset).</td>
+        <td>Faixa 60–65 fica fora do C₂. Pedir idade exata.</td>
+      </tr>
+      <tr>
+        <td class="p">TB e hanseníase</td>
+        <td>Carteira: cadência <b>diária</b>.</td>
+        <td>Não pontua — <b>não há flag no dataset</b>.</td>
+        <td>Captura via Ficha B-TB; override de faixa.</td>
+      </tr>
+      <tr>
+        <td class="p">Puerpério e lactante</td>
+        <td>Lei 11.350, art. 3º, §3º, IV: acompanhar “no parto e <b>no puerpério</b>” e a lactante nos
+        <b>seis meses</b> seguintes.</td>
+        <td><b>Não pontua.</b> O motor tem o parâmetro
+        (<span class="k">postpartum.window_days = 42</span>) mas ele está
+        <span class="k">enabled: false</span> — falta dias pós-parto na base.</td>
+        <td><b>Lacuna frente à lei.</b> Hoje a paciente zera C₁ e C₂ no dia do parto. Ligar assim que o
+        campo existir.</td>
+      </tr>
+      <tr>
+        <td class="p">Acamado</td>
+        <td>Carteira: cadência <b>mensal</b>.</td>
+        <td>Não pontua — sem campo na base.</td>
+        <td>Captura em campo pelo app.</td>
+      </tr>
+      <tr>
+        <td class="p">Unidade de análise</td>
+        <td>ERF-CS pontua a <b>família</b>.</td>
+        <td>PRIO-ACS pontua o <b>paciente</b>.</td>
+        <td>Intencional (a lista do ACS é de pessoas), mas muda a semântica do escore.</td>
+      </tr>
+      <tr>
+        <td class="p">Nome do C₁</td>
+        <td>ICSAP é indicador de <b>internações</b>, apurado sobre altas hospitalares — não é escore de risco
+        de pessoa.</td>
+        <td>Código e banco ainda usam <span class="k">c1_icsap</span> / <span class="k">score_icsap</span>,
+        e o 1-pager dizia “risco de internação evitável”.</td>
+        <td>Folha e 1-pager já corrigidos. <b>Renomear no código e na coluna</b> segue pendente.</td>
+      </tr>
+      <tr>
+        <td class="p">Documentação interna</td>
+        <td>—</td>
+        <td><span class="k">docs/engine-spec.md</span> ainda descreve a v0.1 (C₃ binário, janela 60 d, cortes fixos)
+        e repete “Captures risk of preventable hospitalization”.</td>
+        <td>Atualizar para v0.2 — auditar pela spec hoje leva à fórmula errada.</td>
+      </tr>
+    </table>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.8</span>
+  </footer>
+</div>
+
+<!-- ══════════════════ PÁGINA 9 ══════════════════ -->
+<div class="page">
+  <div class="p-head">
+    <h2>Fontes</h2>
+    <span class="sub">Documento, trecho e onde conferir</span>
+    <span class="pg">Motor PRIO-ACS v0.2</span>
+  </div>
+
+  <div class="rule">
+    <h3>Fontes <span class="tag">documento · trecho · onde conferir</span></h3>
+    <ol class="srclist">
+      <li><b>[F1] Portaria SAS/MS nº 221, de 17 de abril de 2008</b> — Lista Brasileira de ICSAP, 19 grupos
+      CID-10. Usada em: C₁ — <b>critério de seleção das condições</b>, não de pontuação.
+      <span class="u">bvsms.saude.gov.br/bvs/saudelegis/sas/2008/prt0221_17_04_2008.html</span></li>
+
+      <li><b>[F2] Carteira de Serviços da Atenção Primária — SMS-Rio, 2021</b> — periodicidade mínima de
+      visita (PDF p.47 / impressa p.46, repetida em PDF p.88 / impressa p.87); multimorbidade; Cartão Família
+      Carioca. Usada em: C₁, C₂, C₄, prazo de visita, janela do C₃.
+      <span class="u">subpav.org/download/impressos/Livro_CarteiraDeServicosAPS_2021_20211229.pdf</span></li>
+
+      <li><b>[F3] Guia Prático para o ACS — Ministério da Saúde</b> — critérios de maior frequência de visita
+      ao idoso (PDF p.177 / impressa p.175). Usada em: C₁, C₂, C₃.
+      <span class="u">189.28.128.100/dab/docs/publicacoes/geral/guia_acs.pdf</span></li>
+
+      <li><b>[F4] Lei nº 11.350/2006, art. 3º, §3º, IV e V</b> — redação da Lei nº 13.595/2018. Visitas
+      regulares e periódicas a gestante e criança; grupos com maior vulnerabilidade social. Usada em: C₂, C₄.
+      <span class="u">planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13595.htm</span></li>
+
+      <li><b>[F5] PNAB — Portaria GM/MS nº 2.436/2017</b> — Anexo: priorização por vulnerabilidade e risco
+      epidemiológico; atribuição III do ACS; limite de 750 pessoas por microárea. Usada em: C₄, faixas.
+      <span class="u">bvsms.saude.gov.br/bvs/saudelegis/gm/2017/prt2436_22_09_2017.html</span></li>
+
+      <li><b>[F6] Manual do ACS — Ministério da Saúde</b> — situações de risco (PDF p.29 / impressa p.27);
+      barreiras geográficas e determinantes sociais (PDF p.30 / impressa p.28); risco ⇒ maior frequência
+      (PDF p.50 / impressa p.48). Usada em: C₁, C₄, prazo de visita.
+      <span class="u">189.28.128.100/dab/docs/publicacoes/geral/manual_acs.pdf</span></li>
+
+      <li><b>[F7] Escala de Risco Familiar de Coelho-Savassi (ERF-CS)</b> — Savassi LCM, Lage JL, Coelho FLG.
+      JMPHC, 2012 (Quadros 1–3 e ponto de corte, pp.2, 5 e 6). Usada em: três faixas, modo quantil, comparação
+      de pesos clínico × social.
+      <span class="u">jmphc.com.br/jmphc/article/view/155</span></li>
+    </ol>
+    <div class="note" style="margin-top:9px;">
+      <b>Como reproduzir esta folha.</b> Fonte do documento em
+      <span class="k">docs/src/priorizacao-visitare-regras.html</span>. Os valores conferem com
+      <span class="k">engine/scoring.py</span> e <span class="k">config/rio-de-janeiro.yaml</span> do repositório
+      <span class="k">Visitare/visitare-engine</span>. Trechos citados extraídos dos PDFs originais com
+      <span class="k">pdftotext -layout</span>; a numeração “PDF p.N” é a página do arquivo e “impressa p.M” a
+      impressa no rodapé da publicação.
+    </div>
+  </div>
+
+  <footer>
+    <span>Visitare · Motor PRIO-ACS v0.2 · O copiloto do Agente Comunitário de Saúde</span>
+    <span>Gerado em <span class="gen">—</span> · <span class="mono">visitare.app</span> · p.9</span>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    var d = new Date();
+    var s = d.toLocaleDateString('pt-BR') + ' ' +
+            d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.querySelectorAll('.gen').forEach(function(el){ el.textContent = s; });
+  })();
+</script>
+</body>
+</html>
