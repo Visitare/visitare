@@ -1,7 +1,9 @@
 """
-Carrega os parquets anonimizados (data/raw/) no Supabase Postgres e cria a
-tabela `visitas_capturadas` para receber os forms preenchidos pelo ACS em
-campo.
+Carrega os parquets anonimizados (data/raw/) no Supabase Postgres.
+
+Pressupõe que o schema já existe — aplicado via Supabase CLI
+(`supabase db push` / `supabase db reset`, ver supabase/migrations/ e
+VISI-11). Este script SÓ carrega dados; não cria nem derruba tabela nenhuma.
 
 Uso:
     pip install 'psycopg[binary]' duckdb pandas
@@ -19,83 +21,18 @@ import duckdb
 import psycopg
 
 
-SCHEMA = """
-DROP TABLE IF EXISTS visitas_capturadas CASCADE;
-DROP TABLE IF EXISTS visitas CASCADE;
-DROP TABLE IF EXISTS eventos CASCADE;
-DROP TABLE IF EXISTS pacientes CASCADE;
-DROP TABLE IF EXISTS equipes CASCADE;
-
-CREATE TABLE equipes (
-    equipe_id          TEXT PRIMARY KEY,
-    endereco_latitude  DOUBLE PRECISION NOT NULL,
-    endereco_longitude DOUBLE PRECISION NOT NULL
-);
-
-CREATE TABLE pacientes (
-    paciente_id              TEXT PRIMARY KEY,
-    equipe_id                TEXT NOT NULL REFERENCES equipes(equipe_id),
-    unidade_id               TEXT NOT NULL,
-    faixa_etaria             TEXT NOT NULL,
-    sexo                     TEXT NOT NULL,
-    raca_cor                 TEXT,
-    situacao_vulnerabilidade BOOLEAN NOT NULL,
-    endereco_longitude       DOUBLE PRECISION NOT NULL,
-    endereco_latitude        DOUBLE PRECISION NOT NULL,
-    hipertenso               BOOLEAN NOT NULL,
-    diabetico                BOOLEAN NOT NULL,
-    gestacao                 BOOLEAN NOT NULL
-);
-CREATE INDEX pacientes_equipe_idx   ON pacientes (equipe_id);
-CREATE INDEX pacientes_unidade_idx  ON pacientes (unidade_id);
-
-CREATE TABLE eventos (
-    id              BIGSERIAL PRIMARY KEY,
-    paciente_id     TEXT NOT NULL REFERENCES pacientes(paciente_id),
-    tipo            TEXT NOT NULL,
-    data_referencia DATE NOT NULL
-);
-CREATE INDEX eventos_paciente_data_idx ON eventos (paciente_id, data_referencia DESC);
-CREATE INDEX eventos_tipo_idx          ON eventos (tipo);
-
-CREATE TABLE visitas (
-    id               BIGSERIAL PRIMARY KEY,
-    profissional_id  TEXT NOT NULL,
-    registrados_em   DATE NOT NULL,
-    ordem_visita_dia INTEGER,
-    paciente_id      TEXT NOT NULL REFERENCES pacientes(paciente_id)
-);
-CREATE INDEX visitas_paciente_data_idx   ON visitas (paciente_id, registrados_em DESC);
-CREATE INDEX visitas_profissional_idx    ON visitas (profissional_id, registrados_em DESC);
-
--- Forms preenchidos em campo pelo ACS. payload é JSONB porque varia por perfil.
-CREATE TABLE visitas_capturadas (
-    id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    paciente_id            TEXT NOT NULL REFERENCES pacientes(paciente_id),
-    profissional_id        TEXT NOT NULL,
-    capturado_em           TIMESTAMPTZ NOT NULL DEFAULT now(),
-    perfil_blocos          TEXT[] NOT NULL,
-    payload                JSONB NOT NULL,
-    sincronizado_vitacare  BOOLEAN NOT NULL DEFAULT FALSE,
-    sincronizado_em        TIMESTAMPTZ
-);
-CREATE INDEX visitas_capturadas_paciente_idx     ON visitas_capturadas (paciente_id, capturado_em DESC);
-CREATE INDEX visitas_capturadas_profissional_idx ON visitas_capturadas (profissional_id, capturado_em DESC);
-"""
-
-
 COPY_PLAN = [
-    ("equipes", "equipes_anonimizadas.parquet",
+    ("teams", "equipes_anonimizadas.parquet",
      "SELECT equipe_id, endereco_latitude, endereco_longitude FROM read_parquet('{p}')"),
-    ("pacientes", "pacientes_anonimizados.parquet",
+    ("patients", "pacientes_anonimizados.parquet",
      """SELECT paciente_id, equipe_id, unidade_id, faixa_etaria, sexo, raca_cor,
                situacao_vulnerabilidade, endereco_longitude, endereco_latitude,
                hipertenso, diabetico, gestacao
         FROM read_parquet('{p}')"""),
-    ("eventos(paciente_id, tipo, data_referencia)", "eventos_clinicos_anonimizados.parquet",
+    ("events(patient_id, type, reference_date)", "eventos_clinicos_anonimizados.parquet",
      """SELECT paciente_id, tipo, CAST(data_referencia AS DATE) AS data_referencia
         FROM read_parquet('{p}')"""),
-    ("visitas(profissional_id, registrados_em, ordem_visita_dia, paciente_id)",
+    ("visits(professional_id, recorded_at, daily_visit_order, patient_id)",
      "visitas_anonimizadas.parquet",
      """SELECT profissional_id, CAST(registrados_em AS DATE) AS registrados_em,
                ordem_visita_dia, paciente_id
@@ -119,13 +56,6 @@ def main() -> int:
     CHUNK = 5_000
 
     with psycopg.connect(db_url, autocommit=False) as conn:
-        with conn.cursor() as cur:
-            # pooler default statement_timeout pode matar COPYs grandes
-            cur.execute("SET statement_timeout = 0")
-            print("→ aplicando schema")
-            cur.execute(SCHEMA)
-        conn.commit()
-
         for target, parquet_name, query in COPY_PLAN:
             table_only = target.split("(")[0].strip()
             parquet_path = dados_dir / parquet_name
@@ -149,12 +79,12 @@ def main() -> int:
 
         print("\n→ contagens finais")
         with conn.cursor() as cur:
-            for table in ["equipes", "pacientes", "eventos", "visitas", "visitas_capturadas"]:
+            for table in ["teams", "patients", "events", "visits", "captured_visits"]:
                 cur.execute(f"SELECT COUNT(*) FROM {table}")
                 n = cur.fetchone()[0]
                 print(f"  {table:<22} {n:>10,}")
 
-    print("\nOK. Schema pronto e dados carregados.")
+    print("\nOK. Dados carregados.")
     return 0
 
 

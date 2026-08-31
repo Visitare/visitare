@@ -566,24 +566,46 @@ Se precisarmos derrubar mais, dá pra adicionar materialized view ou
 
 ---
 
-## 9. Recarregar / resetar dados
+## 9. Migrations e recarga de dados (Supabase CLI — ver VISI-11)
 
-O script de carga vive em `scripts/setup_supabase.py` (drop+recreate das 5
-tabelas + reload dos 4 parquets). **Não rode em produção** — só em ambiente
-de dev/demo.
+O schema (tabelas, RLS, RPCs, Realtime) é versionado via **Supabase CLI** em
+`supabase/migrations/`, não mais colado à mão no SQL Editor.
+
+```bash
+# Projeto novo (staging) — reconstrói o schema do zero
+supabase link --project-ref <ref-do-staging>
+supabase db reset
+
+# Produção (gyutcqmrbbtftrowcyhv) — NUNCA usou o Supabase CLI antes desta
+# adoção. `supabase_migrations.schema_migrations` está vazia lá, então
+# `db push` sem passo prévio acha as 5 migrations pendentes e tenta rodar
+# a 000_base_schema.sql (CREATE TABLE sem IF NOT EXISTS) contra tabelas que
+# já existem → erro `relation "teams" already exists`. Rode nesta ordem:
+supabase link --project-ref gyutcqmrbbtftrowcyhv
+
+# 1) Baseline — ONE-SHOT. Marca as 5 versões como já aplicadas (elas já
+#    estão refletidas no banco vivo; a 014 desde 27/07). Não roda nenhum SQL,
+#    só grava linhas em supabase_migrations.schema_migrations. Depois desta
+#    vez, nunca mais repita este comando — daqui pra frente é só `db push`.
+supabase migration repair --status applied \
+  20260524000000 20260628224258 20260628230031 20260628235051 20260727173707
+
+# 2) Só agora `db push` aplica exclusivamente migrations futuras (as que
+#    ainda não tiverem `repair`/push registrados).
+supabase db push
+```
+
+Rodar `db push` **antes** do `repair` acima falha em produção com a tabela de
+controle vazia — não pule o passo 1 na primeira vez.
+
+`scripts/setup_supabase.py` faz **só carga de dados** (reload dos 4 parquets
+anonimizados) — pressupõe que o schema já existe via migrations. **Não roda
+em produção**, só em dev/demo:
 
 ```bash
 pip install 'psycopg[binary]' duckdb pandas
-export SUPABASE_DB_URL='postgresql://postgres.gyutcqmrbbtftrowcyhv:<senha>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres'
+export SUPABASE_DB_URL='postgresql://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres'
 python scripts/setup_supabase.py
-```
-
-As migrations das funções RPC e Realtime estão em `db/migrations/`:
-
-```bash
-# Aplicar tudo
-psql "$SUPABASE_DB_URL" -f db/migrations/001_priorization.sql
-psql "$SUPABASE_DB_URL" -f db/migrations/002_realtime.sql
 ```
 
 ---

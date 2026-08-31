@@ -171,7 +171,10 @@ ranking é um requisito (não opcional). Detalhes em
 ```bash
 # 1. backend (Supabase já está no ar — sa-east-1)
 #    URL: https://gyutcqmrbbtftrowcyhv.supabase.co
-#    schema + dados aplicados via db/migrations/ + scripts/setup_supabase.py
+#    schema versionado em supabase/migrations/ (Supabase CLI) — ver VISI-11.
+#    `supabase link --project-ref <ref> && supabase db push` aplica migrations
+#    novas num projeto já existente; `supabase db reset` reconstrói do zero
+#    (dev local / staging). Dados de demo: scripts/setup_supabase.py.
 
 # 2. frontend
 cd frontend
@@ -191,7 +194,7 @@ Detalhes de integração e schema: [`docs/supabase.md`](docs/supabase.md).
 - [`docs/prd.md`](docs/prd.md) — produto, princípios e perguntas em aberto.
 - [`docs/architecture.md`](docs/architecture.md) — arquitetura técnica completa, com foco em segurança e LGPD.
 - [`docs/supabase.md`](docs/supabase.md) — schema do banco, todas as RPCs, padrão de Realtime e exemplos de uso com `supabase-js`.
-- [`db/migrations/`](db/migrations/) — migrations versionadas (schema → motor → Realtime → ficha estendida → picker).
+- [`supabase/migrations/`](supabase/migrations/) — migrations versionadas via Supabase CLI (schema base → RPCs → Realtime → segurança/RLS).
 - [`docs/fichas/`](docs/fichas/) — fichas oficiais SMS-Rio (Ficha A, Crônico, Gestante, Primeira Infância, Tuberculose) em PDF + JSON estruturado.
 - [`docs/manuais/`](docs/manuais/) — manuais oficiais do Ministério da Saúde consultados na construção das regras.
 
