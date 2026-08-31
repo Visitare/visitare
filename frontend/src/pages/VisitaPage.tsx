@@ -65,14 +65,14 @@ export function VisitaPage() {
   const [mostrarEncaminhamento, setMostrarEncaminhamento] = useState(false)
 
   if (loading) {
-    return <div className="p-8 text-center text-slate-400 text-sm">Carregando paciente…</div>
+    return <div className="p-8 text-center text-on-surface-variant/70 text-sm">Carregando paciente…</div>
   }
 
   if (error || !paciente) {
     return (
-      <div className="p-8 text-center text-slate-500">
+      <div className="p-8 text-center text-on-surface-variant">
         {error ? `Erro: ${error.message}` : 'Paciente não encontrado.'}
-        <button onClick={() => navigate('/')} className="block mx-auto mt-4 text-blue-600 underline">Voltar</button>
+        <button onClick={() => navigate('/')} className="block mx-auto mt-4 text-primary underline">Voltar</button>
       </div>
     )
   }
@@ -134,23 +134,23 @@ export function VisitaPage() {
   const camposFaltando = getCamposFaltando(form, paciente, semanaGest, foiAtendido ?? false)
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-surface flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-4 pt-10 pb-4 sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="text-blue-600 text-sm mb-3 flex items-center gap-1">← Voltar</button>
+      <div className="bg-surface-bright border-b border-surface-container-high px-4 pt-10 pb-4 sticky top-0 z-10">
+        <button onClick={() => navigate(-1)} className="text-primary text-sm mb-3 flex items-center gap-1">← Voltar</button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-slate-800">{paciente.nome}</h1>
-          <p className="text-xs text-slate-400 mt-0.5">{paciente.sexo} · {paciente.faixaEtaria} anos · {paciente.racaCor}</p>
+          <h1 className="text-xl font-bold text-on-surface">{paciente.nome}</h1>
+          <p className="text-xs text-on-surface-variant/70 mt-0.5">{paciente.sexo} · {paciente.faixaEtaria} anos · {paciente.racaCor}</p>
           <div className="flex flex-wrap gap-1 mt-2">
             {paciente.condicoes.map((c) => <CondicaoBadge key={c} condicao={c} />)}
             <PrioridadeBadge prioridade={paciente.prioridade} />
           </div>
         </div>
-        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2 leading-snug">
+        <p className="text-xs text-warning-strong bg-warning-subtle border border-warning-strong/20 rounded-lg px-3 py-2 mt-2 leading-snug">
           {paciente.motivoPrioridade}
         </p>
         <a href={googleMapsUrl(paciente)} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-blue-600 mt-2">
+          className="inline-flex items-center gap-1 text-xs text-primary mt-2">
           📍 {paciente.distanciaKm.toFixed(1).replace('.', ',')} km da unidade — abrir no Maps
         </a>
       </div>
@@ -226,16 +226,16 @@ export function VisitaPage() {
 
       {/* Botão salvar */}
       {estavaCasa !== null && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 max-w-[28rem] mx-auto space-y-3">
+        <div className="fixed bottom-0 left-0 right-0 bg-surface-bright border-t border-surface-container-high p-4 max-w-[28rem] mx-auto space-y-3">
           {camposFaltando.length > 0 && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
-              <p className="text-xs font-semibold text-amber-700 mb-1">Preencha antes de salvar:</p>
+            <div className="bg-warning-subtle border border-warning-strong/30 rounded-xl px-3 py-2.5">
+              <p className="text-xs font-semibold text-warning-strong mb-1">Preencha antes de salvar:</p>
               <ul className="space-y-0.5">
                 {camposFaltando.slice(0, 4).map((campo) => (
-                  <li key={campo} className="text-xs text-amber-600">• {campo}</li>
+                  <li key={campo} className="text-xs text-warning-strong">• {campo}</li>
                 ))}
                 {camposFaltando.length > 4 && (
-                  <li className="text-xs text-amber-500">• +{camposFaltando.length - 4} outros campos</li>
+                  <li className="text-xs text-warning-strong">• +{camposFaltando.length - 4} outros campos</li>
                 )}
               </ul>
             </div>
@@ -243,7 +243,7 @@ export function VisitaPage() {
           <button
             onClick={handleSalvar}
             disabled={salvando || camposFaltando.length > 0}
-            className="w-full bg-blue-600 active:bg-blue-700 text-white font-semibold py-4 rounded-2xl text-base disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-primary active:bg-primary-dark text-on-primary font-semibold py-4 rounded-2xl text-base disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {salvando ? 'Salvando...' : foiAtendido ? 'Salvar visita' : 'Registrar ocorrência'}
           </button>
@@ -252,21 +252,21 @@ export function VisitaPage() {
 
       {/* Modal encaminhamento */}
       {mostrarEncaminhamento && (
-        <div className="fixed inset-0 bg-black/50 flex items-end z-50">
-          <div className="bg-white rounded-t-3xl w-full p-6 space-y-4 max-w-[28rem] mx-auto">
+        <div className="fixed inset-0 bg-on-surface/60 flex items-end z-50">
+          <div className="bg-surface-bright rounded-t-3xl w-full p-6 space-y-4 max-w-[28rem] mx-auto">
             <div className="text-center">
               <div className="text-3xl mb-2">📋</div>
-              <h2 className="text-lg font-bold text-slate-800">Indicar consulta necessária</h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <h2 className="text-lg font-bold text-on-surface">Indicar consulta necessária</h2>
+              <p className="text-sm text-on-surface-variant mt-1">
                 Há campos sem resposta ou alertas registrados nesta visita. Deseja marcar que este paciente precisa de consulta?
               </p>
             </div>
             <button onClick={() => navigate('/', { replace: true })}
-              className="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-2xl">
+              className="w-full bg-primary text-on-primary font-semibold py-3.5 rounded-2xl">
               ✅ Sim, indicar consulta
             </button>
             <button onClick={() => navigate('/', { replace: true })}
-              className="w-full text-slate-500 text-sm py-2">
+              className="w-full text-on-surface-variant text-sm py-2">
               Pular por agora
             </button>
           </div>
@@ -286,35 +286,35 @@ function SecaoCronico({ form, set, isDM, historico }: FormSectionProps & {
     ? '❤️ Hipertensão + Diabetes' : isDM ? '💉 Diabetes' : '❤️ Hipertensão'
 
   return (
-    <div className="rounded-2xl shadow-sm border-2 border-blue-300 overflow-hidden">
-      <div className="bg-blue-50 px-4 py-3 border-b border-blue-200">
-        <h3 className="font-semibold text-blue-800">{titulo}</h3>
-        <p className="text-xs text-blue-500 mt-0.5">Ficha B Crônico — SMS-Rio 2022</p>
+    <div className="rounded-2xl shadow-sm border-2 border-secondary overflow-hidden">
+      <div className="bg-surface-container px-4 py-3 border-b border-secondary">
+        <h3 className="font-semibold text-primary-dark">{titulo}</h3>
+        <p className="text-xs text-primary mt-0.5">Ficha B Crônico — SMS-Rio 2022</p>
       </div>
 
       {historico && (
-        <div className="bg-blue-50 px-4 pb-3 border-b border-blue-200">
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">
+        <div className="bg-surface-container px-4 pb-3 border-b border-secondary">
+          <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-2">
             Último registro · {new Date(historico.dataRegistro + 'T12:00:00').toLocaleDateString('pt-BR')}
           </p>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-white rounded-xl py-2 px-1 border border-blue-100">
-              <div className="text-base font-bold text-slate-800">{historico.pressao}</div>
-              <div className="text-xs text-slate-400">mmHg</div>
+            <div className="bg-surface-bright rounded-xl py-2 px-1 border border-secondary/50">
+              <div className="text-base font-bold text-on-surface">{historico.pressao}</div>
+              <div className="text-xs text-on-surface-variant/70">mmHg</div>
             </div>
-            <div className="bg-white rounded-xl py-2 px-1 border border-blue-100">
+            <div className="bg-surface-bright rounded-xl py-2 px-1 border border-secondary/50">
               <div className="text-base font-bold">{historico.tomaMedicacao ? '✅' : '❌'}</div>
-              <div className="text-xs text-slate-400">Medicação</div>
+              <div className="text-xs text-on-surface-variant/70">Medicação</div>
             </div>
-            <div className="bg-white rounded-xl py-2 px-1 border border-blue-100">
-              <div className="text-xs font-semibold text-slate-700 leading-tight mt-1">{historico.sintomas || 'Nenhum'}</div>
-              <div className="text-xs text-slate-400">Sintomas</div>
+            <div className="bg-surface-bright rounded-xl py-2 px-1 border border-secondary/50">
+              <div className="text-xs font-semibold text-on-surface leading-tight mt-1">{historico.sintomas || 'Nenhum'}</div>
+              <div className="text-xs text-on-surface-variant/70">Sintomas</div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="bg-white px-4 py-4 space-y-4">
+      <div className="bg-surface-bright px-4 py-4 space-y-4">
         <OpcaoSN campo="p1_esqueceu_dose" label="1) Nas últimas 2 semanas, esqueceu alguma dose?" form={form} set={set} />
 
         <Campo label="2) Com que frequência é difícil lembrar de tomar o remédio?">
@@ -381,7 +381,7 @@ function SecaoGestante({ form, set, semanaGest }: FormSectionProps & { semanaGes
           <input type="date" className={inputCls} value={(form.dum as string) || ''}
             onChange={(e) => set('dum', e.target.value)} />
           {sem !== undefined && (
-            <p className="text-xs text-blue-600 mt-1 font-medium">Semana gestacional calculada: {sem}ª semana</p>
+            <p className="text-xs text-primary mt-1 font-medium">Semana gestacional calculada: {sem}ª semana</p>
           )}
         </Campo>
 
@@ -587,10 +587,10 @@ function OpcaoSN({ campo, label, form, set }: {
 
 function AlertaBanner({ texto, cor }: { texto: string; cor: 'vermelho' | 'laranja' | 'azul' }) {
   const cls = cor === 'vermelho'
-    ? 'bg-red-50 border-red-200 text-red-700'
+    ? 'bg-error-container border-error-strong/30 text-on-error-container'
     : cor === 'laranja'
-      ? 'bg-orange-50 border-orange-200 text-orange-700'
-      : 'bg-blue-50 border-blue-200 text-blue-700'
+      ? 'bg-warning-subtle border-warning-strong/30 text-warning-strong'
+      : 'bg-surface-container border-secondary text-primary'
   return (
     <div className={`mt-2 px-3 py-2 rounded-lg border text-xs font-medium leading-snug ${cls}`}>
       {texto}
@@ -600,8 +600,8 @@ function AlertaBanner({ texto, cor }: { texto: string; cor: 'vermelho' | 'laranj
 
 function Section({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
-      <h3 className="font-semibold text-slate-700 mb-3">{titulo}</h3>
+    <div className="bg-surface-bright rounded-2xl shadow-sm border border-surface-container-high p-4">
+      <h3 className="font-semibold text-on-surface mb-3">{titulo}</h3>
       {children}
     </div>
   )
@@ -610,7 +610,7 @@ function Section({ titulo, children }: { titulo: string; children: React.ReactNo
 function Campo({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm text-slate-600 mb-1.5">{label}</label>
+      <label className="block text-sm text-on-surface-variant mb-1.5">{label}</label>
       {children}
     </div>
   )
@@ -622,11 +622,12 @@ function OpcaoBtn({ label, ativo, onClick, fullWidth, small }: {
   return (
     <button onClick={onClick}
       className={`py-3 px-2 rounded-xl border transition-colors text-center leading-tight ${fullWidth ? 'w-full' : ''} ${small ? 'text-xs' : 'text-sm font-medium'} ${
-        ativo ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-700 active:bg-slate-50'
+        ativo ? 'bg-primary border-primary text-on-primary' : 'bg-surface-bright border-surface-container-high text-on-surface active:bg-surface-container'
       }`}>
       {label}
     </button>
   )
 }
 
-const inputCls = 'w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500'
+// DESIGN.md §Components: input tem fundo surface-container e, no foco, borda + anel teal.
+const inputCls = 'w-full bg-surface-container border border-surface-container-high rounded-xl px-3 py-2.5 text-sm text-on-surface placeholder-on-surface-variant/60 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary'

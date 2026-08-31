@@ -29,6 +29,9 @@ export const colors = {
 
   // Superfícies
   'surface':                '#FAF9F6',
+  // surface-bright: camada elevada (card sobre o papel ivory).
+  // DESIGN.md proíbe branco puro — cards sobem um nível no ivory mais claro.
+  'surface-bright':         '#FFFEF1',
   'surface-container':      '#EDF6F9',
   'surface-container-high': '#DDEBEF',
   'on-surface':             '#13272A',

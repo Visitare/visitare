@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { SimboloVisitare } from '../components/SimboloVisitare'
 
 // Demo: só o e-mail é pré-preenchido (via env, gitignored). A senha NÃO —
 // é dita ao vivo no evento e digitada pelos testers, então não vaza no bundle público.
@@ -29,12 +30,15 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <div className="bg-blue-700 text-white px-6 pt-14 pb-8">
-        <h1 className="text-2xl font-bold">Visitare</h1>
-        <p className="text-blue-200 text-sm mt-1">Entrar como Agente Comunitário de Saúde</p>
+    <div className="min-h-screen bg-surface flex flex-col">
+      <div className="bg-primary text-on-primary px-6 pt-14 pb-8">
+        <div className="flex items-center gap-3">
+          <SimboloVisitare className="h-9 text-on-primary" />
+          <h1 className="text-2xl font-bold">Visitare</h1>
+        </div>
+        <p className="text-on-primary/70 text-sm mt-2">Entrar como Agente Comunitário de Saúde</p>
         {DEMO_EMAIL && (
-          <p className="text-blue-100 text-xs mt-3 bg-blue-800/50 rounded-lg px-3 py-2">
+          <p className="text-on-primary/85 text-xs mt-3 bg-primary-dark/50 rounded-lg px-3 py-2">
             Modo demonstração — e-mail já preenchido. Digite a <strong>senha</strong> informada no evento e toque em <strong>Entrar</strong>.
           </p>
         )}
@@ -42,7 +46,7 @@ export function LoginPage() {
 
       <form onSubmit={submit} className="px-6 py-6 space-y-4 flex-1">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="email">
+          <label className="block text-sm font-medium text-on-surface mb-1" htmlFor="email">
             E-mail
           </label>
           <input
@@ -52,12 +56,12 @@ export function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md bg-surface-container border border-surface-container-high px-3 py-2.5 text-on-surface focus:border-primary focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1" htmlFor="password">
+          <label className="block text-sm font-medium text-on-surface mb-1" htmlFor="password">
             Senha
           </label>
           <input
@@ -67,12 +71,12 @@ export function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-slate-800 focus:border-blue-500 focus:outline-none"
+            className="w-full rounded-md bg-surface-container border border-surface-container-high px-3 py-2.5 text-on-surface focus:border-primary focus:outline-none"
           />
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-lg bg-error-container border border-error-strong/30 px-4 py-3 text-sm text-on-error-container">
             {error}
           </div>
         )}
@@ -80,7 +84,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-blue-700 text-white font-semibold py-3 active:bg-blue-800 disabled:opacity-60 transition-colors"
+          className="w-full rounded-lg bg-primary text-on-primary font-semibold py-3 active:bg-primary-dark disabled:opacity-60 transition-colors"
         >
           {loading ? 'Entrando…' : 'Entrar'}
         </button>

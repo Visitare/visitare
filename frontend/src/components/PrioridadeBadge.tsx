@@ -1,10 +1,12 @@
 import type { Prioridade } from '../types'
 
+// Tiers de prioridade (DESIGN.md §Components): urgência é VERMELHO, nunca o
+// coral de marca. Degradê de alarme: vermelho → âmbar → pêssego → neutro.
 const config: Record<Prioridade, { label: string; className: string }> = {
-  critica: { label: 'Crítico', className: 'bg-red-100 text-red-700 border border-red-200' },
-  alta: { label: 'Alta', className: 'bg-orange-100 text-orange-700 border border-orange-200' },
-  media: { label: 'Média', className: 'bg-yellow-100 text-yellow-700 border border-yellow-200' },
-  baixa: { label: 'Baixa', className: 'bg-slate-100 text-slate-600 border border-slate-200' },
+  critica: { label: 'Crítico', className: 'bg-error-container text-on-error-container border border-error-strong/40' },
+  alta:    { label: 'Alta',    className: 'bg-warning-subtle text-warning-strong border border-warning-strong/30' },
+  media:   { label: 'Média',   className: 'bg-tertiary-container text-on-tertiary-container border border-on-tertiary-container/20' },
+  baixa:   { label: 'Baixa',   className: 'bg-surface-container text-on-surface-variant border border-surface-container-high' },
 }
 
 export function PrioridadeBadge({ prioridade }: { prioridade: Prioridade }) {
