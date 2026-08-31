@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CondicaoBadge } from '../components/CondicaoBadge'
 import { PrioridadeBadge } from '../components/PrioridadeBadge'
@@ -8,6 +9,7 @@ export function PacientePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { paciente: p, loading, error } = usePacienteDetalhe(id)
+  const [agora] = useState(() => Date.now())
 
   if (loading) {
     return (
@@ -33,7 +35,7 @@ export function PacientePage() {
     : 'Nunca visitado'
 
   const diasSemVisita = p.ultimaVisita
-    ? Math.floor((Date.now() - new Date(p.ultimaVisita + 'T12:00:00').getTime()) / 86400000)
+    ? Math.floor((agora - new Date(p.ultimaVisita + 'T12:00:00').getTime()) / 86400000)
     : null
 
   return (
