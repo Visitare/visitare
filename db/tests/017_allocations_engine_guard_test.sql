@@ -1,6 +1,7 @@
--- Ad-hoc acceptance test for 017_allocations_engine_guard.sql. Run against the
--- stub built by test_stub_supabase.sql + test_stub_base_schema.sql. Not part
--- of the migration chain — local verification only.
+-- Ad-hoc acceptance test for 017_allocations_engine_guard.sql. Runs against the
+-- real migration chain (stub_supabase_runtime.sql + every file in
+-- supabase/migrations/, in filename order) on a throwaway Postgres — see
+-- db/tests/README.md. Not part of the chain; local verification only.
 
 \set ON_ERROR_STOP on
 \pset pager off
@@ -8,8 +9,17 @@
 BEGIN;
 
 -- fixtures ----------------------------------------------------------------
-INSERT INTO teams (team_id) VALUES ('team-1');
-INSERT INTO patients (patient_id, team_id) VALUES ('pat-1', 'team-1'), ('pat-2', 'team-1');
+INSERT INTO teams (team_id, latitude, longitude)
+VALUES ('team-1', -22.9068, -43.1729);
+
+INSERT INTO patients
+    (patient_id, team_id, unit_id, age_band, sex, social_vulnerability,
+     latitude, longitude, hypertensive, diabetic, pregnant)
+VALUES
+    ('pat-1', 'team-1', 'unit-1', '30-39', 'F', false,
+     -22.9068, -43.1729, false, false, false),
+    ('pat-2', 'team-1', 'unit-1', '60-69', 'M', true,
+     -22.9070, -43.1730, true, false, false);
 
 -- pat-1: a manager (gestor) hand-added row for this period.
 INSERT INTO allocations
@@ -98,30 +108,31 @@ BEGIN
     END IF;
 END $$;
 
-\echo '--- TEST 3: authenticated (app/RPC), allowed by RLS, passes through the guard unaffected ---'
-SET LOCAL request.jwt.claims = '{"acs_id":"acs-1"}';
-SET ROLE authenticated;
-UPDATE allocations SET status = 'skipped' WHERE patient_id = 'pat-2';
+\echo '--- TEST 3: authenticated never reaches the guard — 014 leaves it SELECT-only ---'
+-- The ACS app does not UPDATE allocations. Since 014 (lockdown de RLS)
+-- `authenticated` holds SELECT and nothing else, and the only policy on the
+-- table is `acs_read_own_allocations`. The write path is captured_visits
+-- (TEST 4). This asserts that contract instead of assuming a direct write.
+DO $$
+BEGIN
+    SET LOCAL request.jwt.claims = '{"acs_id":"acs-1"}';
+    SET LOCAL ROLE authenticated;
+    BEGIN
+        UPDATE allocations SET status = 'skipped' WHERE patient_id = 'pat-2';
+        RESET ROLE;
+        RAISE EXCEPTION 'FAIL: authenticated could UPDATE allocations directly — the 014 lockdown regressed';
+    EXCEPTION WHEN insufficient_privilege THEN
+        RESET ROLE;
+        RAISE NOTICE 'PASS: authenticated is denied UPDATE on allocations (permission denied), guard never reached';
+    END;
+END $$;
 RESET ROLE;
 
-DO $$
-DECLARE st text;
-BEGIN
-    SELECT status INTO st FROM allocations WHERE patient_id = 'pat-2';
-    IF st = 'skipped' THEN
-        RAISE NOTICE 'PASS: authenticated ACS write (allowed by RLS) went through untouched by the guard (status=%)', st;
-    ELSE
-        RAISE EXCEPTION 'FAIL: authenticated write was altered by the guard (status=%)', st;
-    END IF;
-END $$;
-
--- reset pat-2 back to pending for the remaining tests
-UPDATE allocations SET status = 'pending' WHERE patient_id = 'pat-2';
 
 \echo '--- TEST 4: captured_visits insert marks the matching allocation visited ---'
 -- pat-2 is pending going into this; period_start 2026-08-24 (Mon) + weekly => window is [08-24, 08-31)
 INSERT INTO captured_visits (patient_id, professional_id, captured_at, profile_blocks, payload)
-VALUES ('pat-2', 'acs-1', '2026-08-26 14:00:00-03', '{}'::jsonb, '{}'::jsonb);
+VALUES ('pat-2', 'acs-1', '2026-08-26 14:00:00-03', '{}'::text[], '{}'::jsonb);
 
 DO $$
 DECLARE st text;
