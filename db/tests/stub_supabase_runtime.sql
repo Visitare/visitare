@@ -1,6 +1,9 @@
--- Minimal stub of the Supabase runtime pieces the migrations assume exist:
--- roles anon/authenticated/service_role, schema auth with auth.users + auth.jwt(),
--- and supabase_auth_admin. Local-only, never applied to a real Supabase project.
+-- Minimal stub of the Supabase runtime pieces the migrations assume exist but
+-- a plain Postgres does not provide: roles anon/authenticated/service_role,
+-- schema auth with auth.users + auth.jwt(), supabase_auth_admin, and the
+-- supabase_realtime publication. Apply this first, then replay
+-- supabase/migrations/ in filename order to get the real schema.
+-- Local-only, never applied to a real Supabase project.
 
 DO $$
 BEGIN
@@ -51,3 +54,13 @@ GRANT EXECUTE ON FUNCTION auth.uid() TO anon, authenticated, service_role;
 -- Real Supabase grants service_role ALL PRIVILEGES on every table in public
 -- (on top of BYPASSRLS) — reproduce that here so it can actually write.
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
+
+-- 000_base_schema adds tables to this publication; Supabase creates it as part
+-- of provisioning, so a bare Postgres needs it up front.
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+        CREATE PUBLICATION supabase_realtime;
+    END IF;
+END
+$$;
